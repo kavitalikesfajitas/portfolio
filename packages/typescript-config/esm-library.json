@@ -1,0 +1,22 @@
+{
+    "extends": "./base.json",
+    "display": "ESM Library",
+    "compilerOptions": {
+      "lib": ["esnext"],
+      "types": ["node"],
+      "emitDeclarationOnly": true,
+      "declaration": true,
+      "outDir": "./dist"
+    },
+    "include": [
+      "eslint.config.mjs",
+      "src/**/*.ts",
+      "src/**/*.mts",
+      "src/**/*.mjs",
+      "src/**/*.js",
+      "src/**/*.json",
+      "tests"
+    ],
+    "exclude": ["**/node_modules", "**/.*/", "dist"]
+  }
+  

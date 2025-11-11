@@ -1,0 +1,53 @@
+{
+  "name": "@kavita-likes-fajitas/eslint-config",
+  "version": "0.0.0",
+  "license": "MIT",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./base": {
+      "types": "./types/base.d.ts",
+      "default": "./base.mjs"
+    },
+    "./next-js": {
+      "types": "./types/next.d.ts",
+      "default": "./next.mjs"
+    },
+    "./react-internal": {
+      "types": "./types/react-internal.d.ts",
+      "default": "./react-internal.mjs"
+    }
+  },
+  "files": [
+    "types/**",
+    "base.mjs",
+    "next.mjs",
+    "react-internal.mjs"
+  ],
+  "peerDependencies": {
+    "@eslint/eslintrc": "^3.0.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.5.4"
+  },
+  "optionalDependencies": {
+    "@eslint/eslintrc": "^3.0.0",
+    "@testing-library/react": "^16.1.0",
+    "eslint-config-next": "15.x",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@next/eslint-plugin-next": "^15.5.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-only-warn": "^1.1.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-turbo": "^2.6.0",
+    "globals": "^16.5.0",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.46.3"
+  }
+}
