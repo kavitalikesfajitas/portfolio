@@ -1,0 +1,26 @@
+{
+  "name": "@kavita-likes-fajitas/fonts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./index.tsx",
+  "files": [
+    "index.tsx",
+    "files/*.otf",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "next": "15.5.1"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/next": "^9.0.0",
+    "clsx": "^2.1.1",
+    "typescript": "^5.5.4"
+  },
+  "license": "UNLICENSED"
+}

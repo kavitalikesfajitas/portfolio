@@ -1,0 +1,29 @@
+{
+  "name": "@nike-nvs/tailwind-config",
+  "version": "1.0.0",
+  "private": true,
+  "exports": {
+    ".": "./shared-styles.css",
+    "./postcss": "./postcss.config.mjs"
+  },
+  "peerDependencies": {
+    "@tailwindcss/postcss": "^4.1.12",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.12"
+  },
+  "peerDependenciesMeta": {
+    "postcss": {
+      "optional": false
+    },
+    "tailwindcss": {
+      "optional": false
+    }
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.12",
+    "postcss": "^8.5.6",
+    "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.7.1",
+    "tailwindcss": "^4.1.12"
+  }
+}

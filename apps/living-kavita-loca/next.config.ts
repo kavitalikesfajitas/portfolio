@@ -15,6 +15,17 @@ const nextConfig: NextConfig = {
   },
   allowedDevOrigins: ["local.living-kavita-loca.com"],
   output: "export",
+  reactStrictMode: true,
+  reactCompiler: true,
+  experimental: {
+    esmExternals: true,
+  },
+  /** Because this is a monorepo, we need to set workspace root
+ *  as the root of the repo. This is what allows tailwind config to
+ *  work within in the monorepo, and what will allow us to import other packages
+ *  within the next app.
+ */
+  outputFileTracingRoot: workspaceRoot,
   /* config options here */
 };
 
