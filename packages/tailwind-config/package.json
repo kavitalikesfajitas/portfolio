@@ -1,9 +1,9 @@
 {
-  "name": "@nike-nvs/tailwind-config",
+  "name": "@kavita-likes-fajitas/tailwind-config",
   "version": "1.0.0",
   "private": true,
   "exports": {
-    ".": "./shared-styles.css",
+    "./shared-styles": "./shared-styles.css",
     "./postcss": "./postcss.config.mjs"
   },
   "peerDependencies": {

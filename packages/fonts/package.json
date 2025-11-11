@@ -6,16 +6,11 @@
   "main": "./index.tsx",
   "files": [
     "index.tsx",
-    "files/*.otf",
+    "fonts/*.otf",
     "README.md"
   ],
   "peerDependencies": {
-    "next": "15.5.1"
-  },
-  "peerDependenciesMeta": {
-    "next": {
-      "optional": true
-    }
+    "next": "^16.0.1"
   },
   "devDependencies": {
     "@types/next": "^9.0.0",

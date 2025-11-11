@@ -1,6 +1,6 @@
 {
   "$schema": "https://turborepo.com/schema.json",
-  "ui": "tui",
+  "globalEnv": ["NODE_ENV"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -14,8 +14,7 @@
       "dependsOn": ["^check-types"]
     },
     "dev": {
-      "cache": false,
-      "persistent": true
+      "inputs": ["$TURBO_DEFAULT$", ".env.local", ".env.development", ".env"]
     }
   }
 }

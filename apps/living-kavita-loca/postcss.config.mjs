@@ -1,3 +1,7 @@
-import { postcssConfig } from "@kavita-likes-fajitas/tailwind-config/postcss";
+const config = {
+  plugins: {
+    "@tailwindcss/postcss": {},
+  },
+};
 
-export default postcssConfig;
+export default config;
