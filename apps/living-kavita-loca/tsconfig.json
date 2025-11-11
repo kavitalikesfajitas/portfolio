@@ -17,6 +17,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "next.config.ts",
     ".next/types/**/*.ts",
     "eslint.config.mjs"
   ],
