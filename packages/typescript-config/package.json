@@ -1,9 +1,19 @@
 {
-  "name": "@repo/typescript-config",
-  "version": "0.0.0",
+  "name": "@kavita-likes-fajitas/typescript-config",
+  "version": "0.0.1",
   "private": true,
   "license": "MIT",
-  "publishConfig": {
-    "access": "public"
+  "files": [
+    "base.json",
+    "nextjs.json",
+    "esm-library.json",
+    "react-library.json",
+    "README.md"
+  ],
+  "exports": {
+    "./base": "./base.json",
+    "./nextjs": "./nextjs.json",
+    "./esm-library": "./esm-library.json",
+    "./react-library": "./react-library.json"
   }
 }

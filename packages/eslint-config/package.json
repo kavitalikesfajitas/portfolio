@@ -1,12 +1,41 @@
 {
-  "name": "@repo/eslint-config",
+  "name": "@kavita-likes-fajitas/eslint-config",
   "version": "0.0.0",
+  "license": "MIT",
   "type": "module",
   "private": true,
   "exports": {
-    "./base": "./base.js",
-    "./next-js": "./next.js",
-    "./react-internal": "./react-internal.js"
+    "./base": {
+      "types": "./types/base.d.ts",
+      "default": "./base.mjs"
+    },
+    "./next-js": {
+      "types": "./types/next.d.ts",
+      "default": "./next.mjs"
+    },
+    "./react-internal": {
+      "types": "./types/react-internal.d.ts",
+      "default": "./react-internal.mjs"
+    }
+  },
+  "files": [
+    "types/**",
+    "base.mjs",
+    "next.mjs",
+    "react-internal.mjs"
+  ],
+  "peerDependencies": {
+    "@eslint/eslintrc": "^3.0.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.5.4"
+  },
+  "optionalDependencies": {
+    "@eslint/eslintrc": "^3.0.0",
+    "@testing-library/react": "^16.1.0",
+    "eslint-config-next": "15.x",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
