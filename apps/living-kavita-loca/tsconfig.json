@@ -4,6 +4,9 @@
     "paths": {
       "@/*": [
         "./app/*"
+      ],
+      "@kavita-likes-fajitas/ui-library/*": [
+        "../../packages/ui-library/src/*"
       ]
     },
     "isolatedModules": true,

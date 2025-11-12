@@ -30,6 +30,7 @@
     "generate:component": "turbo gen react-component"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "clsx": "^2.1.1"
   },
   "peerDependencies": {
