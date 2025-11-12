@@ -1,0 +1,37 @@
+{
+  "name": "@kavita-likes-fajitas/{{name}}",
+  "version": "0.1.0",
+  "description": "{{description}}",
+  "sideEffects": false,
+  "type": "module",
+  "files": ["dist", "README.md", "LICENSE"],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./*": {
+      "import": "./dist/*/index.js",
+      "types": "./dist/*/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsdown --config ./tsdown.config.ts",
+    "dev": "tsdown --watch",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit",
+    "test-ci": "vitest run --coverage --reporter=dot",
+    "lint": "eslint"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "tsdown": "^0.12.9",
+    "typescript": "^5.5.4",
+    "vitest": "^3.2.4",
+    "eslint": "^9",
+    "prettier": "^3.6.2",
+    "@kavita-likes-fajitas/eslint-config": "workspace:*",
+    "@kavita-likes-fajitas/typescript-config": "workspace:*"
+  }
+}
