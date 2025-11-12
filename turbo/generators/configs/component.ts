@@ -35,11 +35,13 @@ export default function generator(plop: NodePlopAPI) {
         ],
         actions: (data) => {
             let componentPath: string;
-
+            let testPath: string;
             if (data?.location === "app") {
                 componentPath = "apps/living-kavita-loca/app/components/{{pascalCase name}}/index.tsx";
+                testPath = "apps/living-kavita-loca/app/components/{{pascalCase name}}/index.test.tsx";
             } else {
                 componentPath = `packages/${data?.packageName}/src/{{pascalCase name}}/index.tsx`;
+                testPath = `packages/${data?.packageName}/src/{{pascalCase name}}/index.test.tsx`;
             }
 
             return [
@@ -47,6 +49,11 @@ export default function generator(plop: NodePlopAPI) {
                     type: "add",
                     path: componentPath,
                     templateFile: path.join(__dirname, "../templates/react-component/Component.tsx.hbs"),
+                },
+                {
+                    type: "add",
+                    path: testPath,
+                    templateFile: path.join(__dirname, "../templates/react-component/Component.test.tsx.hbs"),
                 },
             ];
         },

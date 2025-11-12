@@ -1,17 +1,19 @@
 import React from "react";
 import clsx from "clsx";
-import type { NavLink } from "./types";
 import {
   Disclosure,
   DisclosureButton,
   DisclosurePanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
 } from "@headlessui/react";
-import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
-type NavBarProps = React.ComponentProps<"div"> & {
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+
+export type NavLink = {
+  name: string;
+  href: string;
+  current: boolean;
+};
+
+export type NavBarProps = React.ComponentProps<"div"> & {
   navLinks: NavLink[];
 };
 

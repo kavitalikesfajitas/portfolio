@@ -1,6 +1,13 @@
 {
     "$schema": "https://json.schemastore.org/tsconfig",
     "extends": "@kavita-likes-fajitas/typescript-config/react-library",
+    "compilerOptions": {
+        "types": [
+            "./src/types/cssModule.d.ts",
+            "@testing-library/jest-dom",
+            "vitest/globals"
+        ]
+    },
     "include": [
         ".eslint.config.mjs",
         "src/**/*.ts",
