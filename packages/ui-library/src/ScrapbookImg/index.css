@@ -5,9 +5,9 @@
   display: inline-block;
   transform: rotate(-2deg);
   filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.25));
-  /* optional: “paper” background showing through transparent corners */
+  /* optional: "paper" background showing through transparent corners */
   background: #faf7f0;
-  padding: 0.6rem; /* “paper margin” */
+  padding: 0.6rem; /* "paper margin" */
   border: 1px solid #e0dbc8;
   border-radius: 6px; /* softens corners beyond the clip */
   position: relative;
@@ -54,7 +54,7 @@
   border-radius: 4px; /* subtle smoothing inside the clip */
 }
 
-/* add a “washi tape” for fun */
+/* add a "washi tape" for fun */
 .scrap::before {
   content: "";
   position: absolute;
@@ -74,7 +74,7 @@
   opacity: 0.9;
 }
 
-/* hover “lift” */
+/* hover "lift" */
 .scrap:hover {
   transform: rotate(-1deg) translateY(-2px);
 }
