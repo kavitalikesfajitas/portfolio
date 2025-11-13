@@ -6,7 +6,7 @@
   "main": "./index.tsx",
   "files": [
     "index.tsx",
-    "fonts/*.otf",
+    "fonts/**/*",
     "README.md"
   ],
   "peerDependencies": {
