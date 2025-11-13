@@ -7,6 +7,10 @@
   "files": [
     "index.tsx",
     "fonts/**/*",
+    "fonts/*.otf",
+    "fonts/*.ttf",
+    "fonts/*.woff",
+    "fonts/*.woff2",
     "README.md"
   ],
   "peerDependencies": {

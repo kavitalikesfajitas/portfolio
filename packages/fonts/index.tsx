@@ -89,6 +89,24 @@ const fontHelveticaNeue = localFont({
   variable: "--font-helvetica-neue",
 });
 
+const fontMidnightGelactic = localFont({
+  src: [
+    {
+      path: "./fonts/midnight_gelactic/Midnight Gelactic DEMO VERSION.otf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "./fonts/midnight_gelactic/Midnight Gelactic Italic DEMO VERSION.otf",
+      weight: "400",
+      style: "italic",
+    },
+  ],
+  display: "swap",
+  fallback: ["serif"],
+  variable: "--font-midnight-gelactic",
+});
+
 export function getAppFontVariables() {
-  return clsx(fontHelveticaNeue.variable);
+  return clsx(fontHelveticaNeue.variable, fontMidnightGelactic.variable);
 }

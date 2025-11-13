@@ -9,9 +9,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-helvetica-neue);
-  --font-midnight-gelactic: var(--font-midnight-gelactic);
-  --font-helvetica-neue: var(--font-helvetica-neue);
+  --font-helvetica-neue: fontHelveticaNeue, Helvetica, Arial, sans-serif;
+  --font-helvetica-mono: "Helvetica Monospaced Pro", monospace;
+  --font-midnight-gelactic: fontMidnightGelactic, serif;
 }
 
 @media (prefers-color-scheme: dark) {
