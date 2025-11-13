@@ -1,9 +1,52 @@
 @import "tailwindcss";
+@import "@kavita-likes-fajitas/tailwind-config/shared-styles";
 @config "../tailwind.config.ts";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@layer utilities {
+  .noise {
+    background-image: url("/images/noise.png"); /* add your own subtle noise texture */
+    background-repeat: repeat;
+    background-size: 200px 200px;
+  }
+
+  .paper-mask {
+    /* torn paper mask using an SVG/PNG */
+    -webkit-mask-image: url("/images/torn-mask.png");
+    mask-image: url("/images/torn-mask.png");
+    -webkit-mask-size: cover;
+    mask-size: cover;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(244, 63, 94, 0.7);
+  }
 }
 
 @theme inline {
@@ -12,17 +55,18 @@
   --font-helvetica-neue: fontHelveticaNeue, Helvetica, Arial, sans-serif;
   --font-helvetica-mono: "Helvetica Monospaced Pro", monospace;
   --font-midnight-gelactic: fontMidnightGelactic, serif;
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Custom animations */
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-glow: glow 2s ease-in-out infinite;
+  --pulse-slow: pulse 4s ease-in-out infinite;
+  --float-slow: float 6s ease-in-out infinite;
+  --glow-soft: glow 3s ease-in-out infinite;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-helvetica-neue), Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+  background: var(--color-gray-950);
+  color: text-white;
+  font-family: Arial, Helvetica, sans-serif;
 }

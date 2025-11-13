@@ -26,6 +26,10 @@ const nextConfig: NextConfig = {
  *  within the next app.
  */
   outputFileTracingRoot: workspaceRoot,
+  images: {
+    // temporarily setting this because we are not using vercel right now
+    unoptimized: true,
+  }
   /* config options here */
 };
 
