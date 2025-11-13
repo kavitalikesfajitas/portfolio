@@ -30,6 +30,7 @@
     "generate:component": "turbo gen react-component"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.9",
     "@heroicons/react": "^2.2.0",
     "clsx": "^2.1.1"
   },
@@ -39,11 +40,11 @@
     "tailwindcss": "^4"
   },
   "devDependencies": {
-    "@headlessui/react": "^2.2.9",
     "@headlessui/tailwindcss": "^0.2.2",
     "@kavita-likes-fajitas/eslint-config": "workspace:*",
     "@kavita-likes-fajitas/tailwind-config": "workspace:*",
     "@kavita-likes-fajitas/typescript-config": "workspace:*",
+    "@rollup/plugin-url": "^8.0.2",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
@@ -59,6 +60,7 @@
     "prettier-plugin-tailwindcss": "^0.7.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "rollup-plugin-postcss": "^4.0.2",
     "tailwindcss": "^4",
     "tsdown": "^0.12.9",
     "typescript": "^5.5.4",
