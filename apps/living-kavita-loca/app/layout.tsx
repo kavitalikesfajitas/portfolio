@@ -19,11 +19,7 @@ export default function RootLayout({
   const fontVariables = getAppFontVariables();
   return (
     <html lang="en">
-      <body className={clsx(fontVariables, "antialiased ")}>
-        <NavBar navLinks={navLinks.navLinks} />
-        <CenterStickyNav />
-        {children}
-      </body>
+      <body className={clsx(fontVariables, "antialiased ")}>{children}</body>
     </html>
   );
 }
