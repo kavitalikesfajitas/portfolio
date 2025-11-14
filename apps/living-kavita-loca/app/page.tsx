@@ -1,7 +1,13 @@
-import { ScrapbookImg } from "@kavita-likes-fajitas/ui-library/ScrapbookImg";
 import Image from "next/image";
-import Hero from "./components/GlamChatHero/Hero";
-import { TornPaperEffect } from "@kavita-likes-fajitas/ui-library/TornPaperEffect";
+import {
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuTrigger,
+  NavigationMenuContent,
+  NavigationMenuLink,
+} from "@kavita-likes-fajitas/ui-library/shadcn/components/ui/NavigationMenu";
+
 import clsx from "clsx";
 export default function Home() {
   return (
@@ -21,6 +27,16 @@ export default function Home() {
             />
           </div>
         </div>
+        <NavigationMenu>
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <NavigationMenuTrigger>Item One</NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <NavigationMenuLink>Link</NavigationMenuLink>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
       </div>
     </main>
   );

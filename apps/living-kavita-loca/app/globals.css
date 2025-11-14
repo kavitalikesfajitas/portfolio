@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import "@kavita-likes-fajitas/tailwind-config/shared-styles";
+@import "@kavita-likes-fajitas/ui-library/styles/shadcn/global.css";
+
 @config "../tailwind.config.ts";
 
 @layer utilities {
