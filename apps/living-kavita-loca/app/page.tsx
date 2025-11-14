@@ -1,29 +1,15 @@
+"use client";
 import Image from "next/image";
 import clsx from "clsx";
-import { CenterStickyNav } from "./components/ui/Nav";
+import { StickyNav } from "./components/ui/Nav";
 
 export default function Home() {
   return (
     <>
-      <CenterStickyNav />
+      <StickyNav />
       <main className="bg-gray-950 text-white relative">
         {/* HERO (full screen) */}
-        <section className="flex flex-col items-center justify-center min-h-screen relative">
-          <div className="relative inline-block scale-[0.3] md:scale-[0.5] lg:scale-100">
-            <img
-              src="/images/logo.png"
-              alt="living kavita loca"
-              className="flex self-center self-justify-center"
-            />
-            <div className="absolute -right-20 top-1/2 -translate-y-1/2">
-              <img
-                src="/images/lips-glossy.png"
-                alt="living kavita loca"
-                className="lips relative z-10 scale-50 translate-x-3/8"
-              />
-            </div>
-          </div>
-        </section>
+        <Hero />
 
         {/* SCROLLABLE CONTENT BELOW */}
         <section className="min-h-screen px-6 py-24">
@@ -45,18 +31,18 @@ export default function Home() {
 
 const Hero = () => {
   return (
-    <section className="flex flex-col items-center justify-center min-h-screen relative">
-      <div className="relative inline-block scale-[0.3] md:scale-[0.5] lg:scale-100">
+    <section className="flex flex-col lg:items-center  min-h-screen relative">
+      <div className="relative inline-block scale-[0.6] md:scale-[0.5] lg:scale-75">
         <img
           src="/images/logo.png"
           alt="living kavita loca"
-          className={clsx(" flex self-center self-justify-center")}
+          className="flex self-center self-justify-center"
         />
         <div className="absolute -right-20 top-1/2 -translate-y-1/2">
           <img
             src="/images/lips-glossy.png"
             alt="living kavita loca"
-            className={clsx("lips relative z-10 scale-50 translate-x-3/8")}
+            className="lips relative z-10 scale-50 translate-x-3/8"
           />
         </div>
       </div>
