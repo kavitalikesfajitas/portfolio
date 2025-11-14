@@ -5,7 +5,7 @@ type GlamChatHeroProps = React.ComponentProps<"div">;
 
 export function GlamChatHero({ className, ...rest }: GlamChatHeroProps) {
   return (
-    <main className="relative min-h-screen bg-black text-white">
+    <main className="relative min-h-screen bg-black text-white font-midnight-gelactic">
       {/* Noise overlay */}
       <div className="pointer-events-none fixed inset-0 opacity-25 mix-blend-soft-light noise" />
 
@@ -71,7 +71,7 @@ export function GlamChatHero({ className, ...rest }: GlamChatHeroProps) {
               <img
                 src="/images/lips-glossy.png"
                 alt="Glossy open mouth illustration"
-                className="relative z-10 h-64 w-64 animate-float-slow object-contain drop-shadow-[0_0_35px_rgba(0,0,0,0.8)]"
+                className="relative z-10 h-64 w-64 animate-glow object-contain drop-shadow-[0_0_35px_rgba(0,0,0,0.8)]"
               />
               {/* subtle ring */}
               <div className="absolute inset-[-20px] rounded-full border border-rose-300/20" />

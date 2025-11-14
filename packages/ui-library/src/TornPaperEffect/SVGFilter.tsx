@@ -1,6 +1,14 @@
-export function SVGFilter() {
+import clsx from "clsx";
+
+export function SVGFilter({ className }: { className?: string }) {
   return (
-    <svg width="0" height="0" aria-hidden="true" focusable="false">
+    <svg
+      width="0"
+      height="0"
+      aria-hidden="true"
+      focusable="false"
+      className={clsx(className)}
+    >
       <filter id="ragged-edge">
         {/* expand the block a bit so the "paper" extends past the text */}
         <feMorphology
@@ -26,6 +34,8 @@ export function SVGFilter() {
         />
         {/* tiny blur to round off any sharp bits */}
         <feGaussianBlur stdDeviation="1" />
+        {/* IMPORTANT: restore original text on top */}
+        <feComposite in="SourceGraphic" in2="blurred" operator="atop" />
       </filter>
     </svg>
   );

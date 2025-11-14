@@ -26,5 +26,10 @@
   ],
   "[handlebars]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  }
+  },
+  "editor.inlineSuggest.enabled": false,
+  "editor.inlineSuggest.edits.allowCodeShifting": "never",
+  "editor.inlineSuggest.edits.renderSideBySide": "never",
+  "editor.suggest.showInlineDetails": false,
+  "editor.suggest.matchOnWordStartOnly": false
 }

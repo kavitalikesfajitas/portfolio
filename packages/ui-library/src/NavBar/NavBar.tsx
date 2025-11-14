@@ -19,7 +19,13 @@ export function NavBar({ className, navLinks, ...rest }: NavBarProps) {
   return (
     <Disclosure
       as="nav"
-      className="relative bg-black after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-white/10"
+      className={clsx(
+        // add thin line to bottom of navbar, and have it stretch across the width of the navbar
+        // with a height of 1px
+        "relative bg-black",
+        "after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-white/10",
+        className,
+      )}
     >
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">

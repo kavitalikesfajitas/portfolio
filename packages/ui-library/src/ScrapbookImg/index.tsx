@@ -1,7 +1,6 @@
 import React from "react";
 import clsx from "clsx";
 import "./index.css";
-import Image2 from "../public/images/Image2.jpg";
 
 type ScrapbookImgProps = React.ComponentProps<"div"> & {
   src: string;

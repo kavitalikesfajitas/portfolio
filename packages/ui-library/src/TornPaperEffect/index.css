@@ -1,23 +1,9 @@
-.soft-ragged {
-  position: relative;
-  font-size: 72px;
-  color: #000;
-  background: #fff;
-  padding: 40px 60px;
-}
-
-.soft-ragged::before {
-  content: attr(data-text);
-  position: absolute;
-  inset: 0;
-  color: #fff;
-  text-shadow:
-    0 0 20px #fff,
-    0 0 40px #fff,
-    0 0 60px #fff;
-  z-index: -1;
-}
+@import "tailwindcss";
 
 .ragged-text-filter {
   filter: url(#ragged-edge);
+  display: inline-block;
+  font-size: 72px;
+
+  padding: 40px 60px;
 }

@@ -1,22 +1,22 @@
-import React from "react";
+import React, { type PropsWithChildren } from "react";
 import clsx from "clsx";
 import { SVGFilter } from "./SVGFilter";
+import "./index.css";
 
-type TornPaperEffectProps = React.ComponentProps<"div"> & {
-  text: string;
-};
+type TornPaperEffectProps = PropsWithChildren<React.ComponentProps<"div">>;
 
 export function TornPaperEffect({
   className,
-  text,
+  children,
   ...rest
 }: TornPaperEffectProps) {
   return (
-    <div className={clsx(className)} {...rest}>
-      <div className="ragged-text-filter bg-white text-gray-950">
-        <p>{text}</p>
-      </div>
-      <SVGFilter />
+    <div
+      className={clsx(className, "ragged-text-filter bg-white text-gray-950")}
+      {...rest}
+    >
+      <SVGFilter className={clsx()} />
+      <p>{children}</p>
     </div>
   );
 }
