@@ -1,7 +1,6 @@
 import Image from "next/image";
-
 import clsx from "clsx";
-import { Nav } from "./components/ui/Nav";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-gray-950 text-white relative">
@@ -20,7 +19,6 @@ export default function Home() {
             />
           </div>
         </div>
-        <Nav />
       </div>
     </main>
   );
