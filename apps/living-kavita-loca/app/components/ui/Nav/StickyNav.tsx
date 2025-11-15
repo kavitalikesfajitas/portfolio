@@ -32,8 +32,8 @@ const variants = {
     left: "50%",
     x: "-50%",
     y: "-50%",
-    width: "30%",
-    borderRadius: 999,
+    width: "36%",
+    borderRadius: 16,
     boxShadow: "0 12px 35px rgba(0,0,0,0.4)",
   },
   lg: {
@@ -78,13 +78,14 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
     : isLessThanDesktop
       ? variants.md
       : variants.lg;
+
   const position = useTransform(progress, range, ["fixed", "sticky"]);
   const top = useTransform(progress, range, [variant.top, "0%"]);
   const left = useTransform(progress, range, [variant.left, "0%"]);
   const x = useTransform(progress, range, ["-50%", "0%"]);
   const y = useTransform(progress, range, ["-50%", "0%"]);
   const width = useTransform(progress, range, [variant.width, "100%"]);
-  const borderRadius = useTransform(progress, range, [999, 0]);
+  const borderRadius = useTransform(progress, range, [variant.borderRadius, 0]);
   const boxShadow = useTransform(progress, range, [
     "0 12px 35px rgba(0,0,0,0.4)",
     "0 4px 18px rgba(0,0,0,0.25)",
@@ -93,7 +94,7 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
   return (
     <motion.nav
       className={clsx(
-        "sticky z-50 flex justify-center items-center gap-6 bg-white text-gray-950 px-6 py-3",
+        "sticky z-50 flex justify-center items-center gap-6 bg-white text-gray-950 min-w-fit py-3",
       )}
       style={{ top, left, x, y, width, borderRadius, boxShadow }}
     >
