@@ -18,6 +18,7 @@
     "@eslint/eslintrc": "^3",
     "@kavita-likes-fajitas/eslint-config": "*",
     "@kavita-likes-fajitas/fonts": "*",
+    "@kavita-likes-fajitas/shadcn-ui-lib": "*",
     "@kavita-likes-fajitas/tailwind-config": "*",
     "@kavita-likes-fajitas/typescript-config": "*",
     "@kavita-likes-fajitas/ui-library": "*",

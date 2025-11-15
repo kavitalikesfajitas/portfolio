@@ -3,8 +3,9 @@ import { defineConfig } from "tsdown";
 export default defineConfig([
     {
         entry: [
-            "src/**/index.ts",
-            "src/**/index.tsx",
+            "src/**/*.css",
+            "src/**/*.ts",
+            "src/**/*.tsx",
             "!src/**/*.{test,spec}.ts",
             "!src/**/*.{test,spec}.tsx",
             "!src/**/*.stories.{ts,tsx,mdx}",

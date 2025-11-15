@@ -1216,7 +1216,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kavita-likes-fajitas/shadcn-ui-lib@workspace:packages/shadcn-ui-lib":
+"@kavita-likes-fajitas/shadcn-ui-lib@npm:*, @kavita-likes-fajitas/shadcn-ui-lib@workspace:packages/shadcn-ui-lib":
   version: 0.0.0-use.local
   resolution: "@kavita-likes-fajitas/shadcn-ui-lib@workspace:packages/shadcn-ui-lib"
   dependencies:
@@ -6539,6 +6539,7 @@ __metadata:
     "@eslint/eslintrc": "npm:^3"
     "@kavita-likes-fajitas/eslint-config": "npm:*"
     "@kavita-likes-fajitas/fonts": "npm:*"
+    "@kavita-likes-fajitas/shadcn-ui-lib": "npm:*"
     "@kavita-likes-fajitas/tailwind-config": "npm:*"
     "@kavita-likes-fajitas/typescript-config": "npm:*"
     "@kavita-likes-fajitas/ui-library": "npm:*"
