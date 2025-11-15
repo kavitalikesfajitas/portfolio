@@ -1,7 +1,9 @@
 "use client";
 import Image from "next/image";
 import clsx from "clsx";
-import { StickyNav } from "./components/ui/Nav";
+import { CenterStickyNav } from "./components/ui/Nav/StickyNav";
+import { useIsMobile } from "@kavita-likes-fajitas/ui-library/shadcn/hooks/useBreakpoint";
+import { Nav } from "./components/ui/Nav";
 
 export default function Home() {
   return (
@@ -49,3 +51,12 @@ const Hero = () => {
     </section>
   );
 };
+
+export function StickyNav() {
+  const isMobile = useIsMobile();
+  return (
+    <CenterStickyNav isMobile={isMobile}>
+      <Nav isMobile={isMobile} />
+    </CenterStickyNav>
+  );
+}
