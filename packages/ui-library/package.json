@@ -32,8 +32,6 @@
     "generate:component": "turbo gen react-component"
   },
   "dependencies": {
-    "@headlessui/react": "^2.2.9",
-    "@heroicons/react": "^2.2.0",
     "clsx": "^2.1.1"
   },
   "peerDependencies": {
@@ -42,7 +40,6 @@
     "tailwindcss": "^4"
   },
   "devDependencies": {
-    "@headlessui/tailwindcss": "^0.2.2",
     "@kavita-likes-fajitas/eslint-config": "workspace:*",
     "@kavita-likes-fajitas/tailwind-config": "workspace:*",
     "@kavita-likes-fajitas/typescript-config": "workspace:*",
