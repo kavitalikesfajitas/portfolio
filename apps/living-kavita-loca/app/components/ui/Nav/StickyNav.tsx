@@ -37,7 +37,7 @@ const variants = {
     boxShadow: "0 12px 35px rgba(0,0,0,0.4)",
   },
   lg: {
-    top: "78%",
+    top: "75%",
     left: "50%",
     x: "-50%",
     y: "-50%",
@@ -46,7 +46,7 @@ const variants = {
     boxShadow: "0 12px 35px rgba(0,0,0,0.4)",
   },
   md: {
-    top: "70%",
+    top: "65%",
     left: "50%",
     x: "-50%",
     y: "-50%",
@@ -92,7 +92,7 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
   return (
     <motion.nav
       className={clsx(
-        "sticky z-50 flex  left-0 justify-center items-center gap-6 bg-white text-gray-950 min-w-fit mx-auto scroll-smooth",
+        "sticky z-50 flex left-0 justify-center items-center gap-6 bg-white text-gray-950 min-w-fit mx-auto scroll-smooth overflow-visible",
       )}
       style={{ top, width, borderRadius, boxShadow }}
     >

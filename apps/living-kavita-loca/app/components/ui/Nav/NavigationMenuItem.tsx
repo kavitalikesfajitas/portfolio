@@ -3,13 +3,19 @@ import {
   NavigationMenuLink,
   navigationMenuTriggerStyle,
 } from "@kavita-likes-fajitas/ui-library/shadcn/components/ui/NavigationMenu";
-import Link from "next/link";
 
-export function NavigationMenuItemLink() {
+type StandardNavigationMenuItemLinkProps = {
+  children: React.ReactNode;
+  className?: string;
+};
+export function StandardNavigationMenuItemLink({
+  children,
+  className,
+}: StandardNavigationMenuItemLinkProps) {
   return (
-    <NavigationMenuItem>
+    <NavigationMenuItem className={className}>
       <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-        <Link href="/docs">Docs</Link>
+        {children}
       </NavigationMenuLink>
     </NavigationMenuItem>
   );

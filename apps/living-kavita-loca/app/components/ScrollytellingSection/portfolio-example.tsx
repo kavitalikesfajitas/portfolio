@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import ScrollytellingSection, { HTMLOverlaySlide } from "./index";
+import { TornPaperEffect } from "@kavita-likes-fajitas/ui-library/TornPaperEffect";
 import {
   SkillBadge,
   ProjectCard,
@@ -51,7 +52,7 @@ export function PortfolioScrollytellingExample() {
       <HTMLOverlaySlide alignment="left" top={0.2}>
         <div className="space-y-6 max-w-lg">
           <h2 className="text-5xl md:text-6xl font-bold text-white">
-            The Journey
+            Who am I?
           </h2>
           <p className="text-xl text-white/80 leading-relaxed">
             From building my first website in high school to creating production
@@ -59,13 +60,15 @@ export function PortfolioScrollytellingExample() {
             life through code.
           </p>
           <div className="pt-4">
-            <Image
-              src="/images/logo.png"
-              alt="Early work"
-              width={300}
-              height={200}
-              className="rounded-lg opacity-80"
-            />
+            <TornPaperEffect>
+              <Image
+                src="./images/IMG_4003.jpg"
+                alt="Early work"
+                width={300}
+                height={200}
+                className="rounded-lg opacity-80"
+              />
+            </TornPaperEffect>
           </div>
         </div>
       </HTMLOverlaySlide>
