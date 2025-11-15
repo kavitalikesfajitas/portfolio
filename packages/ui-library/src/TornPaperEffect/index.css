@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+.ragged-text-filter {
+  filter: url(#ragged-edge);
+  display: inline-block;
+  font-size: 72px;
+
+  padding: 40px 60px;
+}

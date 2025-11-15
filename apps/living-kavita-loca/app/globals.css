@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@kavita-likes-fajitas/shadcn-ui-lib/styles/global.css";
 @config "../tailwind.config.ts";
 
 :root {
