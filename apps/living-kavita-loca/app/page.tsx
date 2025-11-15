@@ -7,6 +7,7 @@ import { Nav } from "./components/ui/Nav";
 import ScrollytellingSection, {
   HTMLOverlaySlide,
 } from "./components/ScrollytellingSection";
+import { PortfolioScrollytellingExample } from "./components/ScrollytellingSection/portfolio-example";
 
 export default function Home() {
   return (
@@ -16,72 +17,7 @@ export default function Home() {
         {/* HERO (full screen) */}
         <Hero />
 
-        {/* SCROLLYTELLING SECTION */}
-        <ScrollytellingSection
-          // Option 1: Add a background image that stays sticky
-          // backgroundImage="/images/logo.png"
-          backgroundColor="rgb(3 7 18)" // gray-950 fallback
-          chapters={[
-            { id: "intro", y: 0 },
-            { id: "about", y: 0.25 },
-            { id: "skills", y: 0.5 },
-            { id: "work", y: 0.75 },
-          ]}
-          scrollPagesLength={6}
-        >
-          {/* Option 2: Add images inside slides using the children prop */}
-          <HTMLOverlaySlide
-            alignment="left"
-            top={0.1}
-            title="Welcome"
-            body="Scroll down to explore my portfolio and discover my journey."
-          >
-            <div className="mt-6">
-              <Image
-                src="/images/lips-glossy.png"
-                alt="Decorative"
-                width={150}
-                height={150}
-                className="rounded-lg"
-              />
-            </div>
-          </HTMLOverlaySlide>
-
-          {/* Option 3: Image-only slide without text */}
-          <HTMLOverlaySlide alignment="right" top={0.3}>
-            <div className="flex flex-col gap-4">
-              <h3 className="text-white text-4xl font-bold uppercase">
-                About Me
-              </h3>
-              <Image
-                src="/images/mouth-dialog.png"
-                alt="Profile"
-                width={200}
-                height={200}
-                className="rounded-full border-4 border-white/20"
-              />
-              <p className="text-white text-lg opacity-90">
-                I'm a passionate developer focused on creating beautiful and
-                functional experiences.
-              </p>
-            </div>
-          </HTMLOverlaySlide>
-
-          <HTMLOverlaySlide
-            alignment="left"
-            top={0.55}
-            title="My Skills"
-            body="Full-stack development • UI/UX Design • Creative Problem Solving"
-          />
-
-          <HTMLOverlaySlide
-            alignment="center"
-            top={0.8}
-            title="Let's Work Together"
-            body="Ready to bring your ideas to life."
-          />
-        </ScrollytellingSection>
-
+        <PortfolioScrollytellingExample />
         {/* SCROLLABLE CONTENT BELOW */}
         <section className="min-h-screen px-6 py-24 bg-gray-950">
           <h2 className="text-3xl font-bold mb-6">More Content</h2>

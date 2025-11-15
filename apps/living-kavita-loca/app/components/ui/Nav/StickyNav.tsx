@@ -92,7 +92,7 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
   return (
     <motion.nav
       className={clsx(
-        "sticky z-50 flex  left-0 justify-center items-center gap-6 bg-white text-gray-950 min-w-fit mx-auto",
+        "sticky z-50 flex  left-0 justify-center items-center gap-6 bg-white text-gray-950 min-w-fit mx-auto scroll-smooth",
       )}
       style={{ top, width, borderRadius, boxShadow }}
     >
