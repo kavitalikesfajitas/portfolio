@@ -7,11 +7,10 @@
   "files": [
     "dist",
     "README.md",
-    "LICENSE",
-    "styles/**/*.css"
+    "LICENSE"
   ],
   "exports": {
-    "./styles/*": "./styles/*",
+    "./*.css": "./dist/*.css",
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
@@ -31,10 +30,9 @@
     "lint": "eslint",
     "generate:component": "turbo gen react-component"
   },
-  "dependencies": {
-    "clsx": "^2.1.1"
-  },
   "peerDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "clsx": "^2.1.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "tailwindcss": "^4"
@@ -53,6 +51,7 @@
     "@vitejs/plugin-react": "^5.0.2",
     "@vitest/coverage-v8": "3.2.4",
     "autoprefixer": "^10.4.22",
+    "clsx": "^2.1.1",
     "eslint": "^9",
     "jsdom": "^26.1.0",
     "postcss": "^8.5.6",
