@@ -18,7 +18,9 @@ export default function Home() {
 
         {/* SCROLLYTELLING SECTION */}
         <ScrollytellingSection
-          backgroundColor="rgb(3 7 18)" // gray-950
+          // Option 1: Add a background image that stays sticky
+          // backgroundImage="/images/logo.png"
+          backgroundColor="rgb(3 7 18)" // gray-950 fallback
           chapters={[
             { id: "intro", y: 0 },
             { id: "about", y: 0.25 },
@@ -27,19 +29,43 @@ export default function Home() {
           ]}
           scrollPagesLength={6}
         >
+          {/* Option 2: Add images inside slides using the children prop */}
           <HTMLOverlaySlide
             alignment="left"
             top={0.1}
             title="Welcome"
             body="Scroll down to explore my portfolio and discover my journey."
-          />
+          >
+            <div className="mt-6">
+              <Image
+                src="/images/lips-glossy.png"
+                alt="Decorative"
+                width={150}
+                height={150}
+                className="rounded-lg"
+              />
+            </div>
+          </HTMLOverlaySlide>
 
-          <HTMLOverlaySlide
-            alignment="right"
-            top={0.3}
-            title="About Me"
-            body="I'm a passionate developer focused on creating beautiful and functional experiences."
-          />
+          {/* Option 3: Image-only slide without text */}
+          <HTMLOverlaySlide alignment="right" top={0.3}>
+            <div className="flex flex-col gap-4">
+              <h3 className="text-white text-4xl font-bold uppercase">
+                About Me
+              </h3>
+              <Image
+                src="/images/mouth-dialog.png"
+                alt="Profile"
+                width={200}
+                height={200}
+                className="rounded-full border-4 border-white/20"
+              />
+              <p className="text-white text-lg opacity-90">
+                I'm a passionate developer focused on creating beautiful and
+                functional experiences.
+              </p>
+            </div>
+          </HTMLOverlaySlide>
 
           <HTMLOverlaySlide
             alignment="left"
