@@ -1216,6 +1216,48 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@kavita-likes-fajitas/shadcn-ui-lib@workspace:packages/shadcn-ui-lib":
+  version: 0.0.0-use.local
+  resolution: "@kavita-likes-fajitas/shadcn-ui-lib@workspace:packages/shadcn-ui-lib"
+  dependencies:
+    "@kavita-likes-fajitas/eslint-config": "workspace:*"
+    "@kavita-likes-fajitas/tailwind-config": "workspace:*"
+    "@kavita-likes-fajitas/typescript-config": "workspace:*"
+    "@radix-ui/react-navigation-menu": "npm:^1.2.14"
+    "@tailwindcss/postcss": "npm:^4"
+    "@testing-library/jest-dom": "npm:^6.9.1"
+    "@testing-library/react": "npm:^16.3.0"
+    "@types/node": "npm:^20"
+    "@types/react": "npm:^19"
+    "@types/react-dom": "npm:^19"
+    "@vitejs/plugin-react": "npm:^5.0.2"
+    "@vitest/coverage-v8": "npm:3.2.4"
+    class-variance-authority: "npm:^0.7.1"
+    eslint: "npm:^9"
+    jsdom: "npm:^26.1.0"
+    lucide-react: "npm:^0.553.0"
+    postcss: "npm:^8.5.6"
+    prettier: "npm:^3.6.2"
+    prettier-plugin-tailwindcss: "npm:^0.7.1"
+    react: "npm:^19.1.0"
+    react-dom: "npm:^19.1.0"
+    rollup-plugin-postcss: "npm:^4.0.2"
+    tailwind-merge: "npm:^3.4.0"
+    tailwindcss: "npm:^4"
+    tsdown: "npm:^0.12.9"
+    tw-animate-css: "npm:^1.4.0"
+    typescript: "npm:^5.5.4"
+    vite-tsconfig-paths: "npm:^5.1.4"
+    vitest: "npm:^3.2.4"
+  peerDependencies:
+    "@tailwindcss/postcss": ^4
+    clsx: ^2.1.1
+    react: ^19.1.0
+    react-dom: ^19.1.0
+    tailwindcss: ^4
+  languageName: unknown
+  linkType: soft
+
 "@kavita-likes-fajitas/tailwind-config@npm:*, @kavita-likes-fajitas/tailwind-config@workspace:*, @kavita-likes-fajitas/tailwind-config@workspace:packages/tailwind-config":
   version: 0.0.0-use.local
   resolution: "@kavita-likes-fajitas/tailwind-config@workspace:packages/tailwind-config"
