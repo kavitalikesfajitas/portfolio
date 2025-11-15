@@ -32,7 +32,7 @@ const variants = {
     left: "50%",
     x: "-50%",
     y: "-50%",
-    width: "50%",
+    width: "30%",
     borderRadius: 999,
     boxShadow: "0 12px 35px rgba(0,0,0,0.4)",
   },

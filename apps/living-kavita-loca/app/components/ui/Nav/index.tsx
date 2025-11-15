@@ -15,7 +15,7 @@ type NavProps = {
 export function Nav({ isMobile }: NavProps) {
   return (
     <NavigationMenu viewport={isMobile}>
-      <NavigationMenuList className="flex-wrap text-gray-950 bg-white rounded-2xl ">
+      <NavigationMenuList id="nav-list" className=" text-gray-950 bg-white ">
         <ListThatsFancy />
         <ListThatGrowsOut />
         <NavigationMenuItemLink />
