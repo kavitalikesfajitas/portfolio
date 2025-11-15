@@ -38,12 +38,12 @@ export default function Home() {
 
 const Hero = () => {
   return (
-    <section className="flex flex-col lg:items-center  min-h-screen relative">
-      <div className="relative inline-block scale-[0.6] md:scale-[0.5] lg:scale-75">
+    <section className="flex flex-col lg:items-center lg:justify-items-start  min-h-screen relative">
+      <div className="relative inline-block scale-[0.6] md:scale-[0.5] lg:scale-75 lg:-mt-24 ">
         <img
           src="/images/logo.png"
           alt="living kavita loca"
-          className="flex self-center self-justify-center"
+          className="flex self-center"
         />
         <div className="absolute -right-20 top-1/2 -translate-y-1/2">
           <img

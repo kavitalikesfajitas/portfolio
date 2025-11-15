@@ -28,7 +28,7 @@ const navVariants = {
 
 const variants = {
   mobile: {
-    top: "50%",
+    top: "55%",
     left: "50%",
     x: "-50%",
     y: "-50%",
@@ -37,7 +37,7 @@ const variants = {
     boxShadow: "0 12px 35px rgba(0,0,0,0.4)",
   },
   lg: {
-    top: "75%",
+    top: "78%",
     left: "50%",
     x: "-50%",
     y: "-50%",
@@ -46,7 +46,7 @@ const variants = {
     boxShadow: "0 12px 35px rgba(0,0,0,0.4)",
   },
   md: {
-    top: "65%",
+    top: "70%",
     left: "50%",
     x: "-50%",
     y: "-50%",
