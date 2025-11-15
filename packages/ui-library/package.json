@@ -7,9 +7,11 @@
   "files": [
     "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "styles/**/*.css"
   ],
   "exports": {
+    "./styles/*": "./styles/*",
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
@@ -53,6 +55,7 @@
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^5.0.2",
     "@vitest/coverage-v8": "3.2.4",
+    "autoprefixer": "^10.4.22",
     "eslint": "^9",
     "jsdom": "^26.1.0",
     "postcss": "^8.5.6",
