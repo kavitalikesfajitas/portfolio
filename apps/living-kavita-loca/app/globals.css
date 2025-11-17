@@ -3,11 +3,6 @@
 @import "@kavita-likes-fajitas/shadcn-ui-lib/styles/global.css";
 @config "../tailwind.config.ts";
 
-:root {
-  --background: var(--color-gray-950);
-  --foreground: var(--color-white);
-}
-
 .font-midnight-gelactic {
   font-family: var(--font-midnight-gelactic);
 }
@@ -18,22 +13,5 @@ body {
   min-height: 100vh;
   background: var(--color-gray-950);
   color: text-white;
-  font-family: Arial, Helvetica, sans-serif;
-}
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
   font-family: var(--font-helvetica-neue), Helvetica, Arial, sans-serif;
 }
