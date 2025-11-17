@@ -90,13 +90,14 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
   ]);
 
   return (
-    <motion.nav
+    <motion.div
       className={clsx(
         "sticky left-0 z-50 mx-auto flex min-w-fit items-center justify-center gap-6 overflow-visible scroll-smooth bg-white text-gray-950",
+        "rounded-full",
       )}
       style={{ top, width, borderRadius, boxShadow }}
     >
       {children}
-    </motion.nav>
+    </motion.div>
   );
 }
