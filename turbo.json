@@ -14,12 +14,13 @@
       "dependsOn": ["^check-types"]
     },
     "dev": {
+      "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env.local", ".env.development", ".env"],
       "cache": false,
       "persistent": true
     },
     "@kavita-likes-fajitas/ui-library#dev": {
-      "dependsOn": ["@kavita-likes-fajitas/shadcn-ui-lib#build"],
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     }

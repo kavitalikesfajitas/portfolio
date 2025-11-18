@@ -1,0 +1,37 @@
+/* globals.css (or similar) */
+.ragged-card {
+  /* Simple noisy edge using border-image; swap this out for your SVG if you have one */
+  border: 1px solid rgba(248, 113, 181, 0.35);
+  border-radius: 26px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ragged-card::before {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  background-image:
+    radial-gradient(circle at 0 0, transparent 0, transparent 60%, black 61%),
+    radial-gradient(
+      circle at 100% 0,
+      transparent 0,
+      transparent 60%,
+      black 61%
+    ),
+    radial-gradient(
+      circle at 0 100%,
+      transparent 0,
+      transparent 60%,
+      black 61%
+    ),
+    radial-gradient(
+      circle at 100% 100%,
+      transparent 0,
+      transparent 60%,
+      black 61%
+    );
+  mix-blend-mode: screen;
+  opacity: 0.12;
+  pointer-events: none;
+}

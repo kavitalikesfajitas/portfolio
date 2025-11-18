@@ -6576,6 +6576,7 @@ __metadata:
     eslint: "npm:^9"
     eslint-config-next: "npm:16.0.1"
     jsdom: "npm:^26.1.0"
+    motion: "npm:^12.23.24"
     next: "npm:16.0.1"
     react: "npm:19.2.0"
     react-dom: "npm:19.2.0"
