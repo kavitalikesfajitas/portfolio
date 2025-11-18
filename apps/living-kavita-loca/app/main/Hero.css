@@ -39,16 +39,14 @@
 
 .lips {
   display: block;
-  animation: lipsFloat 3.5s ease-in-out infinite;
+  /* animation: lipsFloat 3.5s ease-in-out infinite; */
   transform-origin: center center;
   cursor: pointer;
-}
-/* hover “wiggle” override */
-.lips:hover {
-  animation: lipsWiggle 0.45s ease-in-out infinite;
-}
-.lips {
   opacity: 1;
   transform: translateY(30px) rotate(12deg);
   animation: lipsEnter 0.8s ease-out forwards;
+}
+/* hover “wiggle” override */
+.lips:hover {
+  animation: lipsWiggle 0.45s ease-in-out forwards;
 }

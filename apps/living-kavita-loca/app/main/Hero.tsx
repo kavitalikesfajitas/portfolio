@@ -13,7 +13,7 @@ export function Hero() {
           width={1024}
           className="flex self-center"
         />
-        <div className="absolute -right-20 top-1/2 scale-50 -translate-y-1/2 translate-x-3/8">
+        <div className="absolute -right-20 top-1/2 scale-50 -translate-y-1/2 translate-x-[37.5%]">
           <Image
             src="/images/lips-glossy.png"
             alt="lips open that are glossy"

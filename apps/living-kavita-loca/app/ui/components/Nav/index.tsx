@@ -6,7 +6,6 @@ import {
 } from "@kavita-likes-fajitas/shadcn-ui-lib/components/ui/navigation-menu";
 import { ListThatsFancy } from "./ListThatsFancy";
 import { StandardNavigationMenuItemLink } from "./StandardNavigationMenuItemLink";
-import Link from "next/link";
 
 type NavProps = {
   isMobile: boolean;
@@ -21,9 +20,13 @@ export function Nav({ isMobile }: NavProps) {
       <NavigationMenuList id="nav-list" className=" text-gray-950 bg-white ">
         <ListThatsFancy />
         <StandardNavigationMenuItemLink>
-          <Link href="https://github.com/kavitalikesfajitas" shallow={true}>
+          <a
+            href="https://github.com/kavitalikesfajitas"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Github
-          </Link>
+          </a>
         </StandardNavigationMenuItemLink>
       </NavigationMenuList>
     </NavigationMenu>

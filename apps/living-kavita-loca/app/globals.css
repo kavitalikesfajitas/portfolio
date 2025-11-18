@@ -12,6 +12,6 @@
 body {
   min-height: 100vh;
   background: var(--color-gray-950);
-  color: text-white;
+  color: #ffffff;
   font-family: var(--font-helvetica-neue), Helvetica, Arial, sans-serif;
 }
