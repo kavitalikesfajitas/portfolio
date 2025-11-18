@@ -5,7 +5,8 @@ import clsx from "clsx";
 
 export const metadata: Metadata = {
   title: "Living Kavita Loca",
-  description: "Living Kavita Loca",
+  description:
+    "Portfolio and personal website of Kavita - software engineer and creative developer",
 };
 
 export default function RootLayout({

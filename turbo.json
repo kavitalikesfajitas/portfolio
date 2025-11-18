@@ -4,8 +4,8 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", "out/**"]
+      "inputs": ["$TURBO_DEFAULT$", ".env*", "!README.md"],
+      "outputs": [".next/**", "!.next/cache/**", "out/**", "dist/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -14,7 +14,14 @@
       "dependsOn": ["^check-types"]
     },
     "dev": {
-      "inputs": ["$TURBO_DEFAULT$", ".env.local", ".env.development", ".env"]
+      "inputs": ["$TURBO_DEFAULT$", ".env.local", ".env.development", ".env"],
+      "cache": false,
+      "persistent": true
+    },
+    "@kavita-likes-fajitas/ui-library#dev": {
+      "dependsOn": ["@kavita-likes-fajitas/shadcn-ui-lib#build"],
+      "cache": false,
+      "persistent": true
     }
   }
 }

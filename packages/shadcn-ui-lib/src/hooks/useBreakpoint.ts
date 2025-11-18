@@ -8,7 +8,7 @@ export function useIsDesktopOrLarger(desktopBreakpoint = 1024) {
   return useIsBreakpointMinWidth(desktopBreakpoint);
 }
 
-export function useIsDesktop(tabletBreakpoint = 768) {
+export function useIsLessThanDesktop() {
   const isLessThanDesktop = useIsBreakpointMaxWidth(1024);
   return isLessThanDesktop;
 

@@ -13,7 +13,7 @@ export function StandardNavigationMenuItemLink({
   className,
 }: StandardNavigationMenuItemLinkProps) {
   return (
-    <NavigationMenuItem className={className} id="nav-item`">
+    <NavigationMenuItem className={className} id="nav-item">
       <NavigationMenuLink
         asChild
         className={navigationMenuTriggerStyle()}
