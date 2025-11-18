@@ -64,11 +64,13 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
   ]);
   console.log({ progress });
   // 💋 + text logo animation (nav version)
-  const logoOpacity = useTransform(progress, range, [0, 1]);
-  const logoScale = useTransform(progress, range, [0.8, 1]);
-  const logoY = useTransform(progress, range, ["20%", "0%"]);
-  const logoWidth = useTransform(progress, range, ["0%", "100%"]);
-  const logoDisplay = useTransform(progress, [0, 1], ["none", "flex"]);
+  // Start logo animation at 50% of nav animation (0.1 to 0.2)
+  const logoRange: [number, number] = [0.1, 0.2];
+  const logoOpacity = useTransform(progress, logoRange, [0, 1]);
+  const logoScale = useTransform(progress, logoRange, [0.8, 1]);
+  const logoY = useTransform(progress, logoRange, ["20%", "0%"]);
+  const logoWidth = useTransform(progress, logoRange, ["50%", "100%"]);
+
   return (
     <motion.div
       className={clsx(
@@ -83,7 +85,6 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
           opacity: logoOpacity,
           scale: logoScale,
           y: logoY,
-          display: logoDisplay,
           width: logoWidth,
         }}
         className="flex items-center gap-2"
