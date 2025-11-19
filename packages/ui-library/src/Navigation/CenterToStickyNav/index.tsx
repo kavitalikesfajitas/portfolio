@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { useScroll, useSpring, useTransform, motion } from "motion/react";
+import Image from "next/image";
 import { useIsLessThanDesktop } from "@kavita-likes-fajitas/shadcn-ui-lib/hooks/useBreakpoint";
 
 const variants = {
@@ -37,18 +38,17 @@ type CenterStickyNavProps = React.PropsWithChildren<{
 }>;
 
 export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
-  // 0 at top of page, 1 at very bottom
   const { scrollYProgress } = useScroll();
   const isLessThanDesktop = useIsLessThanDesktop();
-  // Smooth the progress a bit so the animation feels nice
+
   const progress = useSpring(scrollYProgress, {
     stiffness: 200,
     damping: 30,
     mass: 0.2,
   });
 
-  // We only morph the nav in the first 20% of scroll
   const range: [number, number] = [0, 0.2];
+
   const variant = isMobile
     ? variants.mobile
     : isLessThanDesktop
@@ -56,23 +56,70 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
       : variants.lg;
 
   const top = useTransform(progress, range, [variant.top, "0%"]);
-
   const width = useTransform(progress, range, [variant.width, "100%"]);
   const borderRadius = useTransform(progress, range, [variant.borderRadius, 0]);
   const boxShadow = useTransform(progress, range, [
     "0 12px 35px rgba(0,0,0,0.4)",
     "0 4px 18px rgba(0,0,0,0.25)",
   ]);
+  console.log({ progress });
+  // 💋 + text logo animation (nav version)
+  // Start logo animation at 50% of nav animation (0.1 to 0.2)
+  const logoRange: [number, number] = [0.1, 0.2];
+  const logoOpacity = useTransform(progress, logoRange, [0, 1]);
+  const logoScale = useTransform(progress, logoRange, [0.8, 1]);
+  const logoY = useTransform(progress, logoRange, ["20%", "0%"]);
+  // Mobile: smaller basis to prevent cramping
+  const logoFlexBasis = useTransform(
+    progress,
+    logoRange,
+    isMobile ? ["0%", "40%"] : ["0%", "50%"],
+  );
+  const logoFlexShrink = useTransform(progress, logoRange, [0, 0]);
+
+  // Nav items: move from center to right as logo appears
+  // Flex-grow: starts at 1 (takes all space, centers content), ends at 0 (no extra space)
+  const navFlexGrow = useTransform(progress, logoRange, [1, 0]);
 
   return (
     <motion.div
       className={clsx(
-        "sticky left-0 z-50 mx-auto flex min-w-fit items-center justify-center gap-6 overflow-visible scroll-smooth bg-white text-gray-950",
+        "sticky left-0 z-50 mx-auto flex min-w-fit items-center justify-between overflow-visible bg-white text-gray-950",
         "rounded-full",
       )}
       style={{ top, width, borderRadius, boxShadow }}
     >
-      {children}
+      {/* Brand lockup: lips + text */}
+      <motion.div
+        style={{
+          opacity: logoOpacity,
+          scale: logoScale,
+          y: logoY,
+          flexBasis: logoFlexBasis,
+          flexShrink: logoFlexShrink,
+        }}
+        className="flex items-center gap-1 overflow-hidden whitespace-nowrap md:gap-2"
+      >
+        <span className="pl-1 text-[0.5rem] font-semibold uppercase leading-tight tracking-tight md:pl-2 md:text-sm md:tracking-[0.25em]">
+          Living Kavita Loca
+        </span>
+        <div className="relative h-6 w-6 md:h-9 md:w-9">
+          <Image
+            src="/images/lips-glossy.png"
+            alt="Living Kavita Loca lips"
+            fill
+            className="object-contain"
+          />
+        </div>
+      </motion.div>
+
+      {/* Nav items in the center/right */}
+      <motion.div
+        className="flex items-center justify-center"
+        style={{ flexGrow: navFlexGrow }}
+      >
+        {children}
+      </motion.div>
     </motion.div>
   );
 }
