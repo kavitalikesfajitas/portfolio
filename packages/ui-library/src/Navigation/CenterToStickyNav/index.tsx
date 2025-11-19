@@ -69,7 +69,12 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
   const logoOpacity = useTransform(progress, logoRange, [0, 1]);
   const logoScale = useTransform(progress, logoRange, [0.8, 1]);
   const logoY = useTransform(progress, logoRange, ["20%", "0%"]);
-  const logoFlexBasis = useTransform(progress, logoRange, ["0%", "50%"]);
+  // Mobile: smaller basis to prevent cramping
+  const logoFlexBasis = useTransform(
+    progress,
+    logoRange,
+    isMobile ? ["0%", "40%"] : ["0%", "50%"],
+  );
   const logoFlexShrink = useTransform(progress, logoRange, [0, 0]);
 
   // Nav items: move from center to right as logo appears
@@ -93,12 +98,12 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
           flexBasis: logoFlexBasis,
           flexShrink: logoFlexShrink,
         }}
-        className="flex items-center gap-2 overflow-hidden whitespace-nowrap"
+        className="flex items-center gap-1 overflow-hidden whitespace-nowrap md:gap-2"
       >
-        <span className="pl-2 text-xs font-semibold uppercase tracking-[0.25em] md:block md:text-sm">
+        <span className="pl-1 text-[0.5rem] font-semibold uppercase leading-tight tracking-tight md:pl-2 md:text-sm md:tracking-[0.25em]">
           Living Kavita Loca
         </span>
-        <div className="relative h-8 w-8 md:h-9 md:w-9">
+        <div className="relative h-6 w-6 md:h-9 md:w-9">
           <Image
             src="/images/lips-glossy.png"
             alt="Living Kavita Loca lips"
