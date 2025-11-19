@@ -69,7 +69,7 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
   const logoOpacity = useTransform(progress, logoRange, [0, 1]);
   const logoScale = useTransform(progress, logoRange, [0.8, 1]);
   const logoY = useTransform(progress, logoRange, ["20%", "0%"]);
-  const logoFlexBasis = useTransform(progress, logoRange, ["0%", "45%"]);
+  const logoFlexBasis = useTransform(progress, logoRange, ["0%", "50%"]);
   const logoFlexShrink = useTransform(progress, logoRange, [0, 0]);
 
   // Nav items: move from center to right as logo appears
@@ -95,6 +95,9 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
         }}
         className="flex items-center gap-2 overflow-hidden whitespace-nowrap"
       >
+        <span className="pl-2 text-xs font-semibold uppercase tracking-[0.25em] md:block md:text-sm">
+          Living Kavita Loca
+        </span>
         <div className="relative h-8 w-8 md:h-9 md:w-9">
           <Image
             src="/images/lips-glossy.png"
@@ -103,9 +106,6 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
             className="object-contain"
           />
         </div>
-        <span className="text-xs font-semibold uppercase tracking-[0.25em] md:text-sm">
-          Living Kavita Loca
-        </span>
       </motion.div>
 
       {/* Nav items in the center/right */}
