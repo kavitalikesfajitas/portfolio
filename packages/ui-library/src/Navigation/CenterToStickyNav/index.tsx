@@ -89,7 +89,6 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
       )}
       style={{ top, width, borderRadius, boxShadow }}
     >
-      {/* Brand lockup: lips + text */}
       <motion.div
         style={{
           opacity: logoOpacity,
@@ -100,7 +99,7 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
         }}
         className="flex items-center gap-1 overflow-hidden whitespace-nowrap md:gap-2"
       >
-        <span className="pl-1 text-[0.5rem] font-semibold uppercase leading-tight tracking-tight md:pl-2 md:text-sm md:tracking-[0.25em]">
+        <span className="pl-1 text-xs font-semibold uppercase leading-tight tracking-tight sm:text-sm md:pl-2 md:text-base md:tracking-[0.25em]">
           Living Kavita Loca
         </span>
         <div className="relative h-6 w-6 md:h-9 md:w-9">
