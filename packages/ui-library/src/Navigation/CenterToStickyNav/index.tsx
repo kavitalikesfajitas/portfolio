@@ -69,12 +69,17 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
   const logoOpacity = useTransform(progress, logoRange, [0, 1]);
   const logoScale = useTransform(progress, logoRange, [0.8, 1]);
   const logoY = useTransform(progress, logoRange, ["20%", "0%"]);
-  const logoWidth = useTransform(progress, logoRange, ["50%", "100%"]);
+  const logoFlexBasis = useTransform(progress, logoRange, ["0%", "45%"]);
+  const logoFlexShrink = useTransform(progress, logoRange, [0, 0]);
+
+  // Nav items: move from center to right as logo appears
+  // Flex-grow: starts at 1 (takes all space, centers content), ends at 0 (no extra space)
+  const navFlexGrow = useTransform(progress, logoRange, [1, 0]);
 
   return (
     <motion.div
       className={clsx(
-        "sticky left-0 z-50 mx-auto flex min-w-fit items-center justify-between gap-6 overflow-visible bg-white text-gray-950",
+        "sticky left-0 z-50 mx-auto flex min-w-fit items-center justify-between overflow-visible bg-white text-gray-950",
         "rounded-full",
       )}
       style={{ top, width, borderRadius, boxShadow }}
@@ -85,9 +90,10 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
           opacity: logoOpacity,
           scale: logoScale,
           y: logoY,
-          width: logoWidth,
+          flexBasis: logoFlexBasis,
+          flexShrink: logoFlexShrink,
         }}
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 overflow-hidden whitespace-nowrap"
       >
         <div className="relative h-8 w-8 md:h-9 md:w-9">
           <Image
@@ -103,9 +109,12 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
       </motion.div>
 
       {/* Nav items in the center/right */}
-      <div className="flex flex-1 items-center justify-center gap-6">
+      <motion.div
+        className="flex items-center justify-center"
+        style={{ flexGrow: navFlexGrow }}
+      >
         {children}
-      </div>
+      </motion.div>
     </motion.div>
   );
 }
