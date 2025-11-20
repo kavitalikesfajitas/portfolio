@@ -3,13 +3,6 @@
 @import "@kavita-likes-fajitas/shadcn-ui-lib/styles/global.css";
 @config "../tailwind.config.ts";
 
-html,
-body,
-div#__next {
-  height: 100%;
-  width: 100%;
-  min-height: 100%;
-}
 @-ms-viewport {
   width: device-width;
   height: device-width;
