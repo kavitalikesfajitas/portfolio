@@ -24,22 +24,22 @@ export function Hero() {
   const lipsY = useTransform(progress, range, ["0%", "-8%"]);
 
   return (
-    <section className="relative flex min-h-screen flex-col lg:items-center lg:justify-items-start">
+    <section className="relative flex min-h-screen flex-col items-center justify-start ">
       <motion.div
         style={{ scale: heroScale, y: heroY, opacity: heroOpacity }}
-        className="relative inline-block scale-[0.6] md:scale-[0.5] lg:scale-75 lg:-mt-24"
+        className="relative flex basis-[30vh] w-full justify-center items-start scale-[0.7] md:scale-[0.5] lg:scale-75"
       >
         <Image
           src="/images/living-kavita-loca-logo.png"
           alt="living kavita loca"
           height={1024}
           width={1024}
-          className="flex self-center"
+          className="object-contain max-h-full"
         />
 
         <motion.div
           style={{ scale: lipsScale, y: lipsY }}
-          className="absolute -right-20 top-1/2 scale-50 -translate-y-1/2 translate-x-[37.5%]"
+          className="absolute top-1/2 -translate-y-1/2 translate-x-1/2 scale-50"
         >
           <Image
             src="/images/lips-glossy.png"

@@ -1,7 +1,10 @@
 import clsx from "clsx";
 import { useScroll, useSpring, useTransform, motion } from "motion/react";
 import Image from "next/image";
-import { useIsLessThanDesktop } from "@kavita-likes-fajitas/shadcn-ui-lib/hooks/useBreakpoint";
+import {
+  useIsDesktopOrLarger,
+  useIsLessThanDesktopAndLargerThanMobile,
+} from "@kavita-likes-fajitas/shadcn-ui-lib/hooks/useBreakpoint";
 
 const variants = {
   mobile: {
@@ -39,8 +42,9 @@ type CenterStickyNavProps = React.PropsWithChildren<{
 
 export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
   const { scrollYProgress } = useScroll();
-  const isLessThanDesktop = useIsLessThanDesktop();
-
+  const isLessThanDesktopAndLargerThanMobile =
+    useIsLessThanDesktopAndLargerThanMobile();
+  const isDesktopOrLarger = useIsDesktopOrLarger();
   const progress = useSpring(scrollYProgress, {
     stiffness: 200,
     damping: 30,
@@ -48,12 +52,12 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
   });
 
   const range: [number, number] = [0, 0.2];
-
+  console.log({ isMobile, isLessThanDesktopAndLargerThanMobile });
   const variant = isMobile
     ? variants.mobile
-    : isLessThanDesktop
-      ? variants.md
-      : variants.lg;
+    : isDesktopOrLarger
+      ? variants.lg
+      : variants.md;
 
   const top = useTransform(progress, range, [variant.top, "0%"]);
   const width = useTransform(progress, range, [variant.width, "100%"]);
@@ -62,7 +66,7 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
     "0 12px 35px rgba(0,0,0,0.4)",
     "0 4px 18px rgba(0,0,0,0.25)",
   ]);
-  console.log({ progress });
+
   // 💋 + text logo animation (nav version)
   // Start logo animation at 50% of nav animation (0.1 to 0.2)
   const logoRange: [number, number] = [0.1, 0.2];

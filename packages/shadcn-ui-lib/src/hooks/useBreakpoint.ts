@@ -8,16 +8,17 @@ export function useIsDesktopOrLarger(desktopBreakpoint = 1024) {
   return useIsBreakpointMinWidth(desktopBreakpoint);
 }
 
-export function useIsLessThanDesktop() {
+export function useIsLessThanDesktopAndLargerThanMobile() {
   const isLessThanDesktop = useIsBreakpointMaxWidth(1024);
-  return isLessThanDesktop;
-
+  const isLargerThanMobile = useIsBreakpointMinWidth(768);
+  return isLessThanDesktop && isLargerThanMobile;
 }
 
 export function useIsBreakpointMaxWidth(breakpoint = 768) {
   const [isBreakpoint, setIsBreakpoint] = React.useState<boolean | undefined>(
     undefined,
   );
+  console.log({ breakpoint });
 
   React.useEffect(() => {
     const mql = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
