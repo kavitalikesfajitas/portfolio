@@ -2,11 +2,16 @@
 
 import { NavForMain } from "./main/NavForMain";
 import { Hero } from "./main/Hero";
-
+import { useIsMobile } from "@kavita-likes-fajitas/shadcn-ui-lib/hooks/useBreakpoint";
+import { SoftFadeSkeleton } from "@kavita-likes-fajitas/ui-library/Skeletons/SoftFadeSkeleton";
 export default function Home() {
+  const isMobile = useIsMobile();
+  if (isMobile === undefined) {
+    return <SoftFadeSkeleton />;
+  }
   return (
     <>
-      <NavForMain />
+      <NavForMain isMobile={isMobile} />
       <main className="bg-gray-950 text-white relative">
         <Hero />
         <section className="min-h-screen px-6 py-24 bg-gray-950">

@@ -1,10 +1,7 @@
 import clsx from "clsx";
 import { useScroll, useSpring, useTransform, motion } from "motion/react";
 import Image from "next/image";
-import {
-  useIsDesktopOrLarger,
-  useIsLessThanDesktopAndLargerThanMobile,
-} from "@kavita-likes-fajitas/shadcn-ui-lib/hooks/useBreakpoint";
+import { useIsDesktopOrLarger } from "@kavita-likes-fajitas/shadcn-ui-lib/hooks/useBreakpoint";
 
 const variants = {
   mobile: {
@@ -54,7 +51,7 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
 
   const variant = isMobile
     ? variants.mobile
-    : isDesktopOrLarger
+    : !!isDesktopOrLarger
       ? variants.lg
       : variants.md;
 
