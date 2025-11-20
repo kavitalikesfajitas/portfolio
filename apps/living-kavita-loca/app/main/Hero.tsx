@@ -2,17 +2,18 @@
 
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
 import Image from "next/image";
+import "./Hero.css";
 
 export function Hero() {
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, {
-    stiffness: 200,
+    stiffness: 100,
     damping: 30,
-    mass: 0.2,
+    mass: 0.5,
   });
 
-  // Match the nav’s morph range
-  const range: [number, number] = [0, 0.2];
+  // Match the nav's morph range
+  const range: [number, number] = [0, 0.35];
 
   // Animate the whole logo block
   const heroScale = useTransform(progress, range, [1, 0.7]);
@@ -24,7 +25,8 @@ export function Hero() {
   const lipsY = useTransform(progress, range, ["0%", "-8%"]);
 
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-start ">
+    // overflow-x-clip is important to ensure that on mobile it does not scroll horizontally
+    <section className="relative flex min-h-screen flex-col items-center justify-start overflow-x-clip">
       <motion.div
         style={{ scale: heroScale, y: heroY, opacity: heroOpacity }}
         className="relative flex basis-[30vh] shrink-0 grow-0 w-full justify-center items-start scale-[0.7] md:scale-[0.5] lg:scale-75"
@@ -34,12 +36,12 @@ export function Hero() {
           alt="living kavita loca"
           width={1024}
           height={1024}
-          className="object-contain max-h-full"
+          className="object-contain max-w-full"
         />
 
         <motion.div
           style={{ scale: lipsScale, y: lipsY }}
-          className="absolute top-1/2 -translate-y-1/2 translate-x-1/2 scale-50"
+          className="absolute top-1/2 translate-x-[45%] -translate-y-1/2 scale-50 lips"
         >
           <Image
             src="/images/lips-glossy.png"

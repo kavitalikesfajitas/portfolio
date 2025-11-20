@@ -42,12 +42,12 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
 
   const isDesktopOrLarger = useIsDesktopOrLarger();
   const progress = useSpring(scrollYProgress, {
-    stiffness: 200,
+    stiffness: 100,
     damping: 30,
-    mass: 0.2,
+    mass: 0.5,
   });
 
-  const range: [number, number] = [0, 0.2];
+  const range: [number, number] = [0, 0.35];
 
   const variant = isMobile
     ? variants.mobile
@@ -64,8 +64,8 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
   ]);
 
   // 💋 + text logo animation (nav version)
-  // Start logo animation at 50% of nav animation (0.1 to 0.2)
-  const logoRange: [number, number] = [0.1, 0.2];
+  // Start logo animation at 50% of nav animation
+  const logoRange: [number, number] = [0.175, 0.35];
   const logoOpacity = useTransform(progress, logoRange, [0, 1]);
   const logoScale = useTransform(progress, logoRange, [0.8, 1]);
   const logoY = useTransform(progress, logoRange, ["20%", "0%"]);
