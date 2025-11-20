@@ -11,9 +11,9 @@ export default function Home() {
   }
   return (
     <>
-      <NavForMain isMobile={isMobile} />
-      <main className="bg-gray-950 text-white relative">
+      <main className="bg-gray-950 text-white relative flex flex-col">
         <Hero />
+        <NavForMain isMobile={isMobile} />
         <section className="min-h-screen px-6 py-24 bg-gray-950">
           <h2 className="text-3xl font-bold mb-6">More Content</h2>
           <p className="text-lg opacity-80 mb-4">

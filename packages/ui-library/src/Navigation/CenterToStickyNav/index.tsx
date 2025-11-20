@@ -14,20 +14,20 @@ const variants = {
     boxShadow: "0 12px 35px rgba(0,0,0,0.4)",
   },
   lg: {
-    top: "78%",
-    left: "50%",
-    x: "-50%",
-    y: "-50%",
-    width: "50%",
-    borderRadius: 999,
-    boxShadow: "0 12px 35px rgba(0,0,0,0.4)",
-  },
-  md: {
     top: "70%",
     left: "50%",
     x: "-50%",
     y: "-50%",
-    width: "50%",
+    width: "30%",
+    borderRadius: 999,
+    boxShadow: "0 12px 35px rgba(0,0,0,0.4)",
+  },
+  md: {
+    top: "60%",
+    left: "50%",
+    x: "-50%",
+    y: "-50%",
+    width: "30%",
     borderRadius: 999,
     boxShadow: "0 12px 35px rgba(0,0,0,0.4)",
   },
@@ -55,7 +55,7 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
       ? variants.lg
       : variants.md;
 
-  const top = useTransform(progress, range, [variant.top, "0%"]);
+  const top = useTransform(progress, range, ["0%", "-50%"]);
   const width = useTransform(progress, range, [variant.width, "100%"]);
   const borderRadius = useTransform(progress, range, [variant.borderRadius, 0]);
   const boxShadow = useTransform(progress, range, [
@@ -82,8 +82,9 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
       className={clsx(
         "sticky left-0 z-50 mx-auto flex min-w-fit items-center justify-between overflow-visible bg-white text-gray-950",
         "rounded-full",
+        "top-0",
       )}
-      style={{ top, width, borderRadius, boxShadow }}
+      style={{ width, borderRadius, boxShadow }}
     >
       <motion.div
         style={{

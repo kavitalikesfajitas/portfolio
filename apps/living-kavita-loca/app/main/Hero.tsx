@@ -26,32 +26,34 @@ export function Hero() {
 
   return (
     // overflow-x-clip is important to ensure that on mobile it does not scroll horizontally
-    <section className="relative flex min-h-screen flex-col items-center justify-start overflow-x-clip">
-      <motion.div
-        style={{ scale: heroScale, y: heroY, opacity: heroOpacity }}
-        className="relative flex basis-[30vh] shrink-0 grow-0 w-full justify-center items-start scale-[0.7] md:scale-[0.5] lg:scale-75"
-      >
-        <Image
-          src="/images/living-kavita-loca-logo.png"
-          alt="living kavita loca"
-          width={1024}
-          height={1024}
-          className="object-contain max-w-full"
-        />
-
+    <section className="relative flex  flex-col items-center justify-items-center overflow-x-clip">
+      <div className="flex flex-col grow h-full w-full items-center">
         <motion.div
-          style={{ scale: lipsScale, y: lipsY }}
-          className="absolute top-1/2 translate-x-[45%] -translate-y-1/2 scale-50 lips"
+          style={{ scale: heroScale, y: heroY, opacity: heroOpacity }}
+          className="relative flex basis-[30vh] shrink-0 grow-0 w-full justify-center items-start scale-[0.7] md:scale-[0.5] lg:scale-[.50]"
         >
           <Image
-            src="/images/lips-glossy.png"
-            alt="lips open that are glossy"
-            className="lips relative z-10"
-            height={1024}
-            width={1024}
+            src="/images/living-kavita-loca-logo.png"
+            alt="living kavita loca"
+            width={800}
+            height={800}
+            className="object-contain max-w-full"
           />
+
+          <motion.div
+            style={{ scale: lipsScale, y: lipsY }}
+            className="absolute top-1/2 translate-x-[45%] -translate-y-1/2 scale-50 lips"
+          >
+            <Image
+              src="/images/lips-glossy.png"
+              alt="lips open that are glossy"
+              className="lips relative z-10"
+              height={800}
+              width={800}
+            />
+          </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
     </section>
   );
 }
