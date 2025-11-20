@@ -2,9 +2,10 @@
 
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
 import Image from "next/image";
+import { forwardRef } from "react";
 import "./Hero.css";
 
-export function Hero() {
+export const Hero = forwardRef<HTMLElement>(function Hero(props, ref) {
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -26,34 +27,34 @@ export function Hero() {
 
   return (
     // overflow-x-clip is important to ensure that on mobile it does not scroll horizontally
-    <section className="relative flex  flex-col items-center justify-items-center overflow-x-clip">
+    <section ref={ref} className="relative flex flex-col  overflow-x-clip">
       <div className="flex flex-col grow h-full w-full items-center">
         <motion.div
           style={{ scale: heroScale, y: heroY, opacity: heroOpacity }}
-          className="relative flex basis-[30vh] shrink-0 grow-0 w-full justify-center items-start scale-[0.7] md:scale-[0.5] lg:scale-[.50]"
+          className="relative flex  w-full justify-center scale-75 md:scale-100 lg:scale-125"
         >
           <Image
             src="/images/living-kavita-loca-logo.png"
             alt="living kavita loca"
-            width={800}
-            height={800}
+            width={650}
+            height={650}
             className="object-contain max-w-full"
           />
 
           <motion.div
             style={{ scale: lipsScale, y: lipsY }}
-            className="absolute top-1/2 translate-x-[45%] -translate-y-1/2 scale-50 lips"
+            className="absolute top-1/2 translate-x-1/2 -translate-y-1/2 scale-50 lips"
           >
             <Image
               src="/images/lips-glossy.png"
               alt="lips open that are glossy"
               className="lips relative z-10"
-              height={800}
-              width={800}
+              height={600}
+              width={600}
             />
           </motion.div>
         </motion.div>
       </div>
     </section>
   );
-}
+});
