@@ -27,13 +27,13 @@ export function Hero() {
     <section className="relative flex min-h-screen flex-col items-center justify-start ">
       <motion.div
         style={{ scale: heroScale, y: heroY, opacity: heroOpacity }}
-        className="relative flex basis-[30vh] w-full justify-center items-start scale-[0.7] md:scale-[0.5] lg:scale-75"
+        className="relative flex basis-[30vh] shrink-0 grow-0 w-full justify-center items-start scale-[0.7] md:scale-[0.5] lg:scale-75"
       >
         <Image
           src="/images/living-kavita-loca-logo.png"
           alt="living kavita loca"
-          height={1024}
           width={1024}
+          height={1024}
           className="object-contain max-h-full"
         />
 

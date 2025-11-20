@@ -42,8 +42,7 @@ type CenterStickyNavProps = React.PropsWithChildren<{
 
 export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
   const { scrollYProgress } = useScroll();
-  const isLessThanDesktopAndLargerThanMobile =
-    useIsLessThanDesktopAndLargerThanMobile();
+
   const isDesktopOrLarger = useIsDesktopOrLarger();
   const progress = useSpring(scrollYProgress, {
     stiffness: 200,
@@ -52,7 +51,7 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
   });
 
   const range: [number, number] = [0, 0.2];
-  console.log({ isMobile, isLessThanDesktopAndLargerThanMobile });
+
   const variant = isMobile
     ? variants.mobile
     : isDesktopOrLarger
@@ -73,12 +72,8 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
   const logoOpacity = useTransform(progress, logoRange, [0, 1]);
   const logoScale = useTransform(progress, logoRange, [0.8, 1]);
   const logoY = useTransform(progress, logoRange, ["20%", "0%"]);
-  // Mobile: smaller basis to prevent cramping
-  const logoFlexBasis = useTransform(
-    progress,
-    logoRange,
-    isMobile ? ["0%", "40%"] : ["0%", "50%"],
-  );
+
+  const logoFlexBasis = useTransform(progress, logoRange, ["0%", "40%"]);
   const logoFlexShrink = useTransform(progress, logoRange, [0, 0]);
 
   // Nav items: move from center to right as logo appears
