@@ -5,8 +5,6 @@ import { useIsDesktopOrLarger } from "@kavita-likes-fajitas/shadcn-ui-lib/hooks/
 
 const variants = {
   mobile: {
-    top: "55%",
-    left: "50%",
     x: "-50%",
     y: "-50%",
     width: "36%",
@@ -14,8 +12,6 @@ const variants = {
     boxShadow: "0 12px 35px rgba(0,0,0,0.4)",
   },
   lg: {
-    top: "70%",
-    left: "50%",
     x: "-50%",
     y: "-50%",
     width: "30%",
@@ -42,12 +38,12 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
 
   const isDesktopOrLarger = useIsDesktopOrLarger();
   const progress = useSpring(scrollYProgress, {
-    stiffness: 100,
+    stiffness: 200,
     damping: 30,
-    mass: 0.5,
+    mass: 0.4,
   });
 
-  const range: [number, number] = [0, 0.35];
+  const range: [number, number] = [0, 0.9];
 
   const variant = isMobile
     ? variants.mobile
@@ -55,17 +51,17 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
       ? variants.lg
       : variants.md;
 
-  const top = useTransform(progress, range, ["0%", "-50%"]);
   const width = useTransform(progress, range, [variant.width, "100%"]);
   const borderRadius = useTransform(progress, range, [variant.borderRadius, 0]);
   const boxShadow = useTransform(progress, range, [
     "0 12px 35px rgba(0,0,0,0.4)",
     "0 4px 18px rgba(0,0,0,0.25)",
   ]);
+  const top = useTransform(progress, range, ["50%", "0%"]);
 
   // 💋 + text logo animation (nav version)
   // Start logo animation at 50% of nav animation
-  const logoRange: [number, number] = [0.175, 0.35];
+  const logoRange: [number, number] = [0.2, 0.9];
   const logoOpacity = useTransform(progress, logoRange, [0, 1]);
   const logoScale = useTransform(progress, logoRange, [0.8, 1]);
   const logoY = useTransform(progress, logoRange, ["20%", "0%"]);
@@ -82,9 +78,8 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
       className={clsx(
         "sticky left-0 z-50 mx-auto flex min-w-fit items-center justify-between overflow-visible bg-white text-gray-950",
         "rounded-full",
-        "top-0",
       )}
-      style={{ width, borderRadius, boxShadow }}
+      style={{ width, borderRadius, boxShadow, top }}
     >
       <motion.div
         style={{
