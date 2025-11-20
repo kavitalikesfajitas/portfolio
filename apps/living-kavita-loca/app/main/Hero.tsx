@@ -8,18 +8,18 @@ import "./Hero.css";
 export const Hero = forwardRef<HTMLElement>(function Hero(props, ref) {
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    mass: 0.5,
+    stiffness: 80,
+    damping: 40,
+    mass: 0.6,
   });
 
   // Match the nav's morph range
-  const range: [number, number] = [0, 0.35];
+  const range: [number, number] = [0, 0.4];
 
   // Animate the whole logo block
   const heroScale = useTransform(progress, range, [1, 0.7]);
   const heroY = useTransform(progress, range, ["0%", "-12%"]);
-  const heroOpacity = useTransform(progress, range, [1, 0]);
+  const heroOpacity = useTransform(progress, range, [1, 0.15]);
 
   // Optional: give the lips a tiny bit of extra motion so they feel alive
   const lipsScale = useTransform(progress, range, [1, 0.9]);
