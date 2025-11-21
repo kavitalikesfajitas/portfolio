@@ -10,8 +10,11 @@
     "lint": {
       "dependsOn": ["^lint"]
     },
-    "check-types": {
-      "dependsOn": ["^check-types"]
+    "typecheck": {
+      "dependsOn": ["^typecheck"]
+    },
+    "test-ci": {
+      "dependsOn": ["^test-ci"]
     },
     "dev": {
       "inputs": ["$TURBO_DEFAULT$", ".env.local", ".env.development", ".env"],
