@@ -1,8 +1,12 @@
 import clsx from "clsx";
 import { useScroll, useSpring, useTransform, motion } from "motion/react";
-import Image from "next/image";
 
-export function CenterStickyNav({ children }: React.PropsWithChildren) {
+type CenterStickyNavProps = {
+  children: React.ReactNode;
+  InNavLogo: () => React.ReactNode;
+};
+
+export function CenterStickyNav({ children, InNavLogo }: CenterStickyNavProps) {
   const { scrollYProgress } = useScroll();
 
   const progress = useSpring(scrollYProgress, {
@@ -57,17 +61,7 @@ export function CenterStickyNav({ children }: React.PropsWithChildren) {
         }}
         className="flex shrink-0 items-center gap-1 overflow-hidden whitespace-nowrap md:gap-2"
       >
-        <span className="pl-1 text-xs font-semibold uppercase leading-tight tracking-tight sm:text-sm md:pl-2 md:text-base md:tracking-[0.25em]">
-          Living Kavita Loca
-        </span>
-        <div className="relative h-6 w-6 md:h-9 md:w-9">
-          <Image
-            src="/images/lips-glossy.png"
-            alt="Living Kavita Loca lips"
-            fill
-            className="object-contain"
-          />
-        </div>
+        <InNavLogo />
       </motion.div>
 
       {/* Nav items in the center/right */}
