@@ -11,27 +11,33 @@ export function CenterStickyNav({ children }: React.PropsWithChildren) {
     mass: 0.4,
   });
 
+  // this is the range for the nav animation
   const range: [number, number] = [0, 0.7];
 
   const width = useTransform(progress, range, ["30%", "100%"]);
   const borderRadius = useTransform(progress, range, [999, 0]);
   const boxShadow = useTransform(progress, range, [
-    "0 12px 35px rgba(0,0,0,0.4)",
-    "0 4px 18px rgba(0,0,0,0.25)",
+    "0 12px 35px rgba(255,255,255,0.4)", // white shadow
+    "0 4px 18px rgba(255,255,255,0)", // no shadow
   ]);
   const top = useTransform(progress, range, [1, 0]);
 
-  // 💋 + text logo animation (nav version)
-  // Start logo animation at 50% of nav animation
+  // 💋 + text logo animation for the nav
+  // Start logo animation at 40% of nav animation
+  // we want this range to be slightly different because we want it to
+  //  happen slightly later than the nav animation
   const logoRange: [number, number] = [0.4, 0.8];
   const logoOpacity = useTransform(progress, logoRange, [0, 1]);
+  // the logo will slide in from the left and scale up slightly from 80% to 100% of its original size
   const logoScale = useTransform(progress, logoRange, [0.8, 1]);
   const logoY = useTransform(progress, logoRange, ["20%", "0%"]);
 
+  // Use flex-basis to change the width of the logo/left side content
+  // with living kavita loca logo so that it does not show up at first,
+  // then it grows to 40% of the width of the nav.
   const logoFlexBasis = useTransform(progress, logoRange, ["0%", "40%"]);
-  const logoFlexShrink = useTransform(progress, logoRange, [0, 0]);
 
-  // Nav items: move from center to right as logo appears
+  // Nav items: move from center to right as logo appears by changing the flex-grow
   // Flex-grow: starts at 1 (takes all space, centers content), ends at 0 (no extra space)
   const navFlexGrow = useTransform(progress, logoRange, [1, 0]);
 
@@ -49,9 +55,8 @@ export function CenterStickyNav({ children }: React.PropsWithChildren) {
           scale: logoScale,
           y: logoY,
           flexBasis: logoFlexBasis,
-          flexShrink: logoFlexShrink,
         }}
-        className="flex items-center gap-1 overflow-hidden whitespace-nowrap md:gap-2"
+        className="flex shrink-0 items-center gap-1 overflow-hidden whitespace-nowrap md:gap-2"
       >
         <span className="pl-1 text-xs font-semibold uppercase leading-tight tracking-tight sm:text-sm md:pl-2 md:text-base md:tracking-[0.25em]">
           Living Kavita Loca
