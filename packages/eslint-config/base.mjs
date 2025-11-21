@@ -8,7 +8,7 @@ import tseslint from "typescript-eslint";
  *
  * @type {import("eslint").Linter.Config[]}
  * */
-export const config = [
+const config = [
   js.configs.recommended,
   eslintConfigPrettier,
   ...tseslint.configs.recommended,
@@ -22,12 +22,12 @@ export const config = [
   },
   {
     ignores: [
-      '**/node_modules/**',
-      '**/dist/**',
-      '**/.next/**',
-      '**/build/**',
-      '**/coverage/**',
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.next/**",
+      "**/build/**",
+      "**/coverage/**",
     ],
   },
 ];
-
+export default config;

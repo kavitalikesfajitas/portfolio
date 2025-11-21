@@ -2,11 +2,15 @@
   "name": "living-kavita-loca",
   "version": "0.1.0",
   "private": true,
+  "description": "Portfolio and personal website of Kavita - software engineer and creative developer",
   "scripts": {
     "dev": "next dev --experimental-https --port 3001 --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test-ci": "vitest run --coverage --reporter=dot",
     "generate:component": "turbo gen react-component"
   },
   "dependencies": {

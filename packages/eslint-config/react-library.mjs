@@ -1,4 +1,4 @@
-import base from "./index.mjs";
+import baseConfig from "./base.mjs";
 import js from "@eslint/js";
 import tseslint from "@typescript-eslint/eslint-plugin";
 import tsparser from "@typescript-eslint/parser";
@@ -7,7 +7,7 @@ import reactPlugin from "eslint-plugin-react";
 
 /** @type {import('eslint').Linter.Config[]} */
 const config = [
-  ...base,
+  ...baseConfig,
   // ESLint recommended rules for JavaScript files only - for our mjs config files
   {
     files: ["**/*.js", "**/*.mjs"],

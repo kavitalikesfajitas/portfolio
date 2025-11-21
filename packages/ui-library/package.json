@@ -30,6 +30,9 @@
     "lint": "eslint",
     "generate:component": "turbo gen react-component"
   },
+  "dependencies": {
+    "@kavita-likes-fajitas/shadcn-ui-lib": "workspace:*"
+  },
   "peerDependencies": {
     "@tailwindcss/postcss": "^4",
     "clsx": "^2.1.1",
