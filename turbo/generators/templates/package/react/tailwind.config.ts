@@ -1,11 +1,6 @@
 import type { Config } from "tailwindcss";
-import sharedConfig from "@kavita-likes-fajitas/tailwind-config";
 
 const config: Config = {
-  content: [
-    "./src/**/*.{js,ts,jsx,tsx,mdx}"
-  ],
-  presets: [sharedConfig],
-
+  content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
 };
 export default config;
