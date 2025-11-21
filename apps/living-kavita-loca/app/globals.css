@@ -1,29 +1,21 @@
 @import "tailwindcss";
+@import "@kavita-likes-fajitas/tailwind-config/shared-styles";
 @import "@kavita-likes-fajitas/shadcn-ui-lib/styles/global.css";
 @config "../tailwind.config.ts";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@-ms-viewport {
+  width: device-width;
+  height: device-width;
 }
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-helvetica-neue: fontHelveticaNeue, Helvetica, Arial, sans-serif;
-  --font-helvetica-mono: "Helvetica Monospaced Pro", monospace;
-  --font-midnight-gelactic: fontMidnightGelactic, serif;
+.font-midnight-gelactic {
+  font-family: var(--font-midnight-gelactic);
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.font-helvetica-neue {
+  font-family: var(--font-helvetica-neue);
 }
-
 body {
-  background: var(--background);
-  color: var(--foreground);
+  min-height: 100vh;
+  background: var(--color-gray-950);
+  color: #ffffff;
   font-family: var(--font-helvetica-neue), Helvetica, Arial, sans-serif;
 }
