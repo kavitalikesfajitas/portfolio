@@ -16,13 +16,18 @@
     "./react-library": {
       "types": "./types/react-library.d.ts",
       "default": "./react-library.mjs"
+    },
+    "./esm": {
+      "types": "./types/esm.d.ts",
+      "default": "./esm.mjs"
     }
   },
   "files": [
     "types/**",
     "base.mjs",
     "next.mjs",
-    "react-library.mjs"
+    "react-library.mjs",
+    "esm.mjs"
   ],
   "peerDependencies": {
     "@eslint/eslintrc": "^3.0.0",
