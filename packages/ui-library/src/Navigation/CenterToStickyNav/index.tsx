@@ -1,58 +1,20 @@
 import clsx from "clsx";
 import { useScroll, useSpring, useTransform, motion } from "motion/react";
 import Image from "next/image";
-import { useIsDesktopOrLarger } from "@kavita-likes-fajitas/shadcn-ui-lib/hooks/useBreakpoint";
 
-const variants = {
-  mobile: {
-    x: "-50%",
-    y: "-50%",
-    width: "36%",
-    borderRadius: 99,
-    boxShadow: "0 12px 35px rgba(0,0,0,0.4)",
-  },
-  lg: {
-    x: "-50%",
-    y: "-50%",
-    width: "30%",
-    borderRadius: 999,
-    boxShadow: "0 12px 35px rgba(0,0,0,0.4)",
-  },
-  md: {
-    top: "60%",
-    left: "50%",
-    x: "-50%",
-    y: "-50%",
-    width: "30%",
-    borderRadius: 999,
-    boxShadow: "0 12px 35px rgba(0,0,0,0.4)",
-  },
-} as const;
-
-type CenterStickyNavProps = React.PropsWithChildren<{
-  isMobile: boolean;
-}>;
-
-export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
+export function CenterStickyNav({ children }: React.PropsWithChildren) {
   const { scrollYProgress } = useScroll();
 
-  const isDesktopOrLarger = useIsDesktopOrLarger();
   const progress = useSpring(scrollYProgress, {
     stiffness: 200,
     damping: 30,
     mass: 0.4,
   });
 
-  const range: [number, number] = [0, 0.9];
+  const range: [number, number] = [0, 0.7];
 
-  const variant = isMobile
-    ? variants.mobile
-    : !!isDesktopOrLarger
-      ? variants.lg
-      : variants.md;
-
-  const width = useTransform(progress, range, [variant.width, "100%"]);
-  const borderRadius = useTransform(progress, range, [variant.borderRadius, 0]);
+  const width = useTransform(progress, range, ["30%", "100%"]);
+  const borderRadius = useTransform(progress, range, [999, 0]);
   const boxShadow = useTransform(progress, range, [
     "0 12px 35px rgba(0,0,0,0.4)",
     "0 4px 18px rgba(0,0,0,0.25)",
@@ -61,7 +23,7 @@ export function CenterStickyNav({ isMobile, children }: CenterStickyNavProps) {
 
   // 💋 + text logo animation (nav version)
   // Start logo animation at 50% of nav animation
-  const logoRange: [number, number] = [0.2, 0.9];
+  const logoRange: [number, number] = [0.4, 0.8];
   const logoOpacity = useTransform(progress, logoRange, [0, 1]);
   const logoScale = useTransform(progress, logoRange, [0.8, 1]);
   const logoY = useTransform(progress, logoRange, ["20%", "0%"]);

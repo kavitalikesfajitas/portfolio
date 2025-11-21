@@ -14,11 +14,11 @@ export default function Home() {
   }
   return (
     <>
-      <main className="bg-gray-950 text-white relative flex flex-col mt-20 md:mt-32 lg:mt-40 min-h-[200vh]">
+      <main className="bg-gray-950  text-white relative flex flex-col mt-20 md:mt-32 lg:mt-40 min-h-[200vh]">
         <Hero />
         <NavForMain isMobile={isMobile} />
 
-        <div className={clsx("bg-gray-900", "flex grow")}>
+        <div className={clsx("bg-gray-950", "flex grow")}>
           {/* Content that takes up remaining screen height */}
         </div>
 

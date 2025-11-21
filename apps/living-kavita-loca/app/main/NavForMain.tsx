@@ -8,7 +8,7 @@ type NavForMainProps = {
 };
 export function NavForMain({ isMobile }: NavForMainProps) {
   return (
-    <CenterStickyNav isMobile={isMobile}>
+    <CenterStickyNav>
       <Nav isMobile={isMobile} />
     </CenterStickyNav>
   );

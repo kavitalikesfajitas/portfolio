@@ -42,7 +42,7 @@ export function Hero() {
 
           <motion.div
             style={{ scale: lipsScale, y: lipsY }}
-            className="absolute top-1/2 translate-x-1/2 -translate-y-1/2 scale-50 lips"
+            className="absolute top-1/2 translate-x-[45%] -translate-y-1/2 scale-50 lips"
           >
             <Image
               src="/images/lips-glossy.png"
