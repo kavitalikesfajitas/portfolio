@@ -2,8 +2,9 @@ import { describe, test, expect } from "vitest";
 import { render } from "@testing-library/react";
 import { Nav } from ".";
 
-describe("given a <TornPaperEffect>", () => {
+describe("given a <Nav>", () => {
   test("it renders the component successfully", () => {
-    const { container, debug } = render(<Nav isMobile={false} />);
+    const { container } = render(<Nav isMobile={false} />);
+    expect(container).toBeInTheDocument();
   });
 });
