@@ -4,47 +4,21 @@ import { NavForMain } from "./main/NavForMain";
 import { Hero } from "./main/Hero";
 import { useIsMobile } from "@kavita-likes-fajitas/shadcn-ui-lib/hooks/useBreakpoint";
 import { SoftFadeSkeleton } from "@kavita-likes-fajitas/ui-library/Skeletons/SoftFadeSkeleton";
-import { useMeasure, useWindowSize } from "@react-hookz/web";
-import { useRef, useMemo } from "react";
+import clsx from "clsx";
 
 export default function Home() {
   const isMobile = useIsMobile();
-  const mainRef = useRef<HTMLElement>(null);
-  const [heroMeasurements, heroRef] = useMeasure<HTMLDivElement>();
-  const [navMeasurements, navRef] = useMeasure<HTMLDivElement>();
-  const { height: windowHeight } = useWindowSize();
-
-  const remainingHeight = useMemo(() => {
-    if (!mainRef.current || !heroMeasurements || !navMeasurements) return 0;
-
-    const heroHeight = heroMeasurements.height || 0;
-    const navHeight = navMeasurements.height || 0;
-
-    // Get the main element's margin-top
-    const mainStyles = window.getComputedStyle(mainRef.current);
-    const marginTop = parseInt(mainStyles.marginTop) || 0;
-
-    return (windowHeight || 0) - marginTop - heroHeight - navHeight;
-  }, [windowHeight, heroMeasurements, navMeasurements]);
 
   if (isMobile === undefined) {
     return <SoftFadeSkeleton />;
   }
   return (
     <>
-      <main
-        ref={mainRef}
-        className="bg-gray-950 text-white relative flex flex-col mt-20 md:mt-32 lg:mt-40"
-      >
-        <Hero ref={heroRef} />
-        <NavForMain ref={navRef} isMobile={isMobile} />
+      <main className="bg-gray-950 text-white relative flex flex-col mt-20 md:mt-32 lg:mt-40 min-h-[200vh]">
+        <Hero />
+        <NavForMain isMobile={isMobile} />
 
-        <div
-          className="bg-gray-900"
-          style={{
-            height: remainingHeight > 0 ? `${remainingHeight}px` : "auto",
-          }}
-        >
+        <div className={clsx("bg-gray-900", "flex grow")}>
           {/* Content that takes up remaining screen height */}
         </div>
 

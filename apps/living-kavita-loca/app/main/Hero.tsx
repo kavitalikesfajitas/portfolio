@@ -2,10 +2,9 @@
 
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
 import Image from "next/image";
-import { forwardRef } from "react";
 import "./Hero.css";
 
-export const Hero = forwardRef<HTMLElement>(function Hero(props, ref) {
+export function Hero() {
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, {
     stiffness: 80,
@@ -27,7 +26,7 @@ export const Hero = forwardRef<HTMLElement>(function Hero(props, ref) {
 
   return (
     // overflow-x-clip is important to ensure that on mobile it does not scroll horizontally
-    <section ref={ref} className="relative flex flex-col  overflow-x-clip">
+    <section className="relative flex flex-col overflow-x-clip">
       <div className="flex flex-col grow h-full w-full items-center">
         <motion.div
           style={{ scale: heroScale, y: heroY, opacity: heroOpacity }}
@@ -57,4 +56,4 @@ export const Hero = forwardRef<HTMLElement>(function Hero(props, ref) {
       </div>
     </section>
   );
-});
+}
