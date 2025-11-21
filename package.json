@@ -8,16 +8,28 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "test-ci": "turbo run test-ci",
     "prepare": "husky",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "prettify": "prettier --write \"**/*.{js,ts,mts,tsx,mjs,md,hbs}\"",
+    "typecheck": "turbo run typecheck"
+  },
+  "lint-staged": {
+    "**/*.hbs": "prettier --write",
+    "**/*.{js,ts,mts,tsx,mjs}": [
+      "eslint --fix --max-warnings 0",
+      "prettier --write"
+    ],
+    "*.{css,md,html,json,scss,yaml}": [
+      "prettier --write"
+    ]
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "eslint": "^9.32.0",
     "husky": "^9.1.7",
+    "lint-staged": "^16.2.6",
     "plop": "^4.0.4",
     "prettier": "^3.6.2",
     "turbo": "^2.6.1",

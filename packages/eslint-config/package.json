@@ -9,20 +9,25 @@
       "types": "./types/base.d.ts",
       "default": "./base.mjs"
     },
-    "./next-js": {
+    "./next": {
       "types": "./types/next.d.ts",
       "default": "./next.mjs"
     },
-    "./react-internal": {
-      "types": "./types/react-internal.d.ts",
-      "default": "./react-internal.mjs"
+    "./react-library": {
+      "types": "./types/react-library.d.ts",
+      "default": "./react-library.mjs"
+    },
+    "./esm": {
+      "types": "./types/esm.d.ts",
+      "default": "./esm.mjs"
     }
   },
   "files": [
     "types/**",
     "base.mjs",
     "next.mjs",
-    "react-internal.mjs"
+    "react-library.mjs",
+    "esm.mjs"
   ],
   "peerDependencies": {
     "@eslint/eslintrc": "^3.0.0",

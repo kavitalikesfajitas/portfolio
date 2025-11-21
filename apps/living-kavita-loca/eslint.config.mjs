@@ -1,8 +1,6 @@
-import nextEslintConfig from "@kavita-likes-fajitas/eslint-config/next-js";
+import nextEslintConfig from "@kavita-likes-fajitas/eslint-config/next";
 
 /** @type {import('eslint').Linter.Config[]} */
-const eslintConfig = [
-  ...nextEslintConfig,
-];
+const eslintConfig = [...nextEslintConfig];
 
 export default eslintConfig;
