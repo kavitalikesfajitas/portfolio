@@ -21,8 +21,6 @@ export function CenterStickyNav({ children }: React.PropsWithChildren) {
     "0 12px 35px rgba(255,255,255,0.4)", // white shadow
     "0 4px 18px rgba(255,255,255,0)", // no shadow
   ]);
-  const top = useTransform(progress, range, [1, 0]);
-
   // 💋 + text logo animation for the nav
   // Start logo animation at 40% of nav animation
   // we want this range to be slightly different
@@ -46,9 +44,9 @@ export function CenterStickyNav({ children }: React.PropsWithChildren) {
     <motion.div
       className={clsx(
         "sticky left-0 z-50 mx-auto flex min-w-fit items-center justify-between overflow-visible bg-white text-gray-950",
-        "rounded-full",
+        "top-0 rounded-full",
       )}
-      style={{ width, borderRadius, boxShadow, top }}
+      style={{ width, borderRadius, boxShadow }}
     >
       <motion.div
         style={{
