@@ -1812,6 +1812,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-hookz/web@npm:^25.2.0":
+  version: 25.2.0
+  resolution: "@react-hookz/web@npm:25.2.0"
+  dependencies:
+    "@ver0/deep-equal": "npm:^1.0.0"
+  peerDependencies:
+    js-cookie: ^3.0.5
+    react: ^16.8 || ^17 || ^18 || ^19
+    react-dom: ^16.8 || ^17 || ^18 || ^19
+  peerDependenciesMeta:
+    js-cookie:
+      optional: true
+  checksum: 10c0/8e42ae38a3f8662ca07c5ee10b2f4489969ff716159191726d0e43ff702d0a487f007e3e61856584ccb929e13508c9a62b88d09d1f9c84d06abab914555deec1
+  languageName: node
+  linkType: hard
+
 "@rolldown/binding-darwin-arm64@npm:1.0.0-beta.9-commit.d91dfb5":
   version: 1.0.0-beta.9-commit.d91dfb5
   resolution: "@rolldown/binding-darwin-arm64@npm:1.0.0-beta.9-commit.d91dfb5"
@@ -2803,6 +2819,13 @@ __metadata:
   version: 1.11.1
   resolution: "@unrs/resolver-binding-win32-x64-msvc@npm:1.11.1"
   conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@ver0/deep-equal@npm:^1.0.0":
+  version: 1.0.1
+  resolution: "@ver0/deep-equal@npm:1.0.1"
+  checksum: 10c0/6f3691108aabfd0b2051fa6e27612dd5515ecba5a0e853a99d3482cb2c74bef463b94d26f7a0199eae9a9a71750b7e0007770ed280c52bcda724d856e36e3df7
   languageName: node
   linkType: hard
 
@@ -6672,6 +6695,7 @@ __metadata:
     "@kavita-likes-fajitas/tailwind-config": "npm:*"
     "@kavita-likes-fajitas/typescript-config": "npm:*"
     "@kavita-likes-fajitas/ui-library": "npm:*"
+    "@react-hookz/web": "npm:^25.2.0"
     "@tailwindcss/postcss": "npm:^4"
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/jest-dom": "npm:^6.9.1"
@@ -6686,6 +6710,7 @@ __metadata:
     eslint: "npm:^9"
     eslint-config-next: "npm:16.0.1"
     jsdom: "npm:^26.1.0"
+    motion: "npm:^12.23.24"
     next: "npm:16.0.1"
     react: "npm:19.2.0"
     react-dom: "npm:19.2.0"
