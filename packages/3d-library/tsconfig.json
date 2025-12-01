@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@kavita-likes-fajitas/typescript-config/react-library",
+  "include": [
+    ".eslint.config.mjs",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.mts",
+    "src/**/*.mjs",
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "src/**/*.json",
+    "__tests__/**/test.ts",
+    "__tests__/**/test.tsx"
+  ],
+  "exclude": ["node_modules/**", "**/.*/*", "./dist"]
+}
