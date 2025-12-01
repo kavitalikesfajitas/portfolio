@@ -7,7 +7,7 @@ import React, {
   useState,
 } from "react";
 import { extend, useFrame } from "@react-three/fiber";
-import { useIsLaptopOrHigher } from "@/libs/utils";
+import { useIsLaptopOrHigher } from "./utils";
 import { WaveShaderMaterial } from "./waveShaderMaterial";
 import {
   desktopCarouselAngle,
@@ -18,7 +18,7 @@ import {
 } from "./constants";
 import { useTexture } from "@react-three/drei";
 import { Vector3, Euler } from "three";
-import { Carousel3DItemsType } from "./types";
+import type { Carousel3DItemsType } from "./types";
 import { useCarouselContext } from "./provider";
 
 extend({ WaveShaderMaterial });

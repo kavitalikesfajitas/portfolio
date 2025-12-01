@@ -35,6 +35,16 @@ export default (phase: string) => {
     pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
     turbopack: {
       root: workspaceRoot, // Specify the monorepo root as turbo directory
+      rules: {
+        "*.vert": {
+          loaders: ["raw-loader"],
+          as: "*.js",
+        },
+        "*.frag": {
+          loaders: ["raw-loader"],
+          as: "*.js",
+        },
+      },
     },
     allowedDevOrigins: ["local.living-kavita-loca.com", "localhost"],
     output: "export",
@@ -51,6 +61,11 @@ export default (phase: string) => {
      */
     outputFileTracingRoot: workspaceRoot,
     webpack: (config) => {
+
+      config.module.rules.push({
+      test: /\.(frag|vert)$/,
+      type: "asset/source",
+      });
       config.resolve.alias = {
         ...(config.resolve.alias || {}),
         "@": path.resolve(__dirname, "."),

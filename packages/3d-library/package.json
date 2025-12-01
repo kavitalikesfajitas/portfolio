@@ -45,6 +45,7 @@
     "@kavita-likes-fajitas/eslint-config": "workspace:*",
     "@kavita-likes-fajitas/tailwind-config": "workspace:*",
     "@kavita-likes-fajitas/typescript-config": "workspace:*",
+    "@react-hookz/web": "^25.2.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",

@@ -1,18 +1,16 @@
 import React, { Suspense, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { PerspectiveCamera } from "@react-three/drei";
-import { useIsLaptopOrHigher } from "@/libs/utils";
+import { useIsLaptopOrHigher } from "./utils";
 import Carousel3DItems from "./Carousel3DItems";
-import {
-  desktopCarouselAngle,
-  mobileCarouselAngle,
-} from "../../constants/carousel-constants";
+
 import { useGesture } from "@use-gesture/react";
 import { NoToneMapping } from "three";
 import CarouselContainer from "./CarouselContainer";
-import { CarouselProps, CarouselType } from "./types";
-import { CarouselItems } from "nvs-types/dist/types/generated/contentful";
+
 import { CarouselArrowNav } from "./CarouselArrows";
+import type { CarouselProps } from "./types";
+import { desktopCarouselAngle, mobileCarouselAngle } from "./constants";
 
 const Carousel3D: React.FC<CarouselProps> = ({ items }) => {
   const isLaptop = useIsLaptopOrHigher();
@@ -37,9 +35,8 @@ const Carousel3D: React.FC<CarouselProps> = ({ items }) => {
   if (!items) return null;
   return (
     <CarouselContainer
-      type={CarouselType._3D}
       className={{ thumbails: "relative" }}
-      items={items as CarouselItems[]}
+      items={items}
       selectedIndex={selectedIndex}
       prevSelectedIndex={prevSelectedIndex}
       animateSelected={animateSelected}

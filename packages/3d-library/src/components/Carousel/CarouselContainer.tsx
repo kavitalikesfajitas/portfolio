@@ -1,18 +1,12 @@
-import React, { MutableRefObject, useEffect } from "react";
-import CarouselThumbnails from "./CarouselThumbnails";
-import {
-  CarouselItems,
-  ContentTypeAsset,
-} from "nvs-types/dist/types/generated/contentful";
-import { CarouselType } from "./types";
-import { useCarouselContext } from "../../contexts/CarouselContext";
-import { SiteWrapper } from "@/src/components/grid/components/SiteWrapper";
+import React, { type MutableRefObject, useEffect } from "react";
+import { useCarouselContext } from "./provider";
+import { SiteWrapper } from "./SiteWrapper";
 import clsx from "clsx";
+import { CarouselThumbnails } from "./CarouselThumbnails";
 
 type CarouselContainerProps = React.PropsWithChildren<{
   className?: { thumbails: string };
-  type: CarouselType;
-  items: CarouselItems[];
+  items: any[];
   selectedIndex: MutableRefObject<number>;
   prevSelectedIndex?: MutableRefObject<number>;
   animateSelected?: MutableRefObject<string>;
@@ -20,7 +14,6 @@ type CarouselContainerProps = React.PropsWithChildren<{
 
 const CarouselContainer: React.FC<CarouselContainerProps> = ({
   className,
-  type,
   items,
   children,
   selectedIndex,
@@ -31,26 +24,25 @@ const CarouselContainer: React.FC<CarouselContainerProps> = ({
   const thumbnails = items?.map((item) => item?.carouselThumbnail);
 
   useEffect(() => {
-    carouselContext?.setType(type);
     carouselContext?.setSelectedIndex(selectedIndex.current);
     carouselContext?.setItems(items);
-  }, [carouselContext, items, selectedIndex, type]);
+  }, [carouselContext, items, selectedIndex]);
 
   return (
-    <div className="w-full flex flex-col content-center justify-center overflow-hidden relative">
+    <div className="relative flex w-full flex-col content-center justify-center overflow-hidden">
       <SiteWrapper
-        className={clsx("z-10 absolute top-0", className?.thumbails)}
+        className={clsx("absolute top-0 z-10", className?.thumbails)}
       >
         <div className="mx-auto max-w-6xl self-center">
           <CarouselThumbnails
-            images={thumbnails as ContentTypeAsset[]}
+            images={thumbnails as any[]}
             selectedIndex={selectedIndex}
-            prevSelectedIndex={prevSelectedIndex}
+            prevSelectedIndex={prevSelectedIndex as MutableRefObject<number>}
             animateSelected={animateSelected}
           />
         </div>
       </SiteWrapper>
-      <div className="h-screen w-full relative">{children}</div>
+      <div className="relative h-screen w-full">{children}</div>
     </div>
   );
 };

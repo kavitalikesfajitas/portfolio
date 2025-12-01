@@ -1,6 +1,5 @@
 import React from "react";
-import { ArrowLeft, ArrowRight } from "@nike-nvs/nvs-ds-icons";
-import { Button } from "nvs-design-system/dist/Button_DEPRECATED";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 type CarouselArrowNavProps = {
   onClickRightArrow: () => void;
@@ -9,21 +8,20 @@ type CarouselArrowNavProps = {
 
 export const CarouselArrowNav = (props: CarouselArrowNavProps) => {
   return (
-    <div className="absolute z-1 top-[50%] w-full flex justify-between">
-      <Button
-        className="bg-transparent mx-2"
-        buttonType={"secondary"}
-        size={"lg"}
-        icon={<ArrowLeft />}
+    <div className="z-1 absolute top-[50%] flex w-full justify-between">
+      <button
+        className="mx-2 bg-transparent text-white"
         onClick={props.onClickLeftArrow}
-      />
-      <Button
-        className="bg-transparent mx-2"
-        buttonType={"secondary"}
-        size={"lg"}
-        icon={<ArrowRight />}
+      >
+        <ChevronLeftIcon className="h-6 w-6" />
+      </button>
+
+      <button
+        className="mx-2 bg-transparent text-white"
         onClick={props.onClickRightArrow}
-      />
+      >
+        <ChevronRightIcon className="h-6 w-6" />
+      </button>
     </div>
   );
 };
