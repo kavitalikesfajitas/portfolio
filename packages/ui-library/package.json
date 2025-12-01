@@ -39,7 +39,8 @@
     "clsx": "^2.1.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4",
+    "motion": "^12.23.24"
   },
   "devDependencies": {
     "@kavita-likes-fajitas/eslint-config": "workspace:*",

@@ -5,7 +5,7 @@
 
 @-ms-viewport {
   width: device-width;
-  height: device-width;
+  height: device-height;
 }
 .font-midnight-gelactic {
   font-family: var(--font-midnight-gelactic);

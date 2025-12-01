@@ -4,6 +4,7 @@ import {
   NavigationMenuLink,
   NavigationMenuTrigger,
 } from "@kavita-likes-fajitas/shadcn-ui-lib/components/ui/navigation-menu";
+import clsx from "clsx";
 import Link from "next/link";
 
 export function ListThatsFancy() {
@@ -15,7 +16,10 @@ export function ListThatsFancy() {
           <li className="row-span-3">
             <NavigationMenuLink asChild>
               <Link
-                className="from-muted/50 to-muted flex h-full w-full flex-col justify-end rounded-md bg-linear-to-b p-4 no-underline outline-hidden transition-all duration-200 select-none focus:shadow-md md:p-6"
+                className={clsx(
+                  "from-muted/50 to-muted flex h-full w-full flex-col justify-end rounded-md",
+                  "bg-linear-to-b p-4 no-underline outline-hidden transition-all duration-200 select-none focus:shadow-md md:p-6",
+                )}
                 href="/"
               >
                 <div className="mb-2 text-lg font-medium sm:mt-4">

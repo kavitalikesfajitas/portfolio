@@ -13,29 +13,27 @@ export default function Home() {
     return <SoftFadeSkeleton />;
   }
   return (
-    <>
-      <main
-        className={clsx(
-          "bg-gray-950 text-white relative flex flex-col mt-20 md:mt-32 lg:mt-40 min-h-[200vh]",
-        )}
-      >
-        <Hero />
-        <NavForMain isMobile={isMobile} />
-        <div className={clsx("bg-gray-950", "flex grow")}>
-          {/* Content that takes up remaining screen height */}
+    <main
+      className={clsx(
+        "bg-gray-950 text-white relative flex flex-col mt-20 md:mt-32 lg:mt-40 min-h-[200vh]",
+      )}
+    >
+      <Hero />
+      <NavForMain isMobile={isMobile} />
+      <div className={clsx("bg-gray-950", "flex grow")}>
+        {/* Content that takes up remaining screen height */}
+      </div>
+      <section className="min-h-screen px-6 py-24 bg-gray-950">
+        <h2 className="text-3xl font-bold mb-6">More Content</h2>
+        <p className="text-lg opacity-80 mb-4">
+          Now the page scrolls — My nav can animate.
+        </p>
+        <div className="space-y-10 max-w-2xl">
+          <p>Placeholder content…</p>
+          <p>More placeholder…</p>
+          <p>Scrolling enabled…</p>
         </div>
-        <section className="min-h-screen px-6 py-24 bg-gray-950">
-          <h2 className="text-3xl font-bold mb-6">More Content</h2>
-          <p className="text-lg opacity-80 mb-4">
-            Now the page scrolls — My nav can animate.
-          </p>
-          <div className="space-y-10 max-w-2xl">
-            <p>Placeholder content…</p>
-            <p>More placeholder…</p>
-            <p>Scrolling enabled…</p>
-          </div>
-        </section>
-      </main>
-    </>
+      </section>
+    </main>
   );
 }
