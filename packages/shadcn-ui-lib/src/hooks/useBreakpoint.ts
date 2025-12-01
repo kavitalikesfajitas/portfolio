@@ -8,12 +8,6 @@ export function useIsDesktopOrLarger(desktopBreakpoint = 1024) {
   return useIsBreakpointMinWidth(desktopBreakpoint);
 }
 
-export function useIsDesktop(tabletBreakpoint = 768) {
-  const isLessThanDesktop = useIsBreakpointMaxWidth(1024);
-  return isLessThanDesktop;
-
-}
-
 export function useIsBreakpointMaxWidth(breakpoint = 768) {
   const [isBreakpoint, setIsBreakpoint] = React.useState<boolean | undefined>(
     undefined,
@@ -29,7 +23,7 @@ export function useIsBreakpointMaxWidth(breakpoint = 768) {
     return () => mql.removeEventListener("change", onChange);
   }, [breakpoint]);
 
-  return !!isBreakpoint;
+  return isBreakpoint;
 }
 
 export function useIsBreakpointMinWidth(breakpoint = 768) {
@@ -47,5 +41,5 @@ export function useIsBreakpointMinWidth(breakpoint = 768) {
     return () => mql.removeEventListener("change", onChange);
   }, [breakpoint]);
 
-  return !!isBreakpoint;
+  return isBreakpoint;
 }

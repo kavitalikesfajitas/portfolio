@@ -1306,6 +1306,7 @@ __metadata:
     clsx: "npm:^2.1.1"
     eslint: "npm:^9"
     jsdom: "npm:^26.1.0"
+    motion: "npm:^12.23.24"
     postcss: "npm:^8.5.6"
     prettier: "npm:^3.6.2"
     prettier-plugin-tailwindcss: "npm:^0.7.1"
@@ -1808,6 +1809,22 @@ __metadata:
     "@types/react-dom":
       optional: true
   checksum: 10c0/cf86a37f1cbee50a964056f3dc4f6bb1ee79c76daa321f913aa20ff3e1ccdfafbf2b114d7bb616aeefc7c4b895e6ca898523fdb67710d89bd5d8edb739a0d9b6
+  languageName: node
+  linkType: hard
+
+"@react-hookz/web@npm:^25.2.0":
+  version: 25.2.0
+  resolution: "@react-hookz/web@npm:25.2.0"
+  dependencies:
+    "@ver0/deep-equal": "npm:^1.0.0"
+  peerDependencies:
+    js-cookie: ^3.0.5
+    react: ^16.8 || ^17 || ^18 || ^19
+    react-dom: ^16.8 || ^17 || ^18 || ^19
+  peerDependenciesMeta:
+    js-cookie:
+      optional: true
+  checksum: 10c0/8e42ae38a3f8662ca07c5ee10b2f4489969ff716159191726d0e43ff702d0a487f007e3e61856584ccb929e13508c9a62b88d09d1f9c84d06abab914555deec1
   languageName: node
   linkType: hard
 
@@ -2802,6 +2819,13 @@ __metadata:
   version: 1.11.1
   resolution: "@unrs/resolver-binding-win32-x64-msvc@npm:1.11.1"
   conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@ver0/deep-equal@npm:^1.0.0":
+  version: 1.0.1
+  resolution: "@ver0/deep-equal@npm:1.0.1"
+  checksum: 10c0/6f3691108aabfd0b2051fa6e27612dd5515ecba5a0e853a99d3482cb2c74bef463b94d26f7a0199eae9a9a71750b7e0007770ed280c52bcda724d856e36e3df7
   languageName: node
   linkType: hard
 
@@ -5191,6 +5215,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"framer-motion@npm:^12.23.24":
+  version: 12.23.24
+  resolution: "framer-motion@npm:12.23.24"
+  dependencies:
+    motion-dom: "npm:^12.23.23"
+    motion-utils: "npm:^12.23.6"
+    tslib: "npm:^2.4.0"
+  peerDependencies:
+    "@emotion/is-prop-valid": "*"
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@emotion/is-prop-valid":
+      optional: true
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: 10c0/716addd9fa85dd2c1475ab848e14c4e6d3246ced041de84afc19b1d6534c897256c8f2878864cf057039116e56f5ca1b87a4cbb943f0b1cf37199ef7174c3cf8
+  languageName: node
+  linkType: hard
+
 "fs-minipass@npm:^3.0.0":
   version: 3.0.3
   resolution: "fs-minipass@npm:3.0.3"
@@ -6649,6 +6695,7 @@ __metadata:
     "@kavita-likes-fajitas/tailwind-config": "npm:*"
     "@kavita-likes-fajitas/typescript-config": "npm:*"
     "@kavita-likes-fajitas/ui-library": "npm:*"
+    "@react-hookz/web": "npm:^25.2.0"
     "@tailwindcss/postcss": "npm:^4"
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/jest-dom": "npm:^6.9.1"
@@ -6663,6 +6710,7 @@ __metadata:
     eslint: "npm:^9"
     eslint-config-next: "npm:16.0.1"
     jsdom: "npm:^26.1.0"
+    motion: "npm:^12.23.24"
     next: "npm:16.0.1"
     react: "npm:19.2.0"
     react-dom: "npm:19.2.0"
@@ -7089,6 +7137,43 @@ __metadata:
   dependencies:
     minipass: "npm:^7.1.2"
   checksum: 10c0/5aad75ab0090b8266069c9aabe582c021ae53eb33c6c691054a13a45db3b4f91a7fb1bd79151e6b4e9e9a86727b522527c0a06ec7d45206b745d54cd3097bcec
+  languageName: node
+  linkType: hard
+
+"motion-dom@npm:^12.23.23":
+  version: 12.23.23
+  resolution: "motion-dom@npm:12.23.23"
+  dependencies:
+    motion-utils: "npm:^12.23.6"
+  checksum: 10c0/139705731085063519b88f23fcc5b1c13e15707a4ff3365da02ef9a4bf2a2d8ebed9a151c57e7f215ccd9e822365d93c16e28e619fbf25611f61dcff5ee81d75
+  languageName: node
+  linkType: hard
+
+"motion-utils@npm:^12.23.6":
+  version: 12.23.6
+  resolution: "motion-utils@npm:12.23.6"
+  checksum: 10c0/c058e8ba6423b3baa63e985bcc669877ee7d9579d938f5348b4e60c5ea1b4b33dd7f4877434436a4a5807f3cf00370d3fd4079a6fdd6309c5c87aa62b311a897
+  languageName: node
+  linkType: hard
+
+"motion@npm:^12.23.24":
+  version: 12.23.24
+  resolution: "motion@npm:12.23.24"
+  dependencies:
+    framer-motion: "npm:^12.23.24"
+    tslib: "npm:^2.4.0"
+  peerDependencies:
+    "@emotion/is-prop-valid": "*"
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@emotion/is-prop-valid":
+      optional: true
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: 10c0/d937ddaf50816f97e4e7121f323104fd655045ef122bd03d433370649c00129a5dd928cbe54efe9add22a05b2a9b84b7cfda1fd5c5b1e9c6245cd94e1c24e823
   languageName: node
   linkType: hard
 

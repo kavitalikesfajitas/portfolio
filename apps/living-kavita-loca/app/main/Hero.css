@@ -1,0 +1,52 @@
+/* idle float / rotate */
+@keyframes lipsFloat {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-4deg);
+  }
+}
+@keyframes lipsWiggle {
+  0% {
+    transform: translateY(-4px) rotate(-6deg);
+  }
+  25% {
+    transform: translateY(-2px) rotate(6deg);
+  }
+  50% {
+    transform: translateY(-4px) rotate(-4deg);
+  }
+  75% {
+    transform: translateY(-2px) rotate(4deg);
+  }
+  100% {
+    transform: translateY(-4px) rotate(0deg);
+  }
+}
+@keyframes lipsEnter {
+  0% {
+    transform: translateY(30px) rotate(12deg) scale(0.9);
+  }
+  60% {
+    transform: translateY(-5px) rotate(-4deg) scale(1.05);
+  }
+  100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+}
+
+.lips {
+  display: block;
+  /* animation: lipsFloat 3.5s ease-in-out infinite; */
+  transform-origin: center center;
+  cursor: pointer;
+  opacity: 1;
+  transform: translateY(30px) rotate(12deg);
+  animation: lipsEnter 0.8s ease-out forwards;
+}
+/* hover “wiggle” override */
+.lips:hover {
+  animation: lipsWiggle 0.45s ease-in-out forwards;
+}
