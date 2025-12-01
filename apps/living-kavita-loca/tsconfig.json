@@ -4,7 +4,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
-      "@kavita-likes-fajitas/ui-library/*": ["../../packages/ui-library/src/*"]
+      "@kavita-likes-fajitas/ui-library/*": ["../../packages/ui-library/src/*"],
+      "@kavita-likes-fajitas/3d-library/*": ["../../packages/3d-library/src/*"]
     },
     "isolatedModules": true,
     "lib": ["dom", "dom.iterable", "esnext"]

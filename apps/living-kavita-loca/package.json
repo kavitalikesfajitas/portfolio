@@ -37,6 +37,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@kavita-likes-fajitas/3d-library": "*",
     "@kavita-likes-fajitas/eslint-config": "*",
     "@kavita-likes-fajitas/fonts": "*",
     "@kavita-likes-fajitas/shadcn-ui-lib": "*",
