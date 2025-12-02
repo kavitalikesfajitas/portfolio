@@ -1,6 +1,6 @@
 import React, { Suspense, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
-import { PerspectiveCamera } from "@react-three/drei";
+import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { useIsLaptopOrHigher } from "./utils";
 import Carousel3DItems from "./Carousel3DItems";
 
@@ -36,11 +36,6 @@ const Carousel3D: React.FC<CarouselProps> = ({ items }) => {
   return (
     <div className="relative flex h-screen w-full flex-col content-center justify-center overflow-hidden">
       <div className="relative h-[400px] w-full">
-        {/* <CarouselArrowNav
-          onClickRightArrow={() => carousel3DitemsRef.current.slideRight()}
-          onClickLeftArrow={() => carousel3DitemsRef.current.slideLeft()}
-        /> */}
-
         <Canvas
           gl={{ toneMapping: NoToneMapping }}
           linear
@@ -49,13 +44,9 @@ const Carousel3D: React.FC<CarouselProps> = ({ items }) => {
         >
           <PerspectiveCamera
             makeDefault
-            position={[5, 0, 0]}
+            position={[0, 0, 5]}
             fov={isLaptop ? 8 : 13}
-            rotation={[
-              0,
-              Math.PI / 2,
-              isLaptop ? desktopCarouselAngle : mobileCarouselAngle,
-            ]}
+            rotation={[0, 0, 0]}
           />
           <Suspense fallback={null}>
             <Carousel3DItems
@@ -65,6 +56,7 @@ const Carousel3D: React.FC<CarouselProps> = ({ items }) => {
               animateSelected={animateSelected}
               ref={carousel3DitemsRef}
             />
+            <OrbitControls enablePan={true} maxDistance={5} minDistance={2} />
           </Suspense>
         </Canvas>
       </div>

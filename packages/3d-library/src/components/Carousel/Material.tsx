@@ -1,49 +1,59 @@
 import { useTexture, useVideoTexture } from "@react-three/drei";
 import { forwardRef, type ForwardedRef, type PropsWithChildren } from "react";
-import type { ShaderMaterial } from "three";
+import {
+  DoubleSide,
+  type Texture,
+  VideoTexture,
+  type ShaderMaterial,
+} from "three";
 
 type MaterialProps = PropsWithChildren<{
-  option: any;
-  i: number;
-  itemVideo: string;
-  video: boolean;
-  itemTexture: string;
+  option: {
+    noiseFactor: number;
+    noiseFreq: number;
+    noiseAmp: number;
+  };
 }>;
 
+export const VideoMaterial = forwardRef<
+  ShaderMaterial,
+  MaterialProps & { video: string }
+>((props, ref) => {
+  const videoTexture = useVideoTexture(props.video, {
+    muted: true,
+    loop: true,
+    start: true,
+  });
+  return <Material itemTexture={videoTexture} ref={ref} {...props} />;
+});
+VideoMaterial.displayName = "VideoMaterial";
+
+export const TextureMaterial = forwardRef<
+  ShaderMaterial,
+  MaterialProps & { itemTexture: string }
+>(({ itemTexture, ...props }, ref) => {
+  const posterTexture = useTexture(itemTexture);
+  return <Material itemTexture={posterTexture} ref={ref} {...props} />;
+});
+TextureMaterial.displayName = "TextureMaterial";
+
 // list of supported materials for the carousel
-export const Material = forwardRef<ShaderMaterial, MaterialProps>(
-  (props, ref) => {
-    console.log(props.itemTexture, props.video, props.itemVideo);
-    const posterTexture = useTexture(props.itemTexture);
-    // Always call the hook unconditionally, pass null if no video
-    // const videoTexture = useVideoTexture(
-    //   props.video && props.itemVideo ? props.itemVideo : null,
-    //   {
-    //     muted: true,
-    //     loop: true,
-    //     start: true,
-    //   },
-    // );
-    const texture = posterTexture;
-    // props.video && props.itemVideo ? videoTexture : posterTexture;
-    switch (props.option.type) {
-      case "wavy":
-        return (
-          <>
-            {/* @ts-expect-error ShaderMaterial from R3F/drei doesn't work well with TS */}
-            <waveShaderMaterial
-              ref={ref}
-              uTexture={texture}
-              uFactor={props.option.params.noiseFactor}
-              uNoiseFrequency={props.option.params.noiseFreq}
-              uNoiseAmplitude={props.option.params.noiseAmp}
-            />
-          </>
-        );
-      default:
-        return <></>;
-    }
-  },
-);
+export const Material = forwardRef<
+  ShaderMaterial,
+  MaterialProps & { itemTexture: Texture<unknown> }
+>(({ itemTexture, option }, ref) => {
+  return (
+    <>
+      {/* @ts-expect-error ShaderMaterial from R3F/drei doesn't work well with TS */}
+      <waveShaderMaterial
+        ref={ref}
+        uTexture={itemTexture}
+        uFactor={option.noiseFactor}
+        uNoiseFrequency={option.noiseFreq}
+        uNoiseAmplitude={option.noiseAmp}
+      />
+    </>
+  );
+});
 
 Material.displayName = "Material";

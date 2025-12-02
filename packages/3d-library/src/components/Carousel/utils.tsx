@@ -28,7 +28,7 @@ export const easeOutCubic = (x: number): number => {
  * @returns The rotation
  */
 export const rotation = (x: number, y: number, z: number) => {
-  return new Euler(x, y, z, "XYZ");
+  return new Euler(x, y, z, "XYZ"); // (0, Math.PI / 2, option, "XYZ");
 };
 
 /**
@@ -42,4 +42,8 @@ export const arrayRotate = (arr: any, count: number) => {
   const newArr = arr;
   newArr.push(...newArr.splice(0, ((count % len) + len) % len));
   return newArr;
+};
+
+export const degreesToRadians = (degrees: number) => {
+  return degrees * (Math.PI / 180);
 };
