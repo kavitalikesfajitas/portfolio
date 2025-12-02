@@ -34,8 +34,9 @@ const Carousel3D: React.FC<CarouselProps> = ({ items }) => {
 
   if (!items) return null;
   return (
-    <div className="relative flex h-screen w-full flex-col content-center justify-center overflow-hidden">
-      <div className="relative h-[400px] w-full">
+    <div className="display flex h-screen w-full flex-col justify-center overflow-hidden">
+      <div className="flex-2 flex h-10 w-full text-white">hellos</div>
+      <div className="flex w-fit flex-grow">
         <Canvas
           gl={{ toneMapping: NoToneMapping }}
           linear
