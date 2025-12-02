@@ -7,25 +7,31 @@ import React, {
   useState,
 } from "react";
 import { extend, useFrame } from "@react-three/fiber";
-import { useIsLaptopOrHigher } from "./utils";
+import {
+  arrayRotate,
+  easeOutCubic,
+  rotation,
+  useIsLaptopOrHigher,
+} from "./utils";
 import { WaveShaderMaterial } from "./waveShaderMaterial";
 import {
   desktopCarouselAngle,
   mobileCarouselAngle,
   desktopRadius,
   mobileRadius,
-  desktopPosterSize,
 } from "./constants";
-import { useTexture } from "@react-three/drei";
-import { Vector3, Euler } from "three";
+import { Geometry } from "./Geometry";
+import { Vector3, type Mesh, type ShaderMaterial } from "three";
 import type { Carousel3DItemsType } from "./types";
 import { useCarouselContext } from "./provider";
+import { Material } from "./Material";
 
 extend({ WaveShaderMaterial });
 
 const Carousel3DItems = forwardRef((props: Carousel3DItemsType, ref) => {
-  const meshRefList = props.items.map(() => createRef());
-  const shaderRefList = props.items.map(() => createRef());
+  // create refs for the meshes and shader materials
+  const meshRefList = props.items.map(() => createRef<Mesh>());
+  const shaderRefList = props.items.map(() => createRef<ShaderMaterial>());
 
   // animation calculations
   const frameCount = useRef<number>(0);
@@ -33,7 +39,7 @@ const Carousel3DItems = forwardRef((props: Carousel3DItemsType, ref) => {
   const prevAnimationFrameCount = useRef<number>(0);
   const totalAnimationFrames = useRef<number>(0);
 
-  // rotate to selected poster
+  // rotate to selected item
   const [animateSelected, setAnimateSelected] = useState(false);
   // rotate once to left
   const [animateLeft, setAnimateLeft] = useState(false);
@@ -264,30 +270,11 @@ const Carousel3DItems = forwardRef((props: Carousel3DItemsType, ref) => {
     },
   );
 
-  const textureList: string[] = props.items.map(
-    (x: { itemTexture: any }) => x.itemTexture,
-  );
-
   const frontPosition = new Vector3(
     radius * Math.cos((startingPositionDegrees[0] * Math.PI) / 180),
     0,
     radius * Math.sin((startingPositionDegrees[0] * Math.PI) / 180),
   );
-
-  function easeOutCubic(x: number): number {
-    return 1 - Math.pow(1 - x, 3);
-  }
-
-  const rotation = (option: number | undefined) => {
-    return new Euler(0, Math.PI / 2, option, "XYZ");
-  };
-
-  const arrayRotate = (arr: any, count: number) => {
-    const len = arr.length;
-    const newArr = arr;
-    newArr.push(...newArr.splice(0, ((count % len) + len) % len));
-    return newArr;
-  };
 
   const slideTo = (index: number) => {
     if (
@@ -452,40 +439,6 @@ const Carousel3DItems = forwardRef((props: Carousel3DItemsType, ref) => {
     },
   }));
 
-  // list of supported geomtries for the carousel
-  const GeometryList = (props: { option: any }) => {
-    switch (props.option) {
-      case "plane":
-        return <planeGeometry args={desktopPosterSize} />;
-      default:
-        return <></>;
-    }
-  };
-
-  // list of supported materials for the carousel
-  const MaterialList = (props: { option: any; i: number }) => {
-    const posterTextures = useTexture(textureList);
-
-    switch (props.option.type) {
-      case "wavy":
-        return (
-          <>
-            {/* ShaderMaterial from R3F/drei doesn't work well with TS */}
-            {/* @ts-ignore */}
-            <waveShaderMaterial
-              ref={shaderRefList[props.i]}
-              uTexture={posterTextures[props.i]}
-              uFactor={props.option.params.noiseFactor}
-              uNoiseFrequency={props.option.params.noiseFreq}
-              uNoiseAmplitude={props.option.params.noiseAmp}
-            />
-          </>
-        );
-      default:
-        return <></>;
-    }
-  };
-
   return (
     <group>
       {props.items.map((item: any, i: any) => {
@@ -503,8 +456,15 @@ const Carousel3DItems = forwardRef((props: Carousel3DItemsType, ref) => {
             onPointerOver={() => (document.body.style.cursor = "pointer")}
             onPointerOut={() => (document.body.style.cursor = "default")}
           >
-            <GeometryList option={item.itemGeometry} />
-            <MaterialList option={item.itemMaterial} i={i} />
+            <Geometry option={item.itemGeometry} />
+            <Material
+              option={item.itemMaterial}
+              i={i}
+              itemVideo={item.itemVideo}
+              video={item.video}
+              itemTexture={item.itemTexture}
+              ref={shaderRefList[i]}
+            />
           </mesh>
         );
       })}

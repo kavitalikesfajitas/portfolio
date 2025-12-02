@@ -41,12 +41,11 @@ const Carousel3D: React.FC<CarouselProps> = ({ items }) => {
       prevSelectedIndex={prevSelectedIndex}
       animateSelected={animateSelected}
     >
-      {isLaptop ? (
-        <CarouselArrowNav
-          onClickRightArrow={() => carousel3DitemsRef.current.slideRight()}
-          onClickLeftArrow={() => carousel3DitemsRef.current.slideLeft()}
-        />
-      ) : null}
+      <CarouselArrowNav
+        onClickRightArrow={() => carousel3DitemsRef.current.slideRight()}
+        onClickLeftArrow={() => carousel3DitemsRef.current.slideLeft()}
+      />
+
       <Canvas
         gl={{ toneMapping: NoToneMapping }}
         linear

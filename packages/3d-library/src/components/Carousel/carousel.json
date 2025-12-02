@@ -4,10 +4,12 @@
       "items": [
         {
           "item": null,
+          "video": true,
           "itemAsset": null,
           "itemIndex": 0,
           "itemGeometry": "plane",
-          "itemTexture": "/images/poster/Poster-SM-Cultural.jpg",
+          "itemTexture": "/images/poster/Poster-SM-Heritage.jpg",
+          "itemVideo": "/videos/tinaj.mp4",
           "itemMaterial": {
             "type": "wavy",
             "params": {
