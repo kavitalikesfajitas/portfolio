@@ -29,8 +29,8 @@ const CarouselContainer: React.FC<CarouselContainerProps> = ({
   }, [carouselContext, items, selectedIndex]);
 
   return (
-    <div className="relative flex w-full flex-col content-center justify-center overflow-hidden">
-      <SiteWrapper
+    <div className="relative flex h-screen w-full flex-col content-center justify-center overflow-hidden">
+      {/* <SiteWrapper
         className={clsx("absolute top-0 z-10", className?.thumbails)}
       >
         <div className="mx-auto max-w-6xl self-center">
@@ -41,8 +41,8 @@ const CarouselContainer: React.FC<CarouselContainerProps> = ({
             animateSelected={animateSelected}
           />
         </div>
-      </SiteWrapper>
-      <div className="relative h-screen w-full">{children}</div>
+      </SiteWrapper> */}
+      <div className="relative h-[400px] w-full">{children}</div>
     </div>
   );
 };

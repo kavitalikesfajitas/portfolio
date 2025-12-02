@@ -5,7 +5,7 @@ import { useIsLaptopOrHigher } from "./utils";
 import Carousel3DItems from "./Carousel3DItems";
 
 import { useGesture } from "@use-gesture/react";
-import { NoToneMapping } from "three";
+import { AxesHelper, NoToneMapping } from "three";
 import CarouselContainer from "./CarouselContainer";
 
 import { CarouselArrowNav } from "./CarouselArrows";
@@ -34,45 +34,41 @@ const Carousel3D: React.FC<CarouselProps> = ({ items }) => {
 
   if (!items) return null;
   return (
-    <CarouselContainer
-      className={{ thumbails: "relative" }}
-      items={items}
-      selectedIndex={selectedIndex}
-      prevSelectedIndex={prevSelectedIndex}
-      animateSelected={animateSelected}
-    >
-      <CarouselArrowNav
-        onClickRightArrow={() => carousel3DitemsRef.current.slideRight()}
-        onClickLeftArrow={() => carousel3DitemsRef.current.slideLeft()}
-      />
+    <div className="relative flex h-screen w-full flex-col content-center justify-center overflow-hidden">
+      <div className="relative h-[400px] w-full">
+        {/* <CarouselArrowNav
+          onClickRightArrow={() => carousel3DitemsRef.current.slideRight()}
+          onClickLeftArrow={() => carousel3DitemsRef.current.slideLeft()}
+        /> */}
 
-      <Canvas
-        gl={{ toneMapping: NoToneMapping }}
-        linear
-        style={{ touchAction: "pan-y" }}
-        {...gestures()}
-      >
-        <PerspectiveCamera
-          makeDefault
-          position={[5, 0, 0]}
-          rotation={[
-            0,
-            Math.PI / 2,
-            isLaptop ? desktopCarouselAngle : mobileCarouselAngle,
-          ]}
-          fov={isLaptop ? 8 : 13}
-        />
-        <Suspense fallback={null}>
-          <Carousel3DItems
-            items={items}
-            selectedIndex={selectedIndex}
-            prevSelectedIndex={prevSelectedIndex}
-            animateSelected={animateSelected}
-            ref={carousel3DitemsRef}
+        <Canvas
+          gl={{ toneMapping: NoToneMapping }}
+          linear
+          style={{ touchAction: "pan-y" }}
+          {...gestures()}
+        >
+          <PerspectiveCamera
+            makeDefault
+            position={[5, 0, 0]}
+            fov={isLaptop ? 8 : 13}
+            rotation={[
+              0,
+              Math.PI / 2,
+              isLaptop ? desktopCarouselAngle : mobileCarouselAngle,
+            ]}
           />
-        </Suspense>
-      </Canvas>
-    </CarouselContainer>
+          <Suspense fallback={null}>
+            <Carousel3DItems
+              items={items}
+              selectedIndex={selectedIndex}
+              prevSelectedIndex={prevSelectedIndex}
+              animateSelected={animateSelected}
+              ref={carousel3DitemsRef}
+            />
+          </Suspense>
+        </Canvas>
+      </div>
+    </div>
   );
 };
 

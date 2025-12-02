@@ -27,8 +27,8 @@ export const easeOutCubic = (x: number): number => {
  * @param option - The rotation option
  * @returns The rotation
  */
-export const rotation = (option: number | undefined) => {
-  return new Euler(0, Math.PI / 2, option, "XYZ");
+export const rotation = (x: number, y: number, z: number) => {
+  return new Euler(x, y, z, "XYZ");
 };
 
 /**
