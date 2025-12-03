@@ -1,5 +1,5 @@
 import { CarouselContextProvider } from "./provider";
-import Carousel3D from "./Carousel3D";
+import Carousel3D from "./Carousel";
 import carouselData from "./carousel.json";
 
 export function Carousel() {

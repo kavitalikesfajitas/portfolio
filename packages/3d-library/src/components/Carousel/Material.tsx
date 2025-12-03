@@ -1,11 +1,6 @@
 import { useTexture, useVideoTexture } from "@react-three/drei";
-import { forwardRef, type ForwardedRef, type PropsWithChildren } from "react";
-import {
-  DoubleSide,
-  type Texture,
-  VideoTexture,
-  type ShaderMaterial,
-} from "three";
+import { forwardRef, type PropsWithChildren } from "react";
+import { type Texture, type ShaderMaterial } from "three";
 
 type MaterialProps = PropsWithChildren<{
   option: {

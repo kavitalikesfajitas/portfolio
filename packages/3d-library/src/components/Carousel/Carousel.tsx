@@ -3,14 +3,9 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { useIsLaptopOrHigher } from "./utils";
 import Carousel3DItems from "./Carousel3DItems";
-
-import { useGesture } from "@use-gesture/react";
-import { AxesHelper, NoToneMapping } from "three";
-import CarouselContainer from "./CarouselContainer";
-
-import { CarouselArrowNav } from "./CarouselArrows";
+import { NoToneMapping } from "three";
 import type { CarouselProps } from "./types";
-import { desktopCarouselAngle, mobileCarouselAngle } from "./constants";
+import { noop } from "lodash";
 
 const Carousel3D: React.FC<CarouselProps> = ({ items }) => {
   const isLaptop = useIsLaptopOrHigher();
@@ -26,7 +21,13 @@ const Carousel3D: React.FC<CarouselProps> = ({ items }) => {
   if (!items) return null;
   return (
     <div className="display flex h-screen w-full flex-col justify-center overflow-hidden">
-      <div className="flex-2 flex h-10 w-full text-white">hellos</div>
+      <div className="flex-2 w flex h-fit w-full flex-col items-center text-white">
+        buttons here!
+        <div className="flex flex-row justify-between gap-4">
+          <button onClick={noop}>Rotate Left</button>
+          <button onClick={noop}>Rotate Right</button>
+        </div>
+      </div>
       <div className="flex w-fit flex-grow">
         <Canvas
           gl={{ toneMapping: NoToneMapping }}

@@ -27,9 +27,9 @@
         {
           "item": null,
           "itemAsset": null,
-          "itemIndex": 1,
+          "itemIndex": 2,
           "itemGeometry": "plane",
-          "itemTexture": "/images/poster/Poster-SM-Heritage.jpg",
+          "itemTexture": "/images/poster/Poster-SM-Innovation.jpg",
           "itemMaterial": {
             "type": "wavy",
             "params": {
@@ -39,31 +39,9 @@
             }
           },
           "carouselThumbnail": {
-            "description": "[THUMBNAIL] PEOPLE'S CHAMP",
+            "description": "[THUMBNAIL] EPIC SOLE",
             "asset": {
-              "url": "https://images.ctfassets.net/f435tqa2gxs3/7zZa2nNPvvYnCZ1hEFgLNC/c6e9774bc1a4cc289b977a071ae2c6fd/Token-Airdrop-Poster-XS-Heritage.jpg"
-            }
-          }
-        },
-
-        {
-          "item": null,
-          "itemAsset": null,
-          "itemIndex": 3,
-          "itemGeometry": "plane",
-          "itemTexture": "/images/poster/Poster-SM-Regional.jpg",
-          "itemMaterial": {
-            "type": "wavy",
-            "params": {
-              "noiseAmp": 0.2,
-              "noiseFreq": 1.5,
-              "noiseFactor": 0.5
-            }
-          },
-          "carouselThumbnail": {
-            "description": "[THUMBNAIL] GAME ON",
-            "asset": {
-              "url": "https://images.ctfassets.net/f435tqa2gxs3/5OS6rnPvPSiFkFghHqlvD9/70e0403d46eff6b77a74de1ee7223533/Token-Airdrop-Poster-XS-Regional.jpg"
+              "url": "https://images.ctfassets.net/f435tqa2gxs3/3zvAHZktdF75D3r4CmONNU/9f75898dac8f99d499ed25dcc88e4c44/Token-Airdrop-Poster-XS-Innovation.jpg"
             }
           }
         },

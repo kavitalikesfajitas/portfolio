@@ -61,10 +61,9 @@ export default (phase: string) => {
      */
     outputFileTracingRoot: workspaceRoot,
     webpack: (config) => {
-
       config.module.rules.push({
-      test: /\.(frag|vert)$/,
-      type: "asset/source",
+        test: /\.(frag|vert)$/,
+        type: "asset/source",
       });
       config.resolve.alias = {
         ...(config.resolve.alias || {}),
