@@ -20,9 +20,9 @@ import {
   mobileCarouselAngle,
   desktopRadius,
   mobileRadius,
+  desktopPosterSize,
 } from "./constants";
 import { AxesHelper, DoubleSide } from "three";
-import { Geometry } from "./Geometry";
 import { Vector3, type Mesh, type ShaderMaterial } from "three";
 import type { Carousel3DItemsType } from "./types";
 
@@ -91,7 +91,7 @@ function CarouselItem({
       onPointerOver={() => (document.body.style.cursor = "pointer")}
       onPointerOut={() => (document.body.style.cursor = "default")}
     >
-      <Geometry option={item.itemGeometry} />
+      <planeGeometry args={[0.3, 0.3, 16, 16]} />
       {item?.video && item?.itemVideo && (
         <VideoMaterial
           video={item.itemVideo}

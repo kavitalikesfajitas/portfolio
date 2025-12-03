@@ -19,18 +19,9 @@ const Carousel3D: React.FC<CarouselProps> = ({ items }) => {
   const animateSelected = useRef<string>("false");
   const carousel3DitemsRef = useRef<any>(null);
 
-  const handleSwipe = (e: any) => {
-    if (!isLaptop && animateSelected.current == "false" && e == 1) {
-      carousel3DitemsRef.current.slideLeft();
-    }
-    if (!isLaptop && animateSelected.current == "false" && e == -1) {
-      carousel3DitemsRef.current.slideRight();
-    }
-  };
-
-  const gestures = useGesture({
-    onDrag: ({ swipe: [swipeX] }) => handleSwipe(swipeX),
-  });
+  // const gestures = useGesture({
+  //   onDrag: ({ swipe: [swipeX] }) => handleSwipe(swipeX),
+  // });
 
   if (!items) return null;
   return (
@@ -41,12 +32,12 @@ const Carousel3D: React.FC<CarouselProps> = ({ items }) => {
           gl={{ toneMapping: NoToneMapping }}
           linear
           style={{ touchAction: "pan-y" }}
-          {...gestures()}
+          // {...gestures()}
         >
           <PerspectiveCamera
             makeDefault
             position={[0, 0, 5]}
-            fov={isLaptop ? 8 : 13}
+            fov={isLaptop ? 20 : 20}
             rotation={[0, 0, 0]}
           />
           <Suspense fallback={null}>
