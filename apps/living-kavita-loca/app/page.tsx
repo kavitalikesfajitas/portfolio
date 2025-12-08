@@ -8,6 +8,9 @@ import { useRef } from "react";
 import { TornPaperEffect } from "@kavita-likes-fajitas/ui-library/TornPaperEffect";
 import Image from "next/image";
 
+import { projects } from "./exploration/resume/portfolio";
+import { ResumeLinkCard } from "./main/components/FeaturedWorkCard";
+
 export default function Home() {
   const heroRef = useRef<HTMLElement>(null);
   const isHeroInView = useInView(heroRef, { amount: "some" });
@@ -32,7 +35,7 @@ export default function Home() {
         animate={{ opacity: isHeroInView ? 0 : 1 }}
         transition={{ duration: 0.05 }}
       >
-        <div className=" min-h-screen px-6 py-24 bg-gray-950 flex flex-col w-full gap-10 ">
+        <div className=" px-6 py-24 bg-gray-950 flex flex-col w-full gap-10 ">
           <section className=" flex-col flex md:flex-row gap-10">
             <div
               className={clsx(
@@ -66,6 +69,14 @@ export default function Home() {
                 software engineer and creative developer. I&apos;m a software
                 engineer and creative developer.
               </div>
+            </div>
+          </section>
+          <section className=" flex flex-col gap-10  ">
+            <h2>Featured Work</h2>
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {projects.map((project) => (
+                <ResumeLinkCard key={project.title} {...project} />
+              ))}
             </div>
           </section>
         </div>
