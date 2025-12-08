@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: workspaceRoot, // Specify the monorepo root as turbo directory
   },
-  allowedDevOrigins: ["local.living-kavita-loca.com"],
+  allowedDevOrigins: ["local.living-kavita-loca.com", "localhost"],
   output: "export",
   reactStrictMode: true,
   reactCompiler: true,
