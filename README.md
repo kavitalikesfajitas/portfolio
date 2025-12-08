@@ -1,135 +1,177 @@
-# Turborepo starter
+# portfolio
 
-This Turborepo starter is maintained by the Turborepo core team.
+## Monorepo Structure: Yarn Workspaces & Turbo
 
-## Using this example
+This project uses **Yarn Workspaces** to manage dependencies and streamline development across multiple packages in a single repository. Workspaces allow all packages in the `packages/` directory to share dependencies efficiently, reducing duplication and simplifying version management.
 
-Run the following command:
+**Turbo** (Turborepo) is used as the build system and task runner. It enables fast, incremental builds and orchestrates tasks (like build, lint, and test) across all packages, ensuring only affected packages are rebuilt when changes are made.
 
-```sh
-npx create-turbo@latest
+- **Yarn Workspaces**: Handles dependency hoisting and workspace linking.
+- **Turbo**: Provides caching and parallel execution for tasks, improving CI/CD performance.
+
+For more details, see the [`package.json`](./package.json) and [`turbo.json`](./turbo.json) configuration files.
+
+## Development Setup
+
+### Yarn Workspaces
+
+The project uses Yarn Workspaces to manage multiple packages from a single repository. This allows for:
+
+- Shared dependencies across packages
+- Simplified development workflow
+- Consistent versioning
+
+### Turborepo
+
+Turborepo is used for build system orchestration:
+
+- Incremental builds
+- Intelligent caching
+- Parallel execution of tasks
+
+### Node Modules versus PnP
+
+This repo uses Yarn Berry (PnP). However, dependencies are resolved via `node_modules/`, instead of `.pnp.cjs` .
+
+To enable proper IntelliSense and autocompletion in your editor:
+
+```bash
+# For VSCode
+yarn dlx @yarnpkg/sdks vscode
+
+# For WebStorm
+yarn dlx @yarnpkg/sdks webstorm
 ```
 
-## What's inside?
+In the .yarnrc.yaml file:
 
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+```yaml
+nmMode: hardlinks-local
+# This ensures that node-modules are set up
+# with PnP (plug and play)
+nodeLinker: node-modules
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+This configuration ensures that the node modules are visible and dependencies resolve correctly.
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+## Additional Notes
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+## Turbo Generators: Standardizing Package and Component Creation
 
-### Develop
+We use **Turbo Generators** (Plop) to scaffold standardized packages and components. Please refer to this method first before creating packages/components from scratch to ensure we have consistent patterns across the repo.
 
-To develop all apps and packages, run the following command:
+### Prerequisites
 
-```
-cd my-turborepo
+- Ensure dependencies are installed: `yarn install`
+- Run from repo root (`portfolio`)
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+### Available Generators
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+- **package**: Creates a new package in `packages/`
+  - Types:
+    - `ESM Package` (implemented)
+    - `React Package` (implemented)
+- **nvs-preorder app component**: Creates a new React component in `apps/nvs-preorder`
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+### Usage
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+Interactive prompt (recommended):
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+```bash
+yarn turbo gen
 ```
 
-### Remote Caching
+You will be prompted to select which custom generator to use:
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+- **root - package**: Creates a new package in `packages/<name>`
+- **nvs-preorder app component**: Creates a new React component in `apps/nvs-preorder`
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+If you selected package, you will need to provide:
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+- **Package name** (required)
+- **Description** (optional)
+- **Package type**: `React` or `ESM` (both currently supported)
+
+### What Gets Created
+
+#### ESM Package
+
+Files are scaffolded from `turbo/generators/templates/package/esm/` into `packages/<name>/`:
+
+- `package.json` (templated)
+- `tsconfig.json`
+- `eslint.config.mjs`
+- `tsdown.config.ts`
+- `vitest.config.ts`
+- `src/index.ts` - demonstrates the file structure pattern we are standardizing and supporting
+
+#### React Package
+
+Files are scaffolded into `packages/<name>/`:
+
+- `package.json` (templated)
+- `tsconfig.json`
+- `eslint.config.mjs`
+- `tsdown.config.ts`
+- `vitest.config.ts`
+- `.prettierrc` - for Tailwind linting support
+- `tailwind.config.ts`
+- `postcss.config.mjs` - for Tailwind support
+- `src/HelloWorld/index.tsx` - demonstrates the file structure pattern we are standardizing and supporting
+- `src/index.tsx` - demonstrates the barrel file structure pattern
+
+### After Generating
+
+1. Open `packages/<name>/package.json` and update metadata as needed
+2. Run initial build and tests:
+
+   ```bash
+   yarn --top-level run turbo build --filter=@kavita-likes-fajitas/<name>
+   yarn --top-level run turbo test-ci --filter=@kavita-likes-fajitas/<name>
+   yarn --top-level run turbo lint --filter=@kavita-likes-fajitas/<name>
+   ```
+
+## File Structure and Barrel Pattern
+
+We follow a **barrel file format** throughout the monorepo to ensure clean, maintainable imports and proper encapsulation. This pattern is especially critical for packages that need to be published.
+
+### Key Principles
+
+1. **Nearest Index Export Rule**: Everything that needs to be accessible from outside a package or folder must be exported through the nearest `index.ts` or `index.tsx` file
+
+2. **Folder-Level Barrel Files**: Every folder should have its own `index.ts` or `index.tsx` file that exports the public API for that folder
+
+3. **Avoid Monolithic Barrel Files**: **Please ** do not put everything in the main barrel file at the package root. Instead, create a hierarchical structure where each folder manages its own exports
+
+4. **Published Package Requirement**: This pattern is especially important for packages that need to be published, as it provides a clean public API and prevents internal implementation details from being exposed
+
+### Example Structure
 
 ```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+packages/my-package/
+├── src/
+│   ├── components/
+│   │   ├── Button/
+│   │   │   ├── Button.tsx
+│   │   │   ├── Button.test.tsx
+│   │   │   └── index.tsx          # exports Button component
+│   │   ├── Modal/
+│   │   │   ├── Modal.tsx
+│   │   │   ├── Modal.test.tsx
+│   │   │   └── index.tsx          # exports Modal component
+│   │   └── index.tsx              # exports { Button } from './Button'; exports { Modal } from './Modal';
+│   ├── utils/
+│   │   ├── helpers.ts
+│   │   ├── constants.ts
+│   │   └── index.tsx              # exports public utilities
+│   └── index.tsx                  # main package export - exports from ./components and ./utils
+└── package.json
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+### Benefits
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+- **Clean Imports**: Consumers can import from clean paths like `@kavita-likes-fajitas/my-package/components`
+- **Encapsulation**: Internal implementation details remain private
+- **Tree Shaking**: Bundlers can better optimize unused code
+- **Maintainability**: Easy to reorganize internal structure without breaking external APIs
+- **TypeScript Support**: Proper type resolution and IntelliSense

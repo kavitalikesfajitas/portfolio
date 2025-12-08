@@ -33,16 +33,16 @@ src/
 
 ```typescript
 // Don't create barrel files like this:
-src/components/ui/button/index.tsx
-src/components/ui/card/index.tsx
+src / components / ui / button / index.tsx;
+src / components / ui / card / index.tsx;
 ```
 
 ### ✅ Do This Instead
 
 ```typescript
 // Keep files flat as shadcn generates them:
-src/components/ui/button.tsx
-src/components/ui/card.tsx
+src / components / ui / button.tsx;
+src / components / ui / card.tsx;
 ```
 
 ## Adding a New Component
@@ -153,7 +153,7 @@ Make sure your consuming application has:
 
 ## Styles
 
-Global styles for shadcn components are located in `styles/global.css`. Import them in your application:
+Global styles for shadcn components are located in `styles/global.css`. Import them in your application, or in your `css` file
 
 ```typescript
 import "@kavita-likes-fajitas/shadcn-ui-lib/styles/global.css";
