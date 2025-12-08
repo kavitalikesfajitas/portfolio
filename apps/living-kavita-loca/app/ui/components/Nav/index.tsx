@@ -15,7 +15,7 @@ export function Nav({ isMobile }: NavProps) {
   return (
     <NavigationMenu
       viewport={isMobile}
-      className=" py-2 bg-white text-gray-950 rounded-full"
+      className="dark py-2 bg-white text-gray-950 rounded-full"
     >
       <NavigationMenuList id="nav-list" className=" text-gray-950 bg-white ">
         <ListThatsFancy />
