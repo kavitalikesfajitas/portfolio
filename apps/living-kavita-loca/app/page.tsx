@@ -2,38 +2,74 @@
 
 import { NavForMain } from "./main/NavForMain";
 import { Hero } from "./main/Hero";
-import { useIsMobile } from "@kavita-likes-fajitas/shadcn-ui-lib/hooks/useBreakpoint";
-import { SoftFadeSkeleton } from "@kavita-likes-fajitas/ui-library/Skeletons/SoftFadeSkeleton";
 import clsx from "clsx";
+import { motion, useInView } from "motion/react";
+import { useRef } from "react";
+import { TornPaperEffect } from "@kavita-likes-fajitas/ui-library/TornPaperEffect";
+import Image from "next/image";
 
 export default function Home() {
-  const isMobile = useIsMobile();
+  const heroRef = useRef<HTMLElement>(null);
+  const isHeroInView = useInView(heroRef, { amount: "some" });
 
-  if (isMobile === undefined) {
-    return <SoftFadeSkeleton />;
-  }
   return (
     <main
       className={clsx(
-        "bg-gray-950 text-white relative flex flex-col mt-20 md:mt-32 lg:mt-40 min-h-[200vh]",
+        "bg-gray-950 text-white relative flex flex-col mt-20 md:mt-32 lg:mt-40",
       )}
     >
-      <Hero />
-      <NavForMain isMobile={isMobile} />
-      <div className={clsx("bg-gray-950", "flex grow")}>
-        {/* Content that takes up remaining screen height */}
-      </div>
-      <section className="min-h-screen px-6 py-24 bg-gray-950">
-        <h2 className="text-3xl font-bold mb-6">More Content</h2>
-        <p className="text-lg opacity-80 mb-4">
-          Now the page scrolls — My nav can animate.
-        </p>
-        <div className="space-y-10 max-w-2xl">
-          <p>Placeholder content…</p>
-          <p>More placeholder…</p>
-          <p>Scrolling enabled…</p>
-        </div>
+      {/* overflow-x-clip is important to ensure that on mobile it does not scroll horizontally */}
+      <section
+        ref={heroRef}
+        className="relative flex flex-col overflow-x-clip min-h-[100px]"
+      >
+        <Hero />
       </section>
+      <NavForMain />
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isHeroInView ? 0 : 1 }}
+        transition={{ duration: 0.05 }}
+      >
+        <div className=" min-h-screen px-6 py-24 bg-gray-950 flex flex-col w-full gap-10 ">
+          <section className=" flex-col flex md:flex-row gap-10">
+            <div
+              className={clsx(
+                "relative aspect-square",
+                "w-full md:basis-1/2 h-fit",
+              )}
+            >
+              <TornPaperEffect className="h-full w-full">
+                <Image
+                  src="/images/bio-photo.jpg"
+                  alt="Kavita C"
+                  fill
+                  quality={75}
+                  className="object-cover p-5"
+                />
+              </TornPaperEffect>
+            </div>
+            <div className="flex flex-col basis-1/2">
+              <h2 className="text-3xl font-bold mb-6">Hi! I&apos;m Kavita!</h2>
+
+              <div className="space-y-10 max-w-2xl">
+                Hi I&apos;m Kavita! I&apos;m a software engineer and creative
+                developer. I&apos;m a software engineer and creative developer.
+                I&apos;m a software engineer and creative developer. I&apos;m a
+                software engineer and creative developer. I&apos;m a software
+                engineer and creative developer. I&apos;m a software engineer
+                and creative developer. I&apos;m a software engineer and
+                creative developer. I&apos;m a software engineer and creative
+                developer. I&apos;m a software engineer and creative developer.
+                I&apos;m a software engineer and creative developer. I&apos;m a
+                software engineer and creative developer. I&apos;m a software
+                engineer and creative developer.
+              </div>
+            </div>
+          </section>
+        </div>
+      </motion.div>
     </main>
   );
 }
