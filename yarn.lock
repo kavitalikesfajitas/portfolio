@@ -1224,6 +1224,7 @@ __metadata:
     "@kavita-likes-fajitas/tailwind-config": "workspace:*"
     "@kavita-likes-fajitas/typescript-config": "workspace:*"
     "@radix-ui/react-navigation-menu": "npm:^1.2.14"
+    "@radix-ui/react-slot": "npm:^1.2.4"
     "@tailwindcss/postcss": "npm:^4"
     "@testing-library/jest-dom": "npm:^6.9.1"
     "@testing-library/react": "npm:^16.3.0"
@@ -1321,6 +1322,7 @@ __metadata:
   peerDependencies:
     "@tailwindcss/postcss": ^4
     clsx: ^2.1.1
+    motion: ^12.23.24
     react: ^19.2.1
     react-dom: ^19.2.1
     tailwindcss: ^4
@@ -1759,6 +1761,21 @@ __metadata:
     "@types/react":
       optional: true
   checksum: 10c0/5913aa0d760f505905779515e4b1f0f71a422350f077cc8d26d1aafe53c97f177fec0e6d7fbbb50d8b5e498aa9df9f707ca75ae3801540c283b26b0136138eef
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-slot@npm:^1.2.4":
+  version: 1.2.4
+  resolution: "@radix-ui/react-slot@npm:1.2.4"
+  dependencies:
+    "@radix-ui/react-compose-refs": "npm:1.1.2"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/8b719bb934f1ae5ac0e37214783085c17c2f1080217caf514c1c6cc3d9ca56c7e19d25470b26da79aa6e605ab36589edaade149b76f5fc0666f1063e2fc0a0dc
   languageName: node
   linkType: hard
 
