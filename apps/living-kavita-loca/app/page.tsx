@@ -31,16 +31,16 @@ export default function Home() {
         initial={{ opacity: 0 }}
         animate={{ opacity: isHeroInView ? 0 : 1 }}
         transition={{ duration: 0.05 }}
-        className="snap-proximity snap-y overflow-y-auto min-h-screen scroll-pt-20"
+        className="snap-proximity snap-y overflow-y-auto min-h-screen scroll-pt-20 scroll-smooth"
       >
         {/* we need are setting the height to screen and overflow-y-auto to ensure that the content beyond 100vh is visible/scrollable 
         and treated as overflow content so that the user can still scroll to it, but we still pin to start of the content */}
-        <div className="px-6 pt-24 bg-gray-950 flex flex-col w-full gap-10 h-screen overflow-y-auto snap-start scroll-smooth">
-          <section className="flex-col flex md:flex-row gap-10">
+        <div className="px-6 pt-24 bg-gray-950 flex flex-col w-full gap-10 h-screen overflow-y-auto snap-start">
+          <section className="flex-col flex md:flex-row gap-10 pt-10">
             <div
               className={clsx(
                 "relative aspect-square",
-                "w-full md:basis-1/2 h-fit",
+                "w-full md:basis-1/2 h-fit max-w-[600px]",
               )}
             >
               <TornPaperEffect className="h-full w-full">
