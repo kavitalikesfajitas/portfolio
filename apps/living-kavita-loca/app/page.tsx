@@ -22,10 +22,7 @@ export default function Home() {
       )}
     >
       {/* overflow-x-clip is important to ensure that on mobile it does not scroll horizontally */}
-      <section
-        ref={heroRef}
-        className="relative flex flex-col overflow-x-clip min-h-[100px]"
-      >
+      <section ref={heroRef} className="relative flex flex-col overflow-x-clip">
         <Hero />
       </section>
       <NavForMain />
@@ -34,9 +31,10 @@ export default function Home() {
         initial={{ opacity: 0 }}
         animate={{ opacity: isHeroInView ? 0 : 1 }}
         transition={{ duration: 0.05 }}
+        className="snap-proximity snap-y overflow-y-auto min-h-screen"
       >
-        <div className=" px-6 py-24 bg-gray-950 flex flex-col w-full gap-10 ">
-          <section className=" flex-col flex md:flex-row gap-10">
+        <div className="px-6 pt-24 bg-gray-950 flex flex-col w-full gap-10 snap-start h-screen scroll-smooth">
+          <section className="flex-col flex md:flex-row gap-10">
             <div
               className={clsx(
                 "relative aspect-square",
@@ -71,7 +69,7 @@ export default function Home() {
               </div>
             </div>
           </section>
-          <section className=" flex flex-col gap-10  ">
+          <section className=" flex flex-col gap-10 h-fit mb-24">
             <h2>Featured Work</h2>
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {projects.map((project) => (
