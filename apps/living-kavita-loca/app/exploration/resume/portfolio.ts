@@ -15,6 +15,21 @@ export const projects = [
     tech: "TypeScript · Node.js · GraphQL · Redis · AWS",
   },
   {
+    title: "OpenSea Swoosh ID",
+    role: "Lead Engineer / Architect",
+    summary:
+      "Creating a way to dynamically render the Nike Swoosh Membership card on OpenSea using an SVG endpoint",
+    bullets: [
+      "Redis caching, schema stitching, and resilient failover.",
+      "Reduced P95 latency by 40–60% across key experiences.",
+      "Structured logging + metrics for hit rate and error budgets.",
+    ],
+    imageSrc: "/images/opensea-swoosh-id.png",
+
+    badge: "/logos/nike.svg",
+    tech: "TypeScript · Node.js · GraphQL · Redis · AWS",
+  },
+  {
     title: "Templated PDP Platform",
     role: "Lead Frontend Engineer",
     summary:

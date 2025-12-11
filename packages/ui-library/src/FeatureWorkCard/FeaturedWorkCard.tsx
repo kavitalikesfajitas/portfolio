@@ -58,7 +58,7 @@ export const FeaturedWorkCard = ({
       />
       <CardHeader className="gap-0 pt-2">
         <CardTitle className="group-hover:text-primary flex items-center text-center text-lg font-semibold transition-colors">
-          {"Untitled Project"}
+          {title ?? "Untitled Project"}
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
