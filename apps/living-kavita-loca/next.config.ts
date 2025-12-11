@@ -29,6 +29,21 @@ const nextConfig: NextConfig = {
     // temporarily setting this because we are not using vercel right now
     unoptimized: true,
   },
+  headers: async () => {
+    return [
+      {
+        source: "/:all*(svg|jpg|png|otf|mp4|js|ttf|woff2|css|jpeg|json)",
+        locale: false,
+        headers: [
+          // Ref: https://confluence.nike.com/display/AKAMAI/Cache+Options+in+Akamai?preview=/369667718/369667596/Header_Handling.pdf
+          {
+            key: "Edge-Control",
+            value: "!no-store,cache-maxage=1d,downstream-ttl=10m",
+          },
+        ],
+      },
+    ];
+  },
   /* config options here */
 };
 

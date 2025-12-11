@@ -18,7 +18,7 @@ type ResumeLinkCardProps = {
   bullets: string[];
   tech: string;
   animation?: string;
-  thumbnail: string;
+  imageSrc: string | undefined;
   badge: string;
   videoSrc?: string | undefined;
 } & { className?: string };
@@ -26,7 +26,7 @@ type ResumeLinkCardProps = {
 export const FeaturedWorkCard = ({
   title,
   role,
-  thumbnail,
+  imageSrc,
   badge,
   videoSrc,
   summary,
@@ -37,7 +37,7 @@ export const FeaturedWorkCard = ({
   const mouseController = useMouseStateController({
     enabled: !!videoSrc,
   });
-  console.log({ mouseController });
+
   return (
     <Card
       className={clsx(
@@ -47,10 +47,13 @@ export const FeaturedWorkCard = ({
         "transition hover:border-pink-500/60 hover:shadow-[0_25px_80px_rgba(236,72,153,0.45)]",
         className,
       )}
+      onMouseEnter={mouseController.onMouseEnter}
+      onMouseLeave={mouseController.onMouseLeave}
     >
       <FeatureWorkCardThumbnail
-        imageSrc={thumbnail}
+        imageSrc={imageSrc}
         badge={badge}
+        videoSrc={videoSrc}
         isHovered={mouseController.isHovered}
       />
       <CardHeader className="gap-0 pt-2">

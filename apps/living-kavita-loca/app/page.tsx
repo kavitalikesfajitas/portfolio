@@ -37,7 +37,7 @@ export default function Home() {
         {/* we need are setting the height to screen and overflow-y-auto to ensure that the content beyond 100vh is visible/scrollable 
         and treated as overflow content so that the user can still scroll to it, but we still pin to start of the content */}
         <div className="px-6 pt-24 bg-gray-950 flex flex-col w-full gap-10 h-screen overflow-y-auto snap-start">
-          <Container>
+          <Container maxWidth="8xl" size="full">
             <section className="flex-col flex md:flex-row gap-10 pt-10">
               <div
                 className={clsx(
@@ -82,12 +82,7 @@ export default function Home() {
               <h2>Featured Work</h2>
               <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                 {projects.map((project) => (
-                  <FeaturedWorkCard
-                    key={project.title}
-                    {...project}
-                    thumbnail="/images/our_force_1_header.jpg"
-                    badge="/logos/nike.svg"
-                  />
+                  <FeaturedWorkCard key={project.title} {...project} />
                 ))}
               </div>
             </section>
