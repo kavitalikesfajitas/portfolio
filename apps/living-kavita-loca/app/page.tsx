@@ -9,12 +9,13 @@ import { TornPaperEffect } from "@kavita-likes-fajitas/ui-library/TornPaperEffec
 import Image from "next/image";
 
 import { projects } from "./exploration/resume/portfolio";
-import { ResumeLinkCard } from "./main/components/FeaturedWorkCard";
+import { FeaturedWorkCard } from "@kavita-likes-fajitas/ui-library/FeatureWorkCard";
+import { Container } from "./main/components/Container";
 
 export default function Home() {
   const heroRef = useRef<HTMLElement>(null);
-  const isHeroInView = useInView(heroRef, { amount: "some" });
-
+  const isHeroInView = useInView(heroRef, { amount: "some", initial: true });
+  console.log({ isHeroInView });
   return (
     <main
       className={clsx(
@@ -36,49 +37,61 @@ export default function Home() {
         {/* we need are setting the height to screen and overflow-y-auto to ensure that the content beyond 100vh is visible/scrollable 
         and treated as overflow content so that the user can still scroll to it, but we still pin to start of the content */}
         <div className="px-6 pt-24 bg-gray-950 flex flex-col w-full gap-10 h-screen overflow-y-auto snap-start">
-          <section className="flex-col flex md:flex-row gap-10 pt-10">
-            <div
-              className={clsx(
-                "relative aspect-square",
-                "w-full md:basis-1/2 h-fit max-w-[600px]",
-              )}
-            >
-              <TornPaperEffect className="h-full w-full">
-                <Image
-                  src="/images/bio-photo.jpg"
-                  alt="Kavita C"
-                  fill
-                  quality={75}
-                  className="object-cover p-5"
-                />
-              </TornPaperEffect>
-            </div>
-            <div className="flex flex-col basis-1/2">
-              <h2 className="text-3xl font-bold mb-6">Hi! I&apos;m Kavita!</h2>
-
-              <div className="space-y-10 max-w-2xl">
-                Hi I&apos;m Kavita! I&apos;m a software engineer and creative
-                developer. I&apos;m a software engineer and creative developer.
-                I&apos;m a software engineer and creative developer. I&apos;m a
-                software engineer and creative developer. I&apos;m a software
-                engineer and creative developer. I&apos;m a software engineer
-                and creative developer. I&apos;m a software engineer and
-                creative developer. I&apos;m a software engineer and creative
-                developer. I&apos;m a software engineer and creative developer.
-                I&apos;m a software engineer and creative developer. I&apos;m a
-                software engineer and creative developer. I&apos;m a software
-                engineer and creative developer.
+          <Container>
+            <section className="flex-col flex md:flex-row gap-10 pt-10">
+              <div
+                className={clsx(
+                  "relative aspect-square",
+                  "w-full md:basis-1/2 h-fit max-w-[600px]",
+                )}
+              >
+                <TornPaperEffect className="h-full w-full">
+                  <Image
+                    src="/images/bio-photo.jpg"
+                    alt="Kavita C"
+                    fill
+                    quality={75}
+                    className="object-cover p-5"
+                  />
+                </TornPaperEffect>
               </div>
-            </div>
-          </section>
-          <section className=" flex flex-col gap-10 h-fit mb-24">
-            <h2>Featured Work</h2>
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {projects.map((project) => (
-                <ResumeLinkCard key={project.title} {...project} />
-              ))}
-            </div>
-          </section>
+              <div className="flex flex-col basis-1/2">
+                <h2 className="text-3xl font-bold mb-6">
+                  Hi! I&apos;m Kavita!
+                </h2>
+
+                <div className="space-y-10 max-w-2xl">
+                  Hi I&apos;m Kavita! I&apos;m a software engineer and creative
+                  developer. I&apos;m a software engineer and creative
+                  developer. I&apos;m a software engineer and creative
+                  developer. I&apos;m a software engineer and creative
+                  developer. I&apos;m a software engineer and creative
+                  developer. I&apos;m a software engineer and creative
+                  developer. I&apos;m a software engineer and creative
+                  developer. I&apos;m a software engineer and creative
+                  developer. I&apos;m a software engineer and creative
+                  developer. I&apos;m a software engineer and creative
+                  developer. I&apos;m a software engineer and creative
+                  developer. I&apos;m a software engineer and creative
+                  developer.
+                </div>
+              </div>
+            </section>
+
+            <section className=" flex flex-col gap-10 h-fit mb-24">
+              <h2>Featured Work</h2>
+              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                {projects.map((project) => (
+                  <FeaturedWorkCard
+                    key={project.title}
+                    {...project}
+                    thumbnail="/images/our_force_1_header.jpg"
+                    badge="/logos/nike.svg"
+                  />
+                ))}
+              </div>
+            </section>
+          </Container>
         </div>
       </motion.div>
     </main>

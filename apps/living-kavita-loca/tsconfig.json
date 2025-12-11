@@ -2,19 +2,11 @@
   "extends": "@kavita-likes-fajitas/typescript-config/nextjs",
   "compilerOptions": {
     "paths": {
-      "@/*": [
-        "./app/*"
-      ],
-      "@kavita-likes-fajitas/ui-library/*": [
-        "../../packages/ui-library/src/*"
-      ]
+      "@/*": ["./app/*"],
+      "@kavita-likes-fajitas/ui-library/*": ["../../packages/ui-library/src/*"]
     },
     "isolatedModules": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ]
+    "lib": ["dom", "dom.iterable", "esnext"]
   },
   "include": [
     "next-env.d.ts",
@@ -22,9 +14,8 @@
     "**/*.tsx",
     "next.config.ts",
     ".next/types/**/*.ts",
-    "eslint.config.mjs"
+    "eslint.config.mjs",
+    "../../packages/ui-library/src/FeatureWorkCard/FeaturedWorkCard.tsx"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
