@@ -1,13 +1,6 @@
-"use client";
-import { Nav } from "@/app/ui/components/Nav";
-import { CenterStickyNav } from "@kavita-likes-fajitas/ui-library/Navigation/CenterToStickyNav";
 import Image from "next/image";
 
-type NavForMainProps = {
-  isMobile: boolean;
-};
-
-export const LivingKavitaLocaInNavLogo = () => {
+export const LivingKavitaLocaLogo = () => {
   return (
     <>
       <span className="pl-1 text-xs font-semibold uppercase leading-tight tracking-tight sm:text-sm md:pl-2 md:text-base md:tracking-[0.25em]">
@@ -24,11 +17,3 @@ export const LivingKavitaLocaInNavLogo = () => {
     </>
   );
 };
-
-export function NavForMain({ isMobile }: NavForMainProps) {
-  return (
-    <CenterStickyNav InNavLogo={LivingKavitaLocaInNavLogo}>
-      <Nav isMobile={isMobile} />
-    </CenterStickyNav>
-  );
-}
