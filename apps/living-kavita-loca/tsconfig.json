@@ -1,9 +1,9 @@
 {
   "extends": "@kavita-likes-fajitas/typescript-config/nextjs",
   "compilerOptions": {
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./app/*"],
-      "@content/*": ["./content/*"],
+      "@/*": ["./*"],
       "@kavita-likes-fajitas/ui-library/*": ["../../packages/ui-library/src/*"]
     },
     "isolatedModules": true,

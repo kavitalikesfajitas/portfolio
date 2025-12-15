@@ -6,16 +6,21 @@ import {
 } from "@kavita-likes-fajitas/shadcn-ui-lib/components/ui/navigation-menu";
 import { ListThatsFancy } from "./ListThatsFancy";
 import { StandardNavigationMenuItemLink } from "./StandardNavigationMenuItemLink";
+import clsx from "clsx";
 
 type NavProps = {
   isMobile: boolean;
+  className?: string;
 };
 
-export function Nav({ isMobile }: NavProps) {
+export function Nav({ isMobile, className }: NavProps) {
   return (
     <NavigationMenu
       viewport={isMobile}
-      className="dark py-2 bg-white text-gray-950 rounded-full"
+      className={clsx(
+        "dark py-2 bg-white text-gray-950 rounded-full",
+        className,
+      )}
     >
       <NavigationMenuList id="nav-list" className=" text-gray-950 bg-white ">
         <ListThatsFancy />

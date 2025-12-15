@@ -1,10 +1,10 @@
 "use client";
-import { Nav } from "@/ui/components/Nav";
+import { Nav } from "@/app/ui/components/Nav";
 import { useIsMobile } from "@kavita-likes-fajitas/shadcn-ui-lib/hooks/useBreakpoint";
 import { CenterStickyNav } from "@kavita-likes-fajitas/ui-library/Navigation/CenterToStickyNav";
 import Image from "next/image";
 
-const LivingKavitaLocaInNavLogo = () => {
+export const LivingKavitaLocaInNavLogo = () => {
   return (
     <>
       <span className="pl-1 text-xs font-semibold uppercase leading-tight tracking-tight sm:text-sm md:pl-2 md:text-base md:tracking-[0.25em]">

@@ -8,8 +8,8 @@ const projectDetails: Record<
   () => Promise<{ default: React.ComponentType }>
 > = {
   "contentful-graphql-proxy": () =>
-    import("@content/work/contentful-graphql-proxy.mdx"),
-  "opensea-swoosh-id": () => import("@content/work/opensea-swoosh-id.mdx"),
+    import("@/content/work/contentful-graphql-proxy.mdx"),
+  "opensea-swoosh-id": () => import("@/content/work/opensea-swoosh-id.mdx"),
   // Add more project details here as you create them
 };
 

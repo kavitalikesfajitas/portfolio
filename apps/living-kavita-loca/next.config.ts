@@ -28,6 +28,13 @@ const nextConfig: NextConfig = {
    *  within the next app.
    */
   outputFileTracingRoot: workspaceRoot,
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      "@": path.resolve(__dirname, "."),
+    };
+    return config;
+  },
   images: {
     // temporarily setting this because we are not using vercel right now
     unoptimized: true,
