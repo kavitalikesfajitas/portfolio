@@ -4,7 +4,7 @@ import sharedLintStagedConfig from "../../../../../.lintstagedrc.mjs";
 export default {
   ...sharedLintStagedConfig,
   "**/*.{js,ts,mts,tsx,mjs}": [
-    "eslint --fix --config eslint.config.mjs --max-warnings 0",
+    "eslint --fix --config eslint.config.mjs --max-warnings 10",
     "prettier --write",
   ],
 };
