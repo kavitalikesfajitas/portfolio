@@ -17,7 +17,12 @@ export default function RootLayout({
   const fontVariables = getAppFontVariables();
   return (
     <html lang="en">
-      <body className={clsx(fontVariables, "antialiased")}>{children}</body>
+      <body className={clsx(fontVariables, "antialiased")}>
+        {children}
+        <footer className="border-t border-neutral-900 dark bg-primary py-4 text-center text-[0.65rem] uppercase tracking-[0.2em] text-neutral-600">
+          © {new Date().getFullYear()} Kavita Chaudhry - living kavita loca
+        </footer>
+      </body>
     </html>
   );
 }
