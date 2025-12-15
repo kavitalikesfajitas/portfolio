@@ -12,11 +12,15 @@ export function TornPaperEffect({
 }: TornPaperEffectProps) {
   return (
     <div
-      className={clsx(className, "ragged-text-filter bg-white text-gray-950")}
+      className={clsx(
+        className,
+        "ragged-text-filter bg-white text-gray-950",
+        className,
+      )}
       {...rest}
     >
       <SVGFilter className={clsx()} />
-      <p>{children}</p>
+      {children}
     </div>
   );
 }

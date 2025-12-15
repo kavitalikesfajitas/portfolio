@@ -1,6 +1,6 @@
 @import "tailwindcss";
-@import "@kavita-likes-fajitas/tailwind-config/shared-styles";
 @import "@kavita-likes-fajitas/shadcn-ui-lib/styles/global.css";
+@import "@kavita-likes-fajitas/tailwind-config/shared-styles";
 @config "../tailwind.config.ts";
 
 @-ms-viewport {
@@ -13,9 +13,16 @@
 .font-helvetica-neue {
   font-family: var(--font-helvetica-neue);
 }
+
+@layer base {
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--color-gray-950);
+  }
+}
+
 body {
-  min-height: 100vh;
   background: var(--color-gray-950);
   color: #ffffff;
-  font-family: var(--font-helvetica-neue), Helvetica, Arial, sans-serif;
+  min-height: 100vh;
 }

@@ -17,7 +17,10 @@ export function Nav({ isMobile, className }: NavProps) {
   return (
     <NavigationMenu
       viewport={isMobile}
-      className={clsx(" py-2 bg-white text-gray-950 rounded-full", className)}
+      className={clsx(
+        " py-2 bg-white text-gray-950 rounded-full dark",
+        className,
+      )}
     >
       <NavigationMenuList id="nav-list" className=" text-gray-950 bg-white ">
         <ListThatsFancy />

@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: workspaceRoot, // Specify the monorepo root as turbo directory
   },
-  allowedDevOrigins: ["local.living-kavita-loca.com"],
+  allowedDevOrigins: ["local.living-kavita-loca.com", "localhost"],
   output: "export",
   reactStrictMode: true,
   reactCompiler: true,
@@ -29,6 +29,7 @@ const nextConfig: NextConfig = {
     // temporarily setting this because we are not using vercel right now
     unoptimized: true,
   },
+
   /* config options here */
 };
 
