@@ -1,7 +1,7 @@
 "use client";
 
-import { NavForMain } from "./main/NavForMain";
-import { Hero } from "./main/Hero";
+import { NavForMain } from "@/app/main/components/NavForMain";
+import { Hero } from "@/app/main/components/Hero";
 import { useIsMobile } from "@kavita-likes-fajitas/shadcn-ui-lib/hooks/useBreakpoint";
 import { SoftFadeSkeleton } from "@kavita-likes-fajitas/ui-library/Skeletons/SoftFadeSkeleton";
 import clsx from "clsx";
