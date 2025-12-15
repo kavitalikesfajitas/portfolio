@@ -30,7 +30,7 @@ export function Hero() {
         className="relative flex  w-full justify-center scale-75 md:scale-100 lg:scale-125"
       >
         <Image
-          src="/images/living-kavita-loca-logo.png"
+          src="/images/hero/living-kavita-loca-logo.png"
           alt="living kavita loca"
           width={650}
           height={650}
@@ -42,7 +42,7 @@ export function Hero() {
           className="absolute top-1/2 translate-x-[45%] -translate-y-1/2 scale-50 lips"
         >
           <Image
-            src="/images/lips-glossy.png"
+            src="/images/hero/lips-glossy.png"
             alt="lips open that are glossy"
             className="lips relative z-10"
             height={600}

@@ -51,7 +51,7 @@ export default function Home() {
               >
                 <TornPaperEffect className="h-full w-full">
                   <Image
-                    src="/images/bio-photo.jpg"
+                    src="/images/personal/bio-photo.jpg"
                     alt="Kavita C"
                     fill
                     quality={75}

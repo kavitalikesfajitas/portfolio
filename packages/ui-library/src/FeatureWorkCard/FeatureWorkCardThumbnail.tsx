@@ -19,7 +19,7 @@ export function FeatureWorkCardThumbnail(
   return (
     <figure
       className={clsx(
-        "relative z-10 aspect-auto h-48 overflow-hidden rounded-t-lg",
+        "relative z-10 aspect-auto h-64 overflow-hidden rounded-t-lg",
         "w-full",
         props.className,
       )}
@@ -40,9 +40,8 @@ export function FeatureWorkCardThumbnail(
             "object-cover",
             !props.videoSrc &&
               "transition-transform duration-300 group-hover:scale-105",
-            "object-scale-down object-top",
+            "object-center",
           )}
-          unoptimized
         />
       )}
       {props.badge && (

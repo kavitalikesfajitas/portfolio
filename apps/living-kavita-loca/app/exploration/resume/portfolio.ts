@@ -9,7 +9,7 @@ export const projects = [
       "Reduced P95 latency by 40–60% across key experiences.",
       "Structured logging + metrics for hit rate and error budgets.",
     ],
-    imageSrc: "/images/opensea-swoosh-id.png",
+    imageSrc: "/images/work/thumbnails/graphql-proxy.png",
 
     badge: "/logos/nike.svg",
     tech: "TypeScript · Node.js · GraphQL · Redis · AWS",
@@ -24,7 +24,7 @@ export const projects = [
       "Reduced P95 latency by 40–60% across key experiences.",
       "Structured logging + metrics for hit rate and error budgets.",
     ],
-    imageSrc: "/images/opensea-swoosh-id.png",
+    imageSrc: "/images/work/thumbnails/opensea-swoosh-id.png",
 
     badge: "/logos/nike.svg",
     tech: "TypeScript · Node.js · GraphQL · Redis · AWS",
@@ -39,12 +39,12 @@ export const projects = [
       "SSG + ISR tuned for both performance and freshness.",
       "Guardrails codified with design + product partners.",
     ],
-    imageSrc: "/images/our_force_1_header.jpg",
+    imageSrc: "/images/work/thumbnails/our_force_1_header.jpg",
     tech: "Next.js · React · GraphQL · Tailwind · Vercel/AWS",
     badge: "/logos/nike.svg",
   },
   {
-    imageSrc: "/images/our_force_1_header.jpg",
+    imageSrc: "/images/work/thumbnails/our_force_1_header.jpg",
     title: "Authentication Gateway for Internal Apps",
     role: "Full-Stack Engineer",
     summary:
@@ -60,7 +60,7 @@ export const projects = [
   {
     title: "Monorepo & DX Modernization",
     role: "Lead Engineer",
-    imageSrc: "/images/our_force_1_header.jpg",
+    imageSrc: "/images/work/thumbnails/our_force_1_header.jpg",
     summary:
       "Yarn/Turborepo monorepo with shared configs, UI packages, and build tooling for multi-service teams.",
     bullets: [

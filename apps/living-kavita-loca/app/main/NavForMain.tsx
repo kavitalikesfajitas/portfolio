@@ -12,7 +12,7 @@ const LivingKavitaLocaInNavLogo = () => {
       </span>
       <div className="relative h-6 w-6 md:h-9 md:w-9">
         <Image
-          src="/images/lips-glossy.png"
+          src="/images/hero/lips-glossy.png"
           alt="Living Kavita Loca lips"
           fill
           className="object-contain"
