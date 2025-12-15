@@ -1,6 +1,7 @@
 export const projects = [
   {
     title: "Contentful GraphQL Proxy",
+    slug: "contentful-graphql-proxy",
     role: "Lead Engineer / Architect",
     summary:
       "A high-performance GraphQL layer in front of Contentful that caches, normalizes, and instruments content delivery for PDPs.",
@@ -25,7 +26,7 @@ export const projects = [
       "Structured logging + metrics for hit rate and error budgets.",
     ],
     imageSrc: "/images/work/thumbnails/opensea-swoosh-id.png",
-
+    slug: "opensea-swoosh-id",
     badge: "/logos/nike.svg",
     tech: "TypeScript · Node.js · GraphQL · Redis · AWS",
   },

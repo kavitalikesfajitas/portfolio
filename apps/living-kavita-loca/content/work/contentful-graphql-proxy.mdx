@@ -1,0 +1,97 @@
+# Contentful GraphQL Proxy
+
+**Role:** Lead Engineer / Architect  
+**Tech Stack:** TypeScript · Node.js · GraphQL · Redis · AWS
+
+---
+
+## Overview
+
+A high-performance GraphQL layer in front of Contentful that caches, normalizes, and instruments content delivery for Product Detail Pages (PDPs).
+
+## The Challenge
+
+Contentful's GraphQL API is powerful, but when you're serving millions of product pages, every millisecond counts. We needed a solution that could:
+
+- **Reduce latency** for repeated content fetches
+- **Handle traffic spikes** during product launches
+- **Provide observability** into content delivery performance
+- **Maintain data freshness** while maximizing cache hits
+
+## Solution Architecture
+
+### Caching Layer
+
+We implemented a multi-tier caching strategy using Redis:
+
+```typescript
+interface CacheConfig {
+  ttl: number;
+  staleWhileRevalidate: boolean;
+  keyPrefix: string;
+}
+
+async function getCachedContent<T>(
+  key: string, 
+  fetcher: () => Promise<T>,
+  config: CacheConfig
+): Promise<T> {
+  const cached = await redis.get(key);
+  
+  if (cached && !isStale(cached, config.ttl)) {
+    return JSON.parse(cached);
+  }
+  
+  // Stale-while-revalidate pattern
+  if (cached && config.staleWhileRevalidate) {
+    revalidateInBackground(key, fetcher, config);
+    return JSON.parse(cached);
+  }
+  
+  return fetchAndCache(key, fetcher, config);
+}
+```
+
+### Schema Stitching
+
+We stitched together multiple GraphQL schemas to provide a unified API:
+
+- **Contentful CMS** - Product content, images, descriptions
+- **Inventory Service** - Real-time stock levels
+- **Pricing Service** - Dynamic pricing and promotions
+
+### Resilient Failover
+
+The proxy was designed with resilience in mind:
+
+1. **Circuit breakers** prevent cascade failures
+2. **Fallback content** serves cached data when upstream fails
+3. **Health checks** automatically route around unhealthy nodes
+
+## Results
+
+| Metric | Before | After | Improvement |
+|--------|--------|-------|-------------|
+| P50 Latency | 180ms | 45ms | **75% faster** |
+| P95 Latency | 420ms | 168ms | **60% faster** |
+| Cache Hit Rate | N/A | 94% | - |
+| Error Rate | 0.8% | 0.1% | **87% reduction** |
+
+## Key Learnings
+
+- **Structured logging** is invaluable for debugging production issues
+- **Metrics-driven development** helps prioritize optimization efforts
+- **Gradual rollouts** catch edge cases before they become incidents
+
+## Future Enhancements
+
+We're exploring:
+
+- Edge caching with Cloudflare Workers
+- Predictive cache warming based on traffic patterns
+- GraphQL persisted queries for additional performance gains
+
+---
+
+*This project was completed while working at Nike on the Digital Platform team.*
+

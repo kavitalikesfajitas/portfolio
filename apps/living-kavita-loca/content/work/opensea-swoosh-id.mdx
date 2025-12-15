@@ -1,0 +1,112 @@
+# OpenSea Swoosh ID
+
+**Role:** Lead Engineer / Architect  
+**Tech Stack:** TypeScript · Node.js · SVG · AWS Lambda
+
+---
+
+## Overview
+
+Creating a way to dynamically render the Nike Swoosh Membership card on OpenSea using an SVG endpoint. This project enabled Nike's digital membership cards to display as beautiful, personalized NFT artwork across any NFT marketplace.
+
+## The Challenge
+
+When Nike launched the .SWOOSH digital membership program, we needed a way to:
+
+- **Display personalized membership cards** as NFT artwork on OpenSea and other marketplaces
+- **Generate SVGs dynamically** based on member data (level, join date, achievements)
+- **Handle scale** - hundreds of thousands of members, each with unique cards
+- **Maintain freshness** - cards should update as members earn new achievements
+
+## Solution
+
+### Dynamic SVG Generation
+
+We built a serverless endpoint that generates SVG artwork on-the-fly:
+
+```typescript
+export async function generateSwooshCard(
+  memberId: string
+): Promise<string> {
+  const member = await fetchMemberData(memberId);
+  
+  return `
+    <svg viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="cardGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:${member.tier.primaryColor}" />
+          <stop offset="100%" style="stop-color:${member.tier.secondaryColor}" />
+        </linearGradient>
+      </defs>
+      
+      <rect width="400" height="250" rx="16" fill="url(#cardGradient)" />
+      
+      <!-- Swoosh Logo -->
+      <path d="${SWOOSH_PATH}" fill="white" opacity="0.2" />
+      
+      <!-- Member Info -->
+      <text x="24" y="200" fill="white" font-size="14">
+        ${member.username}
+      </text>
+      <text x="24" y="220" fill="white" opacity="0.7" font-size="12">
+        Member since ${formatDate(member.joinDate)}
+      </text>
+      
+      <!-- Achievement Badges -->
+      ${renderAchievements(member.achievements)}
+    </svg>
+  `;
+}
+```
+
+### OpenSea Metadata Integration
+
+NFT marketplaces like OpenSea fetch artwork via the `image` field in token metadata. We configured the metadata to point to our dynamic endpoint:
+
+```json
+{
+  "name": "SWOOSH Membership Card",
+  "description": "Your Nike .SWOOSH digital membership card",
+  "image": "https://api.swoosh.nike/cards/{memberId}/image.svg",
+  "attributes": [
+    { "trait_type": "Tier", "value": "Founding Member" },
+    { "trait_type": "Achievements", "value": 12 }
+  ]
+}
+```
+
+### Caching Strategy
+
+To handle the load while keeping cards fresh:
+
+1. **Edge caching** with 5-minute TTL for most requests
+2. **Cache invalidation** triggered when member data changes
+3. **Fallback rendering** to serve cached SVGs if generation fails
+
+## Visual Design
+
+The card design evolved through several iterations:
+
+- **Tier-based gradients** - different colors for Bronze, Silver, Gold, Platinum
+- **Animated elements** - subtle shine effects for premium tiers
+- **Achievement badges** - small icons showing member accomplishments
+- **Responsive sizing** - looks great from thumbnails to full-screen
+
+## Results
+
+- **100% uptime** during major drops and campaigns
+- **Sub-50ms response times** at the edge
+- **Positive community feedback** on the visual design
+- Successfully rendered for **500K+ unique members**
+
+## Technical Highlights
+
+- Serverless architecture scales automatically with demand
+- SVG format ensures crisp rendering at any size
+- No external font dependencies - all text converted to paths
+- Dark mode and light mode variants available
+
+---
+
+*This project was completed as part of Nike's Web3 initiatives, bringing digital membership to blockchain-native platforms.*
+

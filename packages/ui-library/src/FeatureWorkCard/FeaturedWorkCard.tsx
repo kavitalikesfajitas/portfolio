@@ -10,6 +10,7 @@ import clsx from "clsx";
 import Image from "next/image";
 import { FeatureWorkCardThumbnail } from "./FeatureWorkCardThumbnail";
 import { useMouseStateController } from "../AutoPlayVideo";
+import Link from "next/link";
 
 type ResumeLinkCardProps = {
   title: string;
@@ -19,6 +20,7 @@ type ResumeLinkCardProps = {
   tech: string;
   animation?: string;
   imageSrc: string | undefined;
+  slug?: string;
   badge: string;
   videoSrc?: string | undefined;
 } & { className?: string };
@@ -29,6 +31,7 @@ export const FeaturedWorkCard = ({
   imageSrc,
   badge,
   videoSrc,
+  slug,
   summary,
   bullets,
   tech,
@@ -64,6 +67,11 @@ export const FeaturedWorkCard = ({
       <CardContent className="pt-0">
         <div className="text-muted-foreground mb-2 text-sm">{tech}</div>
         <div className="text-foreground text-sm">{summary || ""}</div>
+        {slug && (
+          <Link href={`/work/${slug}`} className="block">
+            View Project
+          </Link>
+        )}
       </CardContent>
     </Card>
   );
