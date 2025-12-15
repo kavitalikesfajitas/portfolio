@@ -1,11 +1,8 @@
 "use client";
 import { Nav } from "@/ui/components/Nav";
+import { useIsMobile } from "@kavita-likes-fajitas/shadcn-ui-lib/hooks/useBreakpoint";
 import { CenterStickyNav } from "@kavita-likes-fajitas/ui-library/Navigation/CenterToStickyNav";
 import Image from "next/image";
-
-type NavForMainProps = {
-  isMobile: boolean;
-};
 
 const LivingKavitaLocaInNavLogo = () => {
   return (
@@ -25,10 +22,12 @@ const LivingKavitaLocaInNavLogo = () => {
   );
 };
 
-export function NavForMain({ isMobile }: NavForMainProps) {
+export function NavForMain() {
+  const isMobile = useIsMobile();
+
   return (
     <CenterStickyNav InNavLogo={LivingKavitaLocaInNavLogo}>
-      <Nav isMobile={isMobile} />
+      <Nav isMobile={isMobile!} />
     </CenterStickyNav>
   );
 }

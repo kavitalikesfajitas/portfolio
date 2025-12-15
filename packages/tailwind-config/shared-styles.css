@@ -1,4 +1,4 @@
-@import "tailwindcss";
+/* Note: Consuming project should import tailwindcss before this file */
 
 @theme {
   --color-blue-1000: #2a8af6;
