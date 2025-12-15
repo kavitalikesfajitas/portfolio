@@ -3,6 +3,7 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./app/*"],
+      "@content/*": ["./content/*"],
       "@kavita-likes-fajitas/ui-library/*": ["../../packages/ui-library/src/*"]
     },
     "isolatedModules": true,
@@ -12,7 +13,9 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "**/*.mdx",
     "next.config.ts",
+    "mdx-components.tsx",
     ".next/types/**/*.ts",
     "eslint.config.mjs"
   ],

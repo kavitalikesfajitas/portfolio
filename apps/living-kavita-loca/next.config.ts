@@ -1,6 +1,7 @@
 import path from "path";
 import url from "node:url";
 import type { NextConfig } from "next";
+import createMDX from "@next/mdx";
 
 const workspaceRoot = path.resolve(
   path.dirname(url.fileURLToPath(import.meta.url)),
@@ -9,6 +10,8 @@ const workspaceRoot = path.resolve(
 );
 
 const nextConfig: NextConfig = {
+  // Enable MDX file extensions
+  pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   turbopack: {
     root: workspaceRoot, // Specify the monorepo root as turbo directory
   },
@@ -47,4 +50,12 @@ const nextConfig: NextConfig = {
   /* config options here */
 };
 
-export default nextConfig;
+const withMDX = createMDX({
+  // Add markdown plugins here if needed
+  options: {
+    remarkPlugins: [],
+    rehypePlugins: [],
+  },
+});
+
+export default withMDX(nextConfig);
