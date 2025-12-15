@@ -25,10 +25,12 @@ export function NonMainNav({ className }: NonMainNavProps) {
       >
         <LivingKavitaLocaLogo />
       </div>
-      <Nav
-        isMobile={isMobile!}
-        className="h-fit flex-1 grow-0 w-full sticky top-0 "
-      />
+      {isMobile !== undefined && (
+        <Nav
+          isMobile={isMobile}
+          className="h-fit flex-1 grow-0 w-full sticky top-0 "
+        />
+      )}
     </div>
   );
 }
