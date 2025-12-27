@@ -71,7 +71,7 @@ We use **Turbo Generators** (Plop) to scaffold standardized packages and compone
   - Types:
     - `ESM Package` (implemented)
     - `React Package` (implemented)
-- **nvs-preorder app component**: Creates a new React component in `apps/nvs-preorder`
+- **living-kavita-loca app component**: Creates a new React component in `apps/living-kavita-loca`
 
 ### Usage
 
@@ -84,7 +84,7 @@ yarn turbo gen
 You will be prompted to select which custom generator to use:
 
 - **root - package**: Creates a new package in `packages/<name>`
-- **nvs-preorder app component**: Creates a new React component in `apps/nvs-preorder`
+- **living-kavita-loca app component**: Creates a new React component in `apps/living-kavita-loca`
 
 If you selected package, you will need to provide:
 
