@@ -3,7 +3,7 @@ import { NavForMain } from "@/app/main/components/NavForMain";
 import { Hero } from "@/app/main/components/Hero";
 import clsx from "clsx";
 import { motion, useInView } from "motion/react";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 import { Bio } from "./main/components/Bio";
 export default function Home() {
@@ -11,15 +11,6 @@ export default function Home() {
   const isHeroInView = useInView(heroRef, { amount: 0.3, initial: true });
 
   const bioRef = useRef<HTMLDivElement>(null);
-
-  const hasScrolledToBio = useRef(false);
-
-  // useEffect(() => {
-  //   if (!isHeroInView && bioRef.current && !hasScrolledToBio.current) {
-  //     hasScrolledToBio.current = true;
-  //     bioRef.current.scrollIntoView({ behavior: "smooth" });
-  //   }
-  // }, [isHeroInView]);
 
   return (
     <main

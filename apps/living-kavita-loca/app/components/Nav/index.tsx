@@ -14,10 +14,11 @@ type NavProps = {
 };
 
 export function Nav({ isMobile, className }: NavProps) {
+  console.log("isMobile", isMobile);
   return (
     <NavigationMenu
       viewport={isMobile}
-      className={clsx(" py-2 bg-white text-gray-1000 rounded-full", className)}
+      className={clsx(" py-2 bg-white text-gray-1000 ", className)}
     >
       <NavigationMenuList id="nav-list" className=" text-gray-1000 bg-white ">
         <ListThatsFancy />
