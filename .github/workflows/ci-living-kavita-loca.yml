@@ -6,6 +6,9 @@ jobs:
   build-app-and-run-tests:
     name: "Living Kavita Loca App Tests, Build, Lint and Check Size"
     runs-on: [ubuntu-latest]
+    permissions:
+      id-token: write
+      contents: read
     defaults:
       run:
         working-directory: apps/living-kavita-loca
@@ -57,11 +60,14 @@ jobs:
           NEXT_TELEMETRY_DISABLED: true
           ENABLE_CACHE: true
 
-      # - name: 📦 Check size
-      #   run: yarn --cwd apps/living-kavita-loca check-size
+      - name: Configure AWS Credentials
+        if: github.ref == 'refs/heads/main'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
 
-      # - name: 📐 Check browser bundle size limits
-      #   run: yarn --cwd apps/living-kavita-loca check-size
-
-      # - name: 🛟 Check ecmascript checks for build files
-      #   run: yarn  --cwd apps/living-kavita-loca check-dist
+      - name: 🚀 Deploy to S3
+        # TODO: Remove this once we are ready to deploy
+        if: false #github.ref == 'refs/heads/main'
+        run: aws s3 sync out s3://${{ vars.S3_BUCKET_NAME }} --delete

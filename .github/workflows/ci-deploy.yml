@@ -1,0 +1,42 @@
+name: "Portfolio - Living Kavita Loca App Deploy"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/**"
+      - "packages/**"
+      - "package.json"
+      - "*.lock"
+      - ".yarnrc.yml"
+      - "tsconfig.base.json"
+      - ".prettier*"
+      - ".github/**"
+      - "infra/**"
+      - "!.github/workflows/ci-pr-audit.yml"
+      - "!.github/workflows/ci-pr-body-audit-reusable.yml"
+      - "!.github/workflows/ci-pr-reusable-commit-lint.yml"
+
+concurrency: "portfolio-deploy-living-kavita-loca"
+
+jobs:
+  run-build-packages:
+    uses: ./.github/workflows/ci-packages.yml
+    name: "Portfolio - Packages Tests"
+    with:
+      environment: default
+    secrets: inherit
+
+  run-terraform-validation-and-deploy:
+    uses: ./.github/workflows/ci-terraform.yml
+    name: "🚀 Deploy Terraform Infrastructure"
+    with:
+      infra-working-directory: "./infra"
+    secrets: inherit
+
+  run-living-kavita-loca-build-and-deploy:
+    uses: ./.github/workflows/ci-living-kavita-loca.yml
+    name: "Portfolio - Living Kavita Loca App Build and Deploy to S3"
+    with:
+      environment: default
+    secrets: inherit
