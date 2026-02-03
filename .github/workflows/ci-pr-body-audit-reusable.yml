@@ -1,0 +1,107 @@
+name: Validate PR Description/Template
+on:
+  workflow_call:
+jobs:
+  validate-pr:
+    runs-on: [ubuntu-latest]
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Extract PR Body (base64)
+        id: pr
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Pull body from event JSON; if null, coerce to empty string
+          PR_BODY=$(jq -r '.pull_request.body // ""' "$GITHUB_EVENT_PATH")
+          # Encode to base64 to avoid shell interpolation issues
+          PR_BODY_B64=$(printf "%s" "$PR_BODY" | base64 -w0 2>/dev/null || base64 <<<"$PR_BODY" | tr -d '\n')
+          {
+            echo "body_b64<<EOF"
+            echo "$PR_BODY_B64"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Validate PR Description/Template
+        id: validate
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Decode body to a file; normalize line endings (remove CR)
+          : > pr_body.txt
+          printf "%s" "${{ steps.pr.outputs.body_b64 }}" | base64 -d > pr_body.txt || \
+            printf "%s" "${{ steps.pr.outputs.body_b64 }}" | base64 --decode > pr_body.txt
+          sed -i 's/\r$//' pr_body.txt || true
+
+          ERRORS=""
+          WARNINGS=""
+
+          # Helper: extract a markdown section by its H2 heading
+          extract_section() {
+            local heading="$1"
+            awk -v h="$heading" '
+              BEGIN{found=0}
+              # exact H2 line: "## Heading"
+              $0 ~ "^##[[:space:]]+" h "[[:space:]]*$" {found=1; next}
+              # next H2 ends
+              found && $0 ~ "^##[[:space:]]+" {exit}
+              found {print}
+            ' pr_body.txt
+          }
+
+          # Remove just fence markers & comments; keep code content; strip whitespace
+          normalize_for_empty_check() {
+            sed '/^```/d' \
+            | sed '/^<!--/,/-->$/d' \
+            | tr -d '[:space:]'
+          }
+
+          # Basic emptiness check for whole body
+          if [ ! -s pr_body.txt ] || [ -z "$(tr -d '[:space:]' < pr_body.txt)" ]; then
+            ERRORS+="\n❌ **PR description is empty. Please fill out the template or add a brief description for your changes.**"
+          else
+            # What It Does
+            if ! grep -qE '^##[[:space:]]+What It Does[[:space:]]*$' pr_body.txt; then
+              WARNINGS+="\n⚠️ **Missing '## What It Does' section.**"
+            else
+              SECTION_CONTENT="$(extract_section 'What It Does')"
+              if [ -z "$(printf "%s" "$SECTION_CONTENT" | normalize_for_empty_check)" ]; then
+                ERRORS+="\n❌ **'What It Does' section is empty.**"
+              fi
+            fi
+          fi
+
+          {
+            echo "errors<<EOF"
+            echo -e "$ERRORS"
+            echo "EOF"
+            echo "warnings<<EOF"
+            echo -e "$WARNINGS"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          if [ -n "$ERRORS" ]; then
+            exit 1
+          fi
+
+      - name: Comment Warnings (Non-blocking)
+        if: ${{ steps.validate.outputs.warnings != '' }}
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ## ⚠️ PR Template Warnings
+            ${{ steps.validate.outputs.warnings }}
+
+      - name: Comment Errors (Blocking)
+        if: failure()
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ## 🚫 PR Template Validation Failed
+            ${{ steps.validate.outputs.errors }}
+            ## ⚠️ PR Template Warnings
+            ${{ steps.validate.outputs.warnings }}

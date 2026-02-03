@@ -38,7 +38,7 @@ jobs:
             # TODO: sha may changes on every commit, may need to modify this
           key: ${{ runner.os }}-turbo-portfolio-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-turbo-
+            ${{ runner.os }}-turbo-portfolio-
 
       - name: 📥 Monorepo install
         uses: ./.github/actions/yarn-monorepo-install

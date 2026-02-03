@@ -8,6 +8,9 @@ on:
       - "packages/**"
       - ".github/**"
       - "package.json"
+      - "!.github/workflows/ci-pr-audit.yml"
+      - "!.github/workflows/ci-pr-body-audit-reusable.yml"
+      - "!.github/workflows/ci-pr-reusable-commit-lint.yml"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
