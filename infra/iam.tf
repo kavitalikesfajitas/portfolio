@@ -29,9 +29,43 @@ resource "aws_iam_role" "github_deploy" {
   })
 }
 
-# Temporary: Use AdministratorAccess for bootstrapping
-# CI will create the scoped s3_deploy policy later
+# AdministratorAccess for CI to manage infrastructure
 resource "aws_iam_role_policy_attachment" "admin" {
   role       = aws_iam_role.github_deploy.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+}
+
+resource "aws_iam_policy" "s3_deploy" {
+  name = "s3-deploy-site"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "ListBucket"
+        Effect = "Allow"
+        Action = ["s3:ListBucket"]
+        Resource = [
+          aws_s3_bucket.site.arn
+        ]
+      },
+      {
+        Sid    = "ObjectAccess"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = [
+          "${aws_s3_bucket.site.arn}/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach" {
+  role       = aws_iam_role.github_deploy.name
+  policy_arn = aws_iam_policy.s3_deploy.arn
 }
