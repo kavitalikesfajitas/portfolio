@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getAppFontVariables } from "@kavita-likes-fajitas/fonts";
 import "./globals.css";
 import clsx from "clsx";
+import { Footer } from "@kavita-likes-fajitas/ui-library/Navigation/Footer";
 
 export const metadata: Metadata = {
   title: "Living Kavita Loca",
@@ -19,9 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={clsx(fontVariables, "antialiased")}>
         {children}
-        <footer className="border-t border-neutral-900 dark bg-primary py-4 text-center text-[0.65rem] uppercase tracking-[0.2em] text-neutral-600">
-          © {new Date().getFullYear()} Kavita Chaudhry - living kavita loca
-        </footer>
+        <Footer />
       </body>
     </html>
   );
