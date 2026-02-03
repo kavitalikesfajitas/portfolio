@@ -14,7 +14,6 @@
 #          cache-prefix: add cache key prefix       # (default = 'default')            #
 #          cache-node-modules: false                # (default = 'false')              #
 #          cache-install-state: false               # (default = 'false')              #
-#          immutable: true                          # (default = 'true')               #
 #                                                                                      #
 # Inspired by:                                                                         #
 # - https://github.com/belgattitude/nextjs-monorepo-example                            #
@@ -48,7 +47,7 @@ inputs:
   enable-corepack:
     description: "Enable corepack"
     required: false
-    default: "false"
+    default: "true"
   immutable:
     description: "Use --immutable flag (set to false for Dependabot/Renovate PRs that update yarn.lock)"
     required: false
@@ -73,7 +72,10 @@ runs:
       if: inputs.enable-corepack == 'true'
       shell: bash
       working-directory: ${{ inputs.cwd }}
-      run: corepack enable
+      run: |
+        corepack enable
+        corepack prepare --activate
+        yarn --version
 
     - name: ⚙️ Expose yarn config as "$GITHUB_OUTPUT"
       id: yarn-config
@@ -130,7 +132,7 @@ runs:
     - name: 📥 Install dependencies
       shell: bash
       working-directory: ${{ inputs.cwd }}
-      run: yarn install ${{ inputs.immutable == 'true' && '--immutable' || '' }} --inline-builds
+      run: yarn install --immutable --inline-builds
       env:
         # Overrides/align yarnrc.yml options (v3, v4) for a CI context
         YARN_ENABLE_GLOBAL_CACHE: "false" # Use local cache folder to keep downloaded archives

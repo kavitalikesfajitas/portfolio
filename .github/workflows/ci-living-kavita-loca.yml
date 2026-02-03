@@ -6,6 +6,9 @@ jobs:
   build-app-and-run-tests:
     name: "Living Kavita Loca App Tests, Build, Lint and Check Size"
     runs-on: [ubuntu-latest]
+    strategy:
+      matrix:
+        node-version: [24]
     defaults:
       run:
         working-directory: apps/living-kavita-loca
@@ -17,7 +20,7 @@ jobs:
       - name: ⚙️ Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: ".nvmrc"
+          node-version: ${{ matrix.node-version }}
 
       - name: ⏩ Cache turbo build setup
         uses: actions/cache@v4
@@ -31,8 +34,6 @@ jobs:
 
       - name: 📥 Monorepo install
         uses: ./.github/actions/yarn-monorepo-install
-        with:
-          enable-corepack: true
 
       - name: ♻️ Restore living-kavita-loca related caches
         uses: actions/cache@v4
