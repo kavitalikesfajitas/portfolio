@@ -10,7 +10,9 @@ import Link from "next/link";
 export function ListThatsFancy() {
   return (
     <NavigationMenuItem>
-      <NavigationMenuTrigger>Portfolio </NavigationMenuTrigger>
+      <NavigationMenuTrigger className="px-0 rounded-sm">
+        Portfolio
+      </NavigationMenuTrigger>
       <NavigationMenuContent className="md:w-auto md:left-auto md:right-0">
         <ul className="grid gap-2 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
           <li className="row-span-3">

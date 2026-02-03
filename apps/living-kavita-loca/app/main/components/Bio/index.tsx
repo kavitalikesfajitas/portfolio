@@ -49,43 +49,45 @@ export const Bio = forwardRef<
           <SnazzyDivider className="max-w-[75%]" />
         </div>
 
-        <div
-          className={clsx(
-            "relative aspect-square",
-            "w-full max-w-[600px] h-fit ",
-          )}
-        >
-          <TornPaperEffect className="h-full w-full">
+        <div className="flex flex-col md:flex-row flex-wrap gap-10">
+          <div
+            className={clsx(
+              "relative aspect-square",
+              "w-full md:max-w-[600px] h-fit ",
+            )}
+          >
             <Image
               src={BioImage}
               alt="Kavita Chaudhry"
               fill
               placeholder="blur"
               quality={75}
-              className="object-cover rounded-[50px] p-5"
+              className="object-cover rounded-2xl"
             />
-          </TornPaperEffect>
-        </div>
+          </div>
 
-        <div
-          className={clsx(
-            "flex flex-1 bg-white text-gray-1000 font-light rounded-2xl text-sm font-archivo",
-            "p-5",
-          )}
-        >
-          I am a staff full-stack engineer with a wide technical range and a
-          deep love for problem-solving. I&apos;ve spent my career designing and
-          building systems that scale — from frontend architecture and
-          performance-critical user experiences to backend platforms, APIs, and
-          infrastructure. I&apos;m most at home in complex, ambiguous spaces,
-          and I&apos;m known for jumping in wherever the challenge is hardest. 1
-          care deeply about craft, reliability, and clarity - building systems
-          that are not only powerful, but understandable and maintainable by the
-          teams who own them. Whether I&apos;m working on a greenfield project
-          or untangling an existing system, l approach problems with curiosity,
-          empathy, and a long-term mindset. Off the keyboard, I&apos;m hiking
-          Colorado 14ers with my dog, Samosa. Same mindset, different terrain:
-          patience, persistence, and enjoying the journey.
+          <div
+            className={clsx(
+              "flex flex-1 bg-white text-gray-1000 font-light rounded-2xl text-sm",
+              "w-full md:max-w-[600px]  ",
+              "p-5",
+            )}
+          >
+            I am a staff full-stack engineer with a wide technical range and a
+            deep love for problem-solving. I&apos;ve spent my career designing
+            and building systems that scale — from frontend architecture and
+            performance-critical user experiences to backend platforms, APIs,
+            and infrastructure. I&apos;m most at home in complex, ambiguous
+            spaces, and I&apos;m known for jumping in wherever the challenge is
+            hardest. 1 care deeply about craft, reliability, and clarity -
+            building systems that are not only powerful, but understandable and
+            maintainable by the teams who own them. Whether I&apos;m working on
+            a greenfield project or untangling an existing system, l approach
+            problems with curiosity, empathy, and a long-term mindset. Off the
+            keyboard, I&apos;m hiking Colorado 14ers with my dog, Samosa. Same
+            mindset, different terrain: patience, persistence, and enjoying the
+            journey.
+          </div>
         </div>
         {/* <Collapsible>
           <CollapsibleTrigger className="flex items-center gap-2">

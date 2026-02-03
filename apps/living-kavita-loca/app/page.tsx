@@ -12,6 +12,15 @@ export default function Home() {
 
   const bioRef = useRef<HTMLDivElement>(null);
 
+  const hasScrolledToBio = useRef(false);
+
+  // useEffect(() => {
+  //   if (!isHeroInView && bioRef.current && !hasScrolledToBio.current) {
+  //     hasScrolledToBio.current = true;
+  //     bioRef.current.scrollIntoView({ behavior: "smooth" });
+  //   }
+  // }, [isHeroInView]);
+
   return (
     <main
       className={clsx(
