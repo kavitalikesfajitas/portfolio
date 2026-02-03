@@ -14,7 +14,7 @@ export function TornPaperEffect({
     <div
       className={clsx(
         className,
-        "ragged-text-filter bg-white text-gray-950",
+        "ragged-text-filter text-gray-1000 bg-white",
         className,
       )}
       {...rest}

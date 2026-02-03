@@ -47,7 +47,7 @@ export function CenterStickyNav({ children, InNavLogo }: CenterStickyNavProps) {
   return (
     <motion.div
       className={clsx(
-        "sticky left-0 z-50 mx-auto flex min-w-fit items-center justify-between overflow-visible bg-white text-gray-950",
+        "text-gray-1000 sticky left-0 z-50 mx-auto flex min-w-fit items-center justify-between overflow-visible bg-white",
         "top-0 rounded-full",
       )}
       style={{ width, borderRadius, boxShadow }}

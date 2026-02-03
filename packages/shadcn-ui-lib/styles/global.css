@@ -41,11 +41,11 @@
 }
 
 .dark {
-  --background: var(--color-gray-950);
+  --background: var(--color-gray-1000);
   --foreground: #fafafa;
-  --card: var(--color-gray-950);
+  --card: var(--color-gray-1000);
   --card-foreground: #fafafa;
-  --popover: var(--color-gray-950);
+  --popover: var(--color-gray-1000);
   --popover-foreground: #fafafa;
   --primary: #fafafa;
   --primary-foreground: #18181b;

@@ -15,7 +15,7 @@ export function NonMainNav({ className }: NonMainNavProps) {
   return (
     <div
       className={clsx(
-        "sticky left-0 z-50 mx-auto flex w-full items-center justify-between overflow-visible bg-white text-gray-950",
+        "sticky left-0 z-50 mx-auto flex w-full items-center justify-between overflow-visible bg-white text-gray-1000",
         "top-0 ",
         className,
       )}
