@@ -7,9 +7,6 @@ export default defineConfig([
       "src/**/index.ts",
       "src/**/index.tsx",
       "src/**/*.css",
-      "src/shadcn/**/*.ts",
-      "src/shadcn/**/*.tsx",
-      "src/shadcn/**/*.css",
       "!src/**/*.{test,spec}.ts",
       "!src/**/*.{test,spec}.tsx",
       "!src/**/*.stories.{ts,tsx,mdx}",
@@ -23,6 +20,8 @@ export default defineConfig([
     sourcemap: true,
     dts: true,
     tsconfig: new URL("tsconfig.json", import.meta.url).pathname,
+    inlineOnly: false,
+    unbundle: true,
     plugins: [
       postcss({
         extract: true,
