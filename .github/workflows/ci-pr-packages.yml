@@ -1,29 +1,26 @@
-name: "Living Kavita Loca - CI Living Kavita Loca App Pull Request"
+name: "Portfolio - CI Packages Pull Request"
 
 on:
   pull_request:
     # types: [opened, synchronize, reopened]
     # Only consider those paths to trigger the action
     paths:
-      - "apps/living-kavita-loca/**"
       - "packages/**"
-      - "package.json"
-      - "*.lock"
-      - ".yarnrc.yml"
-      - "tsconfig.base.json"
-      - ".prettier*"
       - ".github/**"
+      - "package.json"
       - "!.github/workflows/ci-pr-audit.yml"
       - "!.github/workflows/ci-pr-body-audit-reusable.yml"
       - "!.github/workflows/ci-pr-reusable-commit-lint.yml"
 
-# This is a concurrency key to prevent multiple runs of this workflow from running at the same time on a pr
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
-  run-living-kavita-loca-unit-tests:
+  run-test-build-packages:
     if: github.ref != 'refs/heads/main'
-    uses: ./.github/workflows/ci-living-kavita-loca.yml
-    name: "Living Kavita Loca App Tests"
+    uses: ./.github/workflows/ci-packages.yml
+    name: "Portfolio - CI Test Packages For PR"
+    with:
+      environment: default
+      filter: "./packages/*"

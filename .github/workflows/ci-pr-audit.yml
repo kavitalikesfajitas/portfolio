@@ -1,0 +1,34 @@
+name: Pull Request Audit
+
+on:
+  pull_request:
+    types: ["opened", "edited", "reopened", "synchronize", "ready_for_review"]
+
+concurrency:
+  group: ${{ github.workflow }}-pr-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  # Skip all jobs if PR is a draft
+  check-draft:
+    runs-on: [ubuntu-latest]
+    outputs:
+      is_draft: ${{ github.event.pull_request.draft }}
+    steps:
+      - run: echo "PR draft status - ${{ github.event.pull_request.draft }}"
+  commitlint:
+    needs: check-draft
+    if: github.event.pull_request.draft == false
+    uses: ./.github/workflows/ci-pr-reusable-commit-lint.yml
+    name: "🕵️‍♀️ Check if Commits Follow Conventional Commit Guidelines"
+    secrets: inherit
+  pull-request-body-audit:
+    needs: check-draft
+    if: github.event.pull_request.draft == false
+    uses: ./.github/workflows/ci-pr-body-audit-reusable.yml
+    name: "🕵️‍♀️ Check if PR Body/Descriptions Follows Guidelines"
+    secrets: inherit

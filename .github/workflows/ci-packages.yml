@@ -1,0 +1,70 @@
+name: "Portfolio - CI Packages - Reusable Workflow"
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "Environment to run on"
+        required: true
+        type: string
+      filter:
+        description: "Turbo filter to apply (e.g. './packages/*' or '@kavita-likes-fajitas/ui-library')"
+        required: false
+        type: string
+        default: "./packages/*"
+
+jobs:
+  test:
+    runs-on: [ubuntu-latest]
+    environment: ${{ inputs.environment }}
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: ⏩ Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path:
+            .turbo
+            # TODO: sha may changes on every commit, may need to modify this
+          key: ${{ runner.os }}-turbo-portfolio-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-portfolio-
+
+      - name: 📥 Monorepo install
+        uses: ./.github/actions/yarn-monorepo-install
+
+      - name: ♻️ Restore packages cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ github.workspace }}/.cache
+            ${{ github.workspace }}/**/tsconfig.tsbuildinfo
+          key: packages-cache-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+
+      - name: 🕵️ Typecheck
+        run: yarn turbo typecheck --filter="${{ inputs.filter }}"
+
+      - name: 🔬 Linter
+        run: |
+          yarn turbo lint --filter="${{ inputs.filter }}"
+        env:
+          TIMING: 1
+
+        ## The extra -- is just a separator. It ensures everything after
+        ## gets passed down to Jest (or whatever the task actually runs), instead of being consumed by Turbo.
+        ## it tells it its a part of the command
+      - name: 🧪 Unit tests
+        run: yarn turbo test-ci --filter="${{ inputs.filter }}"
+
+      - name: 🏗 Run build
+        run: yarn turbo build --filter="${{ inputs.filter }}"
