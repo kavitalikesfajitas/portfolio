@@ -1,6 +1,7 @@
 import path from "path";
 import url from "node:url";
 import type { NextConfig } from "next";
+import createMDX from "@next/mdx";
 
 const workspaceRoot = path.resolve(
   path.dirname(url.fileURLToPath(import.meta.url)),
@@ -9,10 +10,12 @@ const workspaceRoot = path.resolve(
 );
 
 const nextConfig: NextConfig = {
+  // Enable MDX file extensions
+  pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   turbopack: {
     root: workspaceRoot, // Specify the monorepo root as turbo directory
   },
-  allowedDevOrigins: ["local.living-kavita-loca.com"],
+  allowedDevOrigins: ["local.living-kavita-loca.com", "localhost"],
   output: "export",
   reactStrictMode: true,
   reactCompiler: true,
@@ -25,11 +28,26 @@ const nextConfig: NextConfig = {
    *  within the next app.
    */
   outputFileTracingRoot: workspaceRoot,
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      "@": path.resolve(__dirname, "."),
+    };
+    return config;
+  },
   images: {
     // temporarily setting this because we are not using vercel right now
     unoptimized: true,
   },
+
   /* config options here */
 };
 
-export default nextConfig;
+const withMDX = createMDX({
+  options: {
+    remarkPlugins: [],
+    rehypePlugins: [],
+  },
+});
+
+export default withMDX(nextConfig);

@@ -10,8 +10,8 @@ import Link from "next/link";
 export function ListThatsFancy() {
   return (
     <NavigationMenuItem>
-      <NavigationMenuTrigger>Home</NavigationMenuTrigger>
-      <NavigationMenuContent className="md:w-auto">
+      <NavigationMenuTrigger>Portfolio </NavigationMenuTrigger>
+      <NavigationMenuContent className="md:w-auto md:left-auto md:right-0">
         <ul className="grid gap-2 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
           <li className="row-span-3">
             <NavigationMenuLink asChild>
@@ -26,14 +26,22 @@ export function ListThatsFancy() {
                   portfolio
                 </div>
                 <p className="text-muted-foreground text-sm leading-tight">
-                  WIP: navigation to beautifully crafted projects and
-                  experiences.
+                  Some of my favorite projects and experiences.
                 </p>
               </Link>
             </NavigationMenuLink>
           </li>
-          <ListItem href="/portfolio" title="Portfolio">
-            Beautifully crafted projects and experiences.
+          <ListItem href="/work/opensea-swoosh-id" title="OpenSea Swoosh ID">
+            Beautifully crafted NFTs for Nike&apos;s .SWOOSH digital membership
+            program.
+          </ListItem>
+          <ListItem
+            href="/work/contentful-graphql-proxy"
+            title="Contentful GraphQL Proxy"
+          >
+            A high-performance GraphQL layer in front of Contentful that caches,
+            normalizes, and instruments content delivery for Product Detail
+            Pages (PDPs).
           </ListItem>
         </ul>
       </NavigationMenuContent>
