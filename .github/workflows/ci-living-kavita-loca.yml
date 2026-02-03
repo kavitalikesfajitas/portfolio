@@ -1,0 +1,70 @@
+name: "Living Kavita Loca App Tests, Build, Lint and Check Size - Reusable Workflow"
+
+on: workflow_call
+
+jobs:
+  build-app-and-run-tests:
+    name: "Living Kavita Loca App Tests, Build, Lint and Check Size"
+    runs-on: [ubuntu-latest]
+    defaults:
+      run:
+        working-directory: apps/living-kavita-loca
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: ⏩ Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path:
+            .turbo
+            # TODO: sha may changes on every commit, may need to modify this
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: 📥 Monorepo install
+        uses: ./.github/actions/yarn-monorepo-install
+        with:
+          enable-corepack: true
+
+      - name: ♻️ Restore living-kavita-loca related caches
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ github.workspace }}/apps/living-kavita-loca/.next/cache
+            ${{ github.workspace }}/.cache
+            ${{ github.workspace }}/**/tsconfig.tsbuildinfo
+          key: living-kavita-loca-cache-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+
+      - name: 🕵️ Typecheck
+        run: yarn --top-level run turbo typecheck
+
+      - name: 🔬 Linter
+        run: yarn --top-level run turbo lint
+        env:
+          TIMING: 1
+
+      - name: 🧪 Unit tests
+        run: yarn --top-level run turbo test-ci
+
+      - name: 🏗 Build living-kavita-loca
+        run: yarn --top-level run turbo build
+        env:
+          NEXT_TELEMETRY_DISABLED: true
+          ENABLE_CACHE: true
+
+      # - name: 📦 Check size
+      #   run: yarn --cwd apps/living-kavita-loca check-size
+
+      # - name: 📐 Check browser bundle size limits
+      #   run: yarn --cwd apps/living-kavita-loca check-size
+
+      # - name: 🛟 Check ecmascript checks for build files
+      #   run: yarn  --cwd apps/living-kavita-loca check-dist
