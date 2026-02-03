@@ -53,7 +53,7 @@ export default async function ProjectDetail({
   const { default: Content, metadata } = await projectLoader();
 
   return (
-    <main className="bg-gray-950 text-white relative flex flex-col min-h-screen">
+    <main className="bg-gray-1000 text-white relative flex flex-col min-h-screen">
       <NonMainNav />
       <div>
         <Hero height="md" className="opacity-40" image={metadata.heroImage}>

@@ -20,12 +20,12 @@
 @layer base {
   body {
     font-family: var(--font-helvetica-neue), var(--font-archivo), sans-serif;
-    background: var(--color-gray-950);
+    background: var(--color-gray-1000);
   }
 }
 
 body {
-  background: var(--color-gray-950);
+  background: var(--color-gray-1000);
   color: #ffffff;
   min-height: 100vh;
 }

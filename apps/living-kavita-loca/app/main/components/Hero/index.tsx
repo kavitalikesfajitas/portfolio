@@ -2,8 +2,12 @@
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
 import Image from "next/image";
 import "./Hero.css";
+import { forwardRef, type RefObject } from "react";
 
-export function Hero() {
+export const Hero = forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>((props, ref) => {
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, {
     stiffness: 80,
@@ -24,35 +28,35 @@ export function Hero() {
   const lipsY = useTransform(progress, range, ["0%", "-8%"]);
 
   return (
-    // overflow-x-clip is important to ensure that on mobile it does not scroll horizontally
-    <section className="relative flex flex-col overflow-x-clip">
-      <div className="flex flex-col grow h-full w-full items-center">
+    <div className="flex flex-col grow h-full w-full items-center">
+      <motion.div
+        ref={ref}
+        style={{ scale: heroScale, y: heroY, opacity: heroOpacity }}
+        className="relative flex  w-full justify-center scale-75 md:scale-100 lg:scale-125"
+      >
+        <Image
+          src="/images/hero/living-kavita-loca-logo.png"
+          alt="living kavita loca"
+          width={650}
+          height={650}
+          className="object-contain max-w-full"
+        />
+
         <motion.div
-          style={{ scale: heroScale, y: heroY, opacity: heroOpacity }}
-          className="relative flex  w-full justify-center scale-75 md:scale-100 lg:scale-125"
+          style={{ scale: lipsScale, y: lipsY }}
+          className="absolute top-1/2 translate-x-[45%] -translate-y-1/2 scale-50 lips"
         >
           <Image
-            src="/images/hero/living-kavita-loca-logo.png"
-            alt="living kavita loca"
-            width={650}
-            height={650}
-            className="object-contain max-w-full"
+            src="/images/hero/lips-glossy.png"
+            alt="lips open that are glossy"
+            className="lips relative z-10"
+            height={600}
+            width={600}
           />
-
-          <motion.div
-            style={{ scale: lipsScale, y: lipsY }}
-            className="absolute top-1/2 translate-x-[45%] -translate-y-1/2 scale-50 lips"
-          >
-            <Image
-              src="/images/hero/lips-glossy.png"
-              alt="lips open that are glossy"
-              className="lips relative z-10"
-              height={600}
-              width={600}
-            />
-          </motion.div>
         </motion.div>
-      </div>
-    </section>
+      </motion.div>
+    </div>
   );
-}
+});
+
+Hero.displayName = "Hero";

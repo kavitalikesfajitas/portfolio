@@ -37,7 +37,7 @@ export const Bio = forwardRef<
   React.HTMLAttributes<HTMLDivElement>
 >(function Bio(props, ref) {
   return (
-    <section className="px-6 pt-24 bg-gray-950 flex flex-col w-full gap-10 min-h-screen overflow-y-auto">
+    <section className="px-6 pt-24 bg-gray-1000 flex flex-col w-full gap-10 min-h-screen overflow-y-auto">
       <Container
         maxWidth="8xl"
         size="full"
@@ -60,6 +60,7 @@ export const Bio = forwardRef<
               src={BioImage}
               alt="Kavita Chaudhry"
               fill
+              placeholder="blur"
               quality={75}
               className="object-cover rounded-[50px] p-5"
             />
@@ -68,7 +69,7 @@ export const Bio = forwardRef<
 
         <div
           className={clsx(
-            "flex flex-1 bg-white text-gray-950 font-light rounded-2xl text-sm font-archivo",
+            "flex flex-1 bg-white text-gray-1000 font-light rounded-2xl text-sm font-archivo",
             "p-5",
           )}
         >
