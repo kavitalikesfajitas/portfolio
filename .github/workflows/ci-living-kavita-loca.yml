@@ -6,9 +6,6 @@ jobs:
   build-app-and-run-tests:
     name: "Living Kavita Loca App Tests, Build, Lint and Check Size"
     runs-on: [ubuntu-latest]
-    strategy:
-      matrix:
-        node-version: [24]
     defaults:
       run:
         working-directory: apps/living-kavita-loca
@@ -20,8 +17,7 @@ jobs:
       - name: ⚙️ Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-
+          node-version-file: ".nvmrc"
       - name: ⏩ Cache turbo build setup
         uses: actions/cache@v4
         with:
