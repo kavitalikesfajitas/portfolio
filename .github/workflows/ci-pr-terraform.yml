@@ -5,6 +5,9 @@ on:
     paths:
       - ".github/**"
       - "infra/**"
+      - "!.github/workflows/ci-pr-audit.yml"
+      - "!.github/workflows/ci-pr-body-audit-reusable.yml"
+      - "!.github/workflows/ci-pr-reusable-commit-lint.yml"
 
 # This is a concurrency key to prevent multiple runs of this workflow from running at the same time on a pr
 concurrency:

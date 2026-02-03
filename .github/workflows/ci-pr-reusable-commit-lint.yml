@@ -1,0 +1,45 @@
+# .github/workflows/commitlint.yml
+name: Pull Request Commitlint
+
+on:
+  workflow_call:
+jobs:
+  commitlint:
+    runs-on: [ubuntu-latest]
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required to access full commit history
+
+      - name: ⚙️ Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: ⏩ Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path:
+            .turbo
+            # TODO: sha may changes on every commit, may need to modify this
+          key: ${{ runner.os }}-turbo-portfolio-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-portfolio-
+
+      - name: 📥 Monorepo install
+        uses: ./.github/actions/yarn-monorepo-install
+
+      - name: ♻️ Restore related caches
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ github.workspace }}/**/tsconfig.tsbuildinfo
+          key: commitlint-tsbuildinfo-cache-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+
+      - name: Run commitlint on PR commits 🕵️‍♀️ Commitlint Time 🕵️‍♀️
+        run: |
+          yarn commitlint --from=${{ github.event.pull_request.base.sha }} --to=${{ github.sha }}
