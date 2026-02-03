@@ -24,7 +24,11 @@ function NavigationMenu({
       {...props}
     >
       {children}
-      {viewport && <NavigationMenuViewport />}
+      {viewport && (
+        <NavigationMenuViewport
+          className={cn("static !left-[auto] md:relative md:left-0", className)}
+        />
+      )}
     </NavigationMenuPrimitive.Root>
   );
 }
