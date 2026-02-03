@@ -6,16 +6,16 @@ export function Footer({ className }: { className?: string }) {
     <footer
       className={clsx(
         "bg-primary dark border-t border-neutral-900 py-4 text-center text-[0.65rem]",
-        "uppercase tracking-[0.2em] text-white",
+        "uppercase tracking-[0.2em] text-black",
         "mx-auto flex w-full flex-row flex-wrap justify-between px-4",
-        "font-archivo",
+
         className,
       )}
     >
       <span className={clsx("font-medium")}>
         © {new Date().getFullYear()} Kavita Chaudhry - living kavita loca
       </span>
-      <span className={clsx("font-archivo", "flex flex-row gap-2")}>
+      <span className={clsx("flex flex-row gap-2")}>
         <span className="font-bold">Connect With me</span>
         <span className="font-medium">
           <a
