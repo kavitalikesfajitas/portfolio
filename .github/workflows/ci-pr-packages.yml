@@ -1,0 +1,23 @@
+name: "Portfolio - CI Packages Pull Request"
+
+on:
+  pull_request:
+    # types: [opened, synchronize, reopened]
+    # Only consider those paths to trigger the action
+    paths:
+      - "packages/**"
+      - ".github/**"
+      - "package.json"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  run-test-build-packages:
+    if: github.ref != 'refs/heads/main'
+    uses: ./.github/workflows/ci-packages.yml
+    name: "Portfolio - CI Test Packages For PR"
+    with:
+      environment: default
+      filter: "./packages/*"

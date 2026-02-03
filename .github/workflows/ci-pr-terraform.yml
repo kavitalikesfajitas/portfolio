@@ -1,0 +1,24 @@
+name: "Portfolio - CI Pull Request - Terraform"
+
+on:
+  pull_request:
+    paths:
+      - ".github/**"
+      - "infra/**"
+
+# This is a concurrency key to prevent multiple runs of this workflow from running at the same time on a pr
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  run-terraform-validation:
+    if: github.ref != 'refs/heads/main'
+    uses: ./.github/workflows/ci-terraform.yml
+    name: "🧰 Check if Terraform files are valid"
+    with:
+      infra-working-directory: "./infra"
+    secrets: inherit
