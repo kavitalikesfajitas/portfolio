@@ -109,4 +109,5 @@ const fontMidnightGelactic = localFont({
 
 export function getAppFontVariables() {
   return clsx(fontHelveticaNeue.variable, fontMidnightGelactic.variable);
+    fontHelveticaNeue.variable,
 }

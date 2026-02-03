@@ -13,9 +13,13 @@
 .font-helvetica-neue {
   font-family: var(--font-helvetica-neue);
 }
+
+.font-lobster {
+  font-family: var(--font-lobster);
+}
 @layer base {
   body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: var(--font-helvetica-neue), var(--font-archivo), sans-serif;
     background: var(--color-gray-950);
   }
 }
