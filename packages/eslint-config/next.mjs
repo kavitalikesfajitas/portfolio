@@ -41,6 +41,7 @@ const nextConfig = [
     rules: {
       ...pluginNext.configs.recommended.rules,
       ...pluginNext.configs["core-web-vitals"].rules,
+      "@typescript-eslint/no-unused-vars": "warn",
     },
   },
   {

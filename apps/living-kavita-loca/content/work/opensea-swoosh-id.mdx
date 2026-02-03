@@ -1,0 +1,212 @@
+export const metadata = {
+  title: "OpenSea Swoosh ID",
+  heroImage: "/images/work/thumbnails/opensea-swoosh-id.png",
+  role: "Lead Engineer / Architect",
+  tech: ["TypeScript", "Node.js", "SVG", "AWS Lambda", "JSDOM"],
+};
+
+# OpenSea Swoosh ID
+
+> _"How do you make 500,000 unique, personalized NFTs look beautiful on OpenSea—without storing 500,000 images?"_
+
+---
+
+## About
+
+When I first joined Nike, I was on the NVS (Nike Virtual Studios) team. We were primarily focused on NFTs and Web3 experiences, building Nike's presence in the emerging digital collectibles space.
+
+### OpenSea: The NFT Marketplace Giant
+
+At the time, [OpenSea](https://opensea.io) was the dominant NFT marketplace—think of it as the eBay or Amazon of the NFT world. It served as the primary storefront where users could discover, buy, sell, and showcase their digital collectibles. When someone minted or purchased an NFT, OpenSea was often where they'd go to view it, share it, and potentially trade it.
+
+For brands like Nike entering the Web3 space, OpenSea wasn't just another platform—it was _the_ platform. If your NFT didn't look good on OpenSea, it didn't look good anywhere. The marketplace would fetch and display your NFT's artwork and metadata, making it the de facto "gallery" for your digital assets.
+
+Nike's .SWOOSH digital membership program needed a way to show up beautifully on OpenSea. Each member had a unique, personalized membership card—and we needed these cards to render dynamically across every NFT marketplace, not just as static images uploaded once and forgotten.
+
+The naive approach would be to pre-render an image for each member and store it somewhere. But with hundreds of thousands of members, each with customizable cards that could change over time, that meant potentially millions of images to generate, store, and keep in sync. There had to be a better way.
+
+### The .SWOOSH Integration
+
+To join the .SWOOSH community in the early stages, each member had the opportunity to create a personalized membership card—complete with a custom Swoosh handle, member number, logo, and color scheme. Here's mine for reference:
+
+<video playsInline autoPlay muted loop className="justify-self-center">
+  <source src="/videos/membership-card.mov" />
+</video>
+
+As newcomers to the OpenSea marketplace, we faced a significant challenge: how do you represent a WebGL, 3D membership card as a static image?
+
+The prevailing approach on our team was to build a React SVG, render it in a browser or iframe, and somehow trick the marketplace into treating it as an image. Engineers were experimenting with headless browsers, server-side React rendering, Puppeteer screenshots—you name it.
+
+We tried the same approach. We built a React SVG component, served it via an iframe, and attempted to trick OpenSea by setting image headers on the response. The idea was that if we returned the right `Content-Type`, maybe OpenSea would just... accept it? It didn't. OpenSea's crawlers weren't fooled—they needed an actual image format, not a JavaScript application pretending to be one.
+
+I stepped back and asked a different question: what if we stopped trying to make React look like an image, and actually returned something that _was_ an image?
+
+That's when it clicked: SVGs. They're images. But they're also just XML—text that can be generated dynamically.
+
+Keep in mind, this was 2022—pre-ChatGPT, pre-Cursor, pre-Copilot. There was no AI to ask "how do I dynamically generate SVGs for OpenSea?" Every solution came from digging through documentation, reading obscure Stack Overflow threads, and good old trial and error.
+
+## The Challenge
+
+When Nike launched the .SWOOSH digital membership program, we needed a way to:
+
+- **Display personalized membership cards** as NFT artwork on OpenSea and other marketplaces
+  - Individual listing pages could render an iframe or JavaScript, but collection views required a static image
+- **Generate SVGs dynamically** based on member data (handle, member number, logo, color scheme)
+- **Handle scale** — hundreds of thousands of members, each with a unique card
+- **Maintain freshness** — cards should update as members customize or earn new achievements
+
+## Solution
+
+### Dynamic SVG Generation
+
+I was on the verge of accepting defeat when a thought hit me: what if the "image" wasn't an image at all?
+
+SVGs are just XML. They're text. And if they're text, they can be generated dynamically—on every single request.
+
+The membership card SVG was complex—gradients, embedded fonts, layered elements, glow effects. Hardcoding all of that in a template string would've been a nightmare to maintain. Instead, I realized we could load the designer's actual SVG file and surgically swap out just the member-specific fields. The design team could iterate on the card in Figma, export an SVG, and we'd inject member data at runtime.
+
+After futzing around with multiple libraries, I ended up using JSDOM—a tried and true favorite. It let us load the full SVG from disk and manipulate specific elements by ID:
+
+- **Swoosh handle** — the member's unique @handle
+- **Date and time** — when the card was generated
+- **Logo** — the member's chosen icon
+- **Card color** — their selected background color
+- **Member ID** — displayed in the marquee
+
+Here's the core logic:
+
+```typescript
+const logoSvg = await jsdom.JSDOM.fromFile(svgLogoPath).then((dom) => {
+  // Extract the inner HTML of the SVG
+  const innerSvgHTML = dom.window.document
+    .getElementsByTagNameNS("http://www.w3.org/2000/svg", "svg")
+    .item(0)?.innerHTML;
+  return innerSvgHTML;
+});
+
+const implementedMembershipSvg = await jsdom.JSDOM.fromFile(svgDirectory).then(
+  (dom) => {
+    dom.window.textSwooshHandle.innerHTML = swooshHandle;
+    dom.window.textDate.innerHTML = dateNow;
+    dom.window.textTime.innerHTML = timeNow;
+    dom.window.imageLogoGlow.innerHTML = logoSvg;
+    dom.window.imageLogo.innerHTML = logoSvg;
+    dom.window.cardColor.setAttribute("fill", `#${color}`);
+    dom.window.textMarquee.innerHTML = memberID;
+    return dom;
+  },
+);
+```
+
+The trick that made it all work? Setting the response header to `.setHeader("Content-Type", "image/svg+xml")`. To OpenSea, our endpoint looked like a static image URL. In reality, it was a dynamic renderer that generated a unique SVG for every request.
+
+I also set an aggressive cache policy—since the membership card only changes when the member updates their profile, we could cache indefinitely based on the URL parameters. Same member, same card, instant response.
+
+### Embedding Custom Fonts in SVG
+
+One challenge with dynamic SVGs is typography. If you rely on system fonts, your design looks different depending on what fonts the viewer has installed—or worse, it falls back to something generic like Arial.
+
+Our solution was to embed Nike's brand fonts directly into the SVG using `@font-face` declarations:
+
+```xml
+<style>
+  @font-face {
+    font-family: "Helvetica Now Variable";
+    src: url("/fonts/HelveticaNowVar.ttf") format("truetype");
+    font-weight: normal;
+  }
+
+  @font-face {
+    font-family: "Helvetica Monospaced Pro";
+    src: url("/fonts/design-system/HelveticaMonospacedPro-Rg.woff2") format("woff2");
+    font-weight: normal;
+    font-display: swap;
+  }
+
+  .font-smoothing {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: normal;
+    text-transform: uppercase;
+  }
+</style>
+```
+
+Then we applied these fonts to the dynamic text elements:
+
+```xml
+<text
+  id="textSwooshHandle"
+  x="25"
+  y="48"
+  fill="white"
+  font-size="1.68rem"
+  class="font-smoothing"
+  font-family="Helvetica Now Variable, Helvetica Monospaced Pro, Helvetica, Arial, sans-serif"
+/>
+```
+
+This ensured every membership card rendered with pixel-perfect Nike typography, regardless of where it was displayed.
+
+### OpenSea Metadata Integration
+
+NFT marketplaces like OpenSea fetch artwork via the `image` field in token metadata. We configured the metadata to point to our dynamic endpoint:
+
+```json
+{
+  "name": "SWOOSH Membership Card",
+  "description": "Your Nike .SWOOSH digital membership card",
+  "image": "https://api.swoosh.nike/cards/{memberId}/image.svg",
+  "attributes": [
+    { "trait_type": "Tier", "value": "Founding Member" },
+    { "trait_type": "Achievements", "value": 12 }
+  ]
+}
+```
+
+### Caching Strategy
+
+To handle the load while keeping cards fresh:
+
+1. **Edge caching** with 5-minute TTL for most requests
+2. **Cache invalidation** triggered when member data changes
+3. **Fallback rendering** to serve cached SVGs if generation fails
+
+## Visual Design
+
+The card design evolved through several iterations:
+
+- **Tier-based gradients** — different colors for Bronze, Silver, Gold, Platinum
+- **Animated elements** — subtle shine effects for premium tiers
+- **Achievement badges** — small icons showing member accomplishments
+- **Responsive sizing** — looks great from thumbnails to full-screen
+
+## Results
+
+What started as an unsolved problem became one of the smoothest parts of the .SWOOSH launch:
+
+- **500K+ unique membership cards** rendered dynamically—zero static images stored
+- **100% uptime** during major drops and campaigns (including moments with massive traffic spikes)
+- **Sub-50ms response times** at the edge, even under load
+- **Zero storage costs** for card images—every card generated on-demand
+- **Positive community feedback** — members loved sharing their cards, and they looked flawless everywhere
+
+## Technical Highlights
+
+- **Serverless & infinitely scalable** — AWS Lambda handles traffic spikes without provisioning
+- **Resolution independent** — SVG renders crisply from 50px thumbnails to 4K displays
+- **Brand-perfect typography** — custom fonts embedded directly in SVG via `@font-face`
+- **Designer-friendly workflow** — design team exports SVG from Figma, we inject data at runtime
+- **Zero image storage** — no S3 buckets full of pre-rendered cards
+
+---
+
+## Reflection
+
+This project taught me that the best engineering solutions often come from reframing the problem. Everyone assumed we needed to _generate images_. The breakthrough was realizing we could _generate markup_ instead.
+
+What looked like an impossible constraint—OpenSea only accepts image URLs—became an opportunity. By treating SVG as a dynamic format rather than a static asset, we built something that scaled effortlessly, looked beautiful everywhere, and cost almost nothing to operate.
+
+---
+
+_Built at Nike as part of the .SWOOSH Web3 initiative, 2022._
