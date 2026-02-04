@@ -43,13 +43,13 @@
   "optionalDependencies": {
     "@eslint/eslintrc": "^3.0.0",
     "@testing-library/react": "^16.1.0",
-    "eslint-config-next": "^16.0.10",
+    "eslint-config-next": "^16.1.5",
     "react": "^19.2.1",
     "react-dom": "^19.2.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@next/eslint-plugin-next": "^16.0.10",
+    "@next/eslint-plugin-next": "^16.1.5",
     "@typescript-eslint/eslint-plugin": "^8.46.3",
     "@typescript-eslint/parser": "^8.46.3",
     "eslint": "^9.39.1",

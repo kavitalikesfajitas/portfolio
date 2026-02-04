@@ -14,7 +14,7 @@
     "README.md"
   ],
   "peerDependencies": {
-    "next": "^16.0.1"
+    "next": "^16.1.5"
   },
   "devDependencies": {
     "@types/next": "^9.0.0",
