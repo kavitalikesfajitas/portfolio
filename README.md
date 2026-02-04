@@ -1,6 +1,21 @@
 # Kavita's Portfolio
 
-My personal portfolio website showcasing my work and projects. Built as a monorepo using modern web technologies and infrastructure-as-code practices.
+## Overview & Purpose
+
+This repository represents a **learning-focused migration** of my personal website ([livingkavitaloca.com](https://livingkavitaloca.com)) from a [TypeScript/React single-page application](https://github.com/kavitalikesfajitas/website) to a modern Next.js-based portfolio.
+
+### Why This Approach?
+
+While the setup may appear complex for a personal website, it serves multiple learning objectives:
+
+1. **Next.js Static Export Experimentation**: Explore Next.js as a **standalone static site generator** with full control over the export process, moving beyond traditional SPAs
+2. **Infrastructure as Code**: Migrate manually-created AWS infrastructure to **Terraform**, enabling version-controlled infrastructure management
+3. **Modern Monorepo Architecture**: Implement a production-grade monorepo with Yarn Workspaces and Turborepo for scalable development patterns
+4. **CI/CD Best Practices**: Establish automated deployment pipelines with GitHub Actions, OIDC authentication, and infrastructure automation
+
+The infrastructure was originally set up manually via AWS Console for the previous website. This repository imports that existing infrastructure into Terraform, demonstrating real-world migration patterns while maintaining zero downtime. See [`infra/README.md`](./infra/README.md) for complete infrastructure documentation.
+
+**TLDR**: A playground for experimenting with modern web development tools and infrastructure management practices in a real production environment.
 
 **Live site:** [livingkavitaloca.com](https://livingkavitaloca.com) _(coming soon)_
 (Currently this is showcasing [my old website](https://github.com/kavitalikesfajitas/website) )

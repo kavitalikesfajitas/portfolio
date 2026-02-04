@@ -39,6 +39,10 @@ jobs:
     secrets: inherit
 
   run-living-kavita-loca-build-and-deploy:
+    needs: [run-terraform-validation-and-deploy]
+    if: needs.run-terraform-validation-and-deploy.result == 'success'
     uses: ./.github/workflows/ci-living-kavita-loca.yml
     name: "Portfolio - Living Kavita Loca App Build and Deploy to S3"
+    with:
+      infra-working-directory: "./infra"
     secrets: inherit

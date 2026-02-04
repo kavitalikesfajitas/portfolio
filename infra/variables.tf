@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "AWS region for all resources"
   type        = string
-  default     = "us-west-2"
+  default     = "us-east-1"
 }
 
 variable "bucket_name" {
@@ -23,4 +23,10 @@ variable "github_branch" {
   description = "Branch allowed to deploy"
   type        = string
   default     = "main"
+}
+
+variable "domain_name" {
+  description = "Domain name for the hosted zone"
+  type        = string
+  default     = "livingkavitaloca.com"
 }
