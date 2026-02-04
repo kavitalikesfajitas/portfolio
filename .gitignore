@@ -60,3 +60,4 @@ certificates
 *.tsbuildinfo
 .scratchwork
 .terraform
+infra/terraform.tfvars
