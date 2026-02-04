@@ -4,6 +4,7 @@ on: workflow_call
 
 jobs:
   build-app-and-run-tests:
+    environment: default
     name: "Living Kavita Loca App Tests, Build, Lint and Check Size"
     runs-on: [ubuntu-latest]
     permissions:
