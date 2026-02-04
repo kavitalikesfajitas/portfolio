@@ -6,7 +6,7 @@ import { LivingKavitaLocaLogo } from "@/app/components/Nav/LivingKavitaLocaLogo"
 export function NavForMain() {
   return (
     <CenterStickyNav InNavLogo={LivingKavitaLocaLogo}>
-      <Nav />
+      <Nav className="" />
     </CenterStickyNav>
   );
 }

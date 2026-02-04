@@ -66,7 +66,8 @@ export function CenterStickyNav({ children, InNavLogo }: CenterStickyNavProps) {
 
       {/* Nav items in the center/right */}
       <motion.div
-        className="flex items-center justify-center"
+        id="nav-container"
+        className="flex items-center justify-center py-1"
         style={{ flexGrow: navFlexGrow }}
       >
         {children}

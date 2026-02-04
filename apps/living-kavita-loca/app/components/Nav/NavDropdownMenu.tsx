@@ -12,29 +12,33 @@ import {
 import Link from "next/link";
 import clsx from "clsx";
 
-export function DropdownMenuBasic() {
+export function NavDropdownMenu() {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>Explore</DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="start"
-        className="border-none shadow-none p-3"
-      >
+      <DropdownMenuTrigger className="">
+        <span className=" pr-1">Explore</span>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="p-3">
         <DropdownMenuGroup>
-          <DropdownMenuLabel>Recent Projects</DropdownMenuLabel>
+          <DropdownMenuLabel className="text-sm md:text-base">
+            Recent Projects
+          </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuLink href="/work/opensea-swoosh-id" className="text-sm">
+          <DropdownMenuLink
+            href="/work/opensea-swoosh-id"
+            className="text-sm md:text-base"
+          >
             Dynamic Svg for Swoosh Id
           </DropdownMenuLink>
           <DropdownMenuLink
             href="/work/contentful-graphql-proxy"
-            className="text-sm"
+            className="text-sm md:text-base"
           >
             Contentful GraphQL Proxy
           </DropdownMenuLink>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            className="text-sm text-muted-foreground italic cursor-default"
+            className="text-sm md:text-base text-muted-foreground italic cursor-default"
             disabled
           >
             More projects coming soon...
