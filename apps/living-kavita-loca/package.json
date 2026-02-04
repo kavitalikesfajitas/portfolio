@@ -2,7 +2,13 @@
   "name": "living-kavita-loca",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "Portfolio and personal website of Kavita - software engineer and creative developer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kavitalikesfajitas/portfolio.git",
+    "directory": "apps/living-kavita-loca"
+  },
   "scripts": {
     "dev": "next dev --experimental-https --port 3001 --turbopack",
     "build": "next build",

@@ -4,6 +4,11 @@
   "license": "MIT",
   "type": "module",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kavitalikesfajitas/portfolio.git",
+    "directory": "packages/eslint-config"
+  },
   "exports": {
     "./base": {
       "types": "./types/base.d.ts",

@@ -1,7 +1,13 @@
 {
   "name": "@kavita-likes-fajitas/ui-library",
   "version": "0.1.0",
+  "license": "MIT",
   "description": "ui components made with tailwind-css/react/typescript",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kavitalikesfajitas/portfolio.git",
+    "directory": "packages/ui-library"
+  },
   "sideEffects": false,
   "type": "module",
   "files": [
