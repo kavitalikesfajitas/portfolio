@@ -1,17 +1,26 @@
-# portfolio
+# Kavita's Portfolio
 
-## Monorepo Structure: Yarn Workspaces & Turbo
+My personal portfolio website showcasing my work and projects. Built as a monorepo using modern web technologies and infrastructure-as-code practices.
 
-This project uses **Yarn Workspaces** to manage dependencies and streamline development across multiple packages in a single repository. Workspaces allow all packages in the `packages/` directory to share dependencies efficiently, reducing duplication and simplifying version management.
+**Live site:** [livingkavitaloca.com](https://livingkavitaloca.com) _(coming soon)_
+(Currently this is showcasing [my old website](https://github.com/kavitalikesfajitas/website) )
 
-**Turbo** (Turborepo) is used as the build system and task runner. It enables fast, incremental builds and orchestrates tasks (like build, lint, and test) across all packages, ensuring only affected packages are rebuilt when changes are made.
+## Tech Stack
 
-- **Yarn Workspaces**: Handles dependency hoisting and workspace linking.
-- **Turbo**: Provides caching and parallel execution for tasks, improving CI/CD performance.
+- **Framework:** Next.js with React
+- **Styling:** Tailwind CSS
+- **Build System:** Turborepo
+- **Package Manager:** Yarn Workspaces (Berry/PnP)
+- **Infrastructure:** Terraform, AWS S3
+- **CI/CD:** GitHub Actions
 
-For more details, see the [`package.json`](./package.json) and [`turbo.json`](./turbo.json) configuration files.
+## Coming Soon
 
-## Development Setup
+- **Infrastructure as Code:** Terraform configuration for AWS resources (S3, IAM, CloudFront)
+- **Automated Deployments:** GitHub Actions CI/CD pipeline with OIDC authentication to AWS
+- **Static Site Hosting:** S3 bucket deployment with automatic cache invalidation
+
+## Monorepo Structure
 
 ### Yarn Workspaces
 
@@ -29,7 +38,32 @@ Turborepo is used for build system orchestration:
 - Intelligent caching
 - Parallel execution of tasks
 
-### Node Modules versus PnP
+For more details, see the [`package.json`](./package.json) and [`turbo.json`](./turbo.json) configuration files.
+
+## Development Setup
+
+### Prerequisites
+
+- Node.js (see `.nvmrc` for version)
+- Yarn Berry
+
+### Getting Started
+
+```bash
+# Install dependencies
+yarn install
+
+# Start development server
+yarn dev
+
+# Run tests
+yarn test-ci
+
+# Build all packages
+yarn build
+```
+
+### Node Modules vs PnP
 
 This repo uses Yarn Berry (PnP). However, dependencies are resolved via `node_modules/`, instead of `.pnp.cjs` .
 
@@ -131,42 +165,21 @@ Files are scaffolded into `packages/<name>/`:
    yarn --top-level run turbo lint --filter=@kavita-likes-fajitas/<name>
    ```
 
-## File Structure and Barrel Pattern
+## File Structure
 
-We follow a **barrel file format** throughout the monorepo to ensure clean, maintainable imports and proper encapsulation. This pattern is especially critical for packages that need to be published.
-
-### Key Principles
-
-1. **Nearest Index Export Rule**: Everything that needs to be accessible from outside a package or folder must be exported through the nearest `index.ts` or `index.tsx` file
-
-2. **Folder-Level Barrel Files**: Every folder should have its own `index.ts` or `index.tsx` file that exports the public API for that folder
-
-3. **Avoid Monolithic Barrel Files**: **Please ** do not put everything in the main barrel file at the package root. Instead, create a hierarchical structure where each folder manages its own exports
-
-4. **Published Package Requirement**: This pattern is especially important for packages that need to be published, as it provides a clean public API and prevents internal implementation details from being exposed
-
-### Example Structure
+This repo uses a **barrel file pattern** for clean imports. Each folder has an `index.ts` that exports its public API.
 
 ```
-packages/my-package/
-├── src/
-│   ├── components/
-│   │   ├── Button/
-│   │   │   ├── Button.tsx
-│   │   │   ├── Button.test.tsx
-│   │   │   └── index.tsx          # exports Button component
-│   │   ├── Modal/
-│   │   │   ├── Modal.tsx
-│   │   │   ├── Modal.test.tsx
-│   │   │   └── index.tsx          # exports Modal component
-│   │   └── index.tsx              # exports { Button } from './Button'; exports { Modal } from './Modal';
-│   ├── utils/
-│   │   ├── helpers.ts
-│   │   ├── constants.ts
-│   │   └── index.tsx              # exports public utilities
-│   └── index.tsx                  # main package export - exports from ./components and ./utils
-└── package.json
+packages/my-package/src/
+├── components/
+│   ├── Button/
+│   │   ├── Button.tsx
+│   │   └── index.tsx       # exports Button
+│   └── index.tsx           # exports { Button } from './Button'
+└── index.tsx               # main package export
 ```
+
+This keeps imports clean (`@kavita-likes-fajitas/my-package`), enables tree shaking, and provides a stable public API for published packages.
 
 ### Benefits
 
@@ -175,3 +188,4 @@ packages/my-package/
 - **Tree Shaking**: Bundlers can better optimize unused code
 - **Maintainability**: Easy to reorganize internal structure without breaking external APIs
 - **TypeScript Support**: Proper type resolution and IntelliSense
+- **Publishable Packages**: Clean public API without exposing internal implementation details
