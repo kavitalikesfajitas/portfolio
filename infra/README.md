@@ -1,12 +1,14 @@
 # Infrastructure for livingkavitaloca.com
 
-This Terraform configuration sets up the complete infrastructure for the livingkavitaloca.com website, including:
+This Terraform configuration manages the complete infrastructure for the livingkavitaloca.com website.
+
+## Infrastructure Components
 
 - **S3 Bucket**: Static site hosting storage
 - **CloudFront**: CDN distribution with SSL/TLS
 - **Route53**: DNS hosting with all necessary records
-- **ACM**: SSL/TLS certificate for HTTPS
-- **IAM**: GitHub Actions deployment role
+- **ACM Certificate**: SSL/TLS for HTTPS
+- **IAM Roles**: GitHub Actions OIDC deployment permissions
 
 ## Architecture
 
@@ -22,7 +24,7 @@ This Terraform configuration sets up the complete infrastructure for the livingk
 │  + SSL Certificate  │
 └──────┬──────────────┘
        │
-       │ Origin Access Control
+       │ Origin Access Identity (OAI)
        ▼
 ┌─────────────────────┐
 │    S3 Bucket        │
@@ -32,103 +34,82 @@ This Terraform configuration sets up the complete infrastructure for the livingk
 
 ## DNS Records
 
-The following DNS records are automatically created:
+The following DNS records are managed by Terraform:
 
-1. **A Record (Root)**: `livingkavitaloca.com` → CloudFront Distribution
-2. **A Record (WWW)**: `www.livingkavitaloca.com` → CloudFront Distribution
-3. **MX Records**: Google Workspace email configuration
-4. **TXT Record**: SPF record for email verification
-5. **CNAME Records**: ACM certificate validation (auto-created)
+- **A Record (Root)**: `livingkavitaloca.com` → CloudFront Distribution
+- **A Record (WWW)**: `www.livingkavitaloca.com` → CloudFront Distribution
+- **MX Records**: Google Workspace email configuration
+- **TXT Record**: SPF record for email verification
+
+## Project History
+
+This infrastructure was **initially created manually via AWS Console** for the original [livingkavitaloca.com website](https://github.com/kavitalikesfajitas/website) (TypeScript/React static site). The configuration has been imported into Terraform to enable:
+
+- **Infrastructure as Code**: Version-controlled infrastructure changes
+- **CI/CD Integration**: Automated deployments via GitHub Actions
+- **Consistency**: Reproducible infrastructure configuration
+- **Collaboration**: Team-friendly infrastructure management
+
+All existing AWS resources were imported without modification, maintaining zero downtime during the migration to this new portfolio repository.
 
 ## Prerequisites
 
-1. AWS Account with appropriate permissions
-2. Terraform Cloud account (or configure local backend)
-3. Domain registered (livingkavitaloca.com)
-4. AWS CLI configured
+- AWS Account with appropriate permissions
+- Terraform Cloud account (for remote state storage)
+- Domain registered: `livingkavitaloca.com`
+- GitHub repository with Actions enabled
 
-## Initial Setup
+## State Management
 
-### 1. Import Existing Resources (if applicable)
+Terraform state is stored remotely in **Terraform Cloud**:
 
-If you already have these resources in AWS, import them first:
+- **Organization**: `kavitalikesfajitas`
+- **Workspace**: `livingkavitaloca-website-infra`
 
-```bash
-# Import the S3 bucket
-terraform import aws_s3_bucket.site your-bucket-name
+### Why Terraform Cloud?
 
-# Import the hosted zone (if it exists)
-terraform import aws_route53_zone.main Z0123456789ABC
+We use Terraform Cloud for remote state storage (instead of S3 or local state) because:
+
+1. **No Bootstrap Required**: Avoids the chicken-and-egg problem of creating S3/DynamoDB for state before having state
+2. **Built-in State Locking**: No need to set up DynamoDB tables for state locks
+3. **Secure by Default**: State encryption and access controls without additional configuration
+4. **CI/CD Integration**: GitHub Actions can access state using `TF_TOKEN_app_terraform_io` secret
+5. **Free Tier**: Sufficient for small teams and personal projects
+6. **State History**: Automatic versioning and rollback capabilities
+
+Configuration in `providers.tf`:
+
+```hcl
+terraform {
+  cloud {
+    organization = "kavitalikesfajitas"
+    workspaces {
+      name = "livingkavitaloca-website-infra"
+    }
+  }
+}
 ```
 
-### 2. Initialize Terraform
+## Configuration
 
-```bash
-cd infra
-terraform init
-```
+### Required Variables
 
-### 3. Plan the Changes
+| Variable       | Description              | Default                | Source in CI                          |
+| -------------- | ------------------------ | ---------------------- | ------------------------------------- |
+| `aws_region`   | AWS region for resources | `us-west-2`            | `${{ vars.AWS_REGION }}`              |
+| `bucket_name`  | S3 bucket name           | Required               | `${{ vars.S3_BUCKET_NAME }}`          |
+| `domain_name`  | Domain name              | `livingkavitaloca.com` | `${{ vars.DOMAIN_NAME }}` (optional)  |
+| `github_owner` | GitHub org/user          | Required               | `${{ github.repository_owner }}`      |
+| `github_repo`  | GitHub repository name   | Required               | `${{ github.event.repository.name }}` |
 
-```bash
-terraform plan
-```
+### GitHub Repository Variables
 
-### 4. Apply the Configuration
+Set these in your repository: **Settings** → **Secrets and variables** → **Actions** → **Variables**
 
-```bash
-terraform apply
-```
-
-## Important Notes
-
-### Certificate Creation
-
-- The ACM certificate **must** be created in `us-east-1` region for CloudFront
-- Certificate validation uses DNS validation via Route53
-- The validation process is automatic but may take 5-30 minutes
-
-### First-Time Deployment
-
-When deploying for the first time:
-
-1. **Apply the infrastructure** (this will create the hosted zone)
-2. **Update your domain's nameservers** at your registrar to use the AWS nameservers
-   - Get nameservers from: `terraform output name_servers`
-3. **Wait for DNS propagation** (can take up to 48 hours, typically much faster)
-4. **Apply again** to create certificate validation records
-
-### Nameserver Update
-
-After the first apply, update your domain registrar with these nameservers:
-
-```bash
-terraform output name_servers
-```
-
-Example output:
-
-```
-[
-  "ns-923.awsdns-51.net",
-  "ns-1295.awsdns-33.org",
-  "ns-1992.awsdns-57.co.uk",
-  "ns-327.awsdns-40.com"
-]
-```
-
-## Variables
-
-The following variables can be configured in Terraform Cloud or via `terraform.tfvars`:
-
-| Variable        | Description              | Default                |
-| --------------- | ------------------------ | ---------------------- |
-| `aws_region`    | AWS region for resources | `us-east-1`            |
-| `bucket_name`   | S3 bucket name           | Required               |
-| `domain_name`   | Domain name              | `livingkavitaloca.com` |
-| `github_owner`  | GitHub org/user          | Required               |
-| `github_repo`   | GitHub repository name   | Required               |
-| `github_branch` | Branch allowed to deploy | `main`                 |
+- `AWS_REGION` = `us-west-2`
+- `AWS_ROLE_ARN` = `arn:aws:iam::250328915800:role/github-deploy-site`
+- `S3_BUCKET_NAME` = `livingkavitaloca.com`
+- `DOMAIN_NAME` = `livingkavitaloca.com` (optional, has default)
 
 ## Outputs
 
@@ -144,20 +125,30 @@ terraform output cloudfront_domain_name   # CloudFront domain
 terraform output certificate_arn          # ACM certificate ARN
 ```
 
-## Deployment
+## CI/CD Deployment
 
-GitHub Actions can deploy to this infrastructure using the IAM role:
+### Infrastructure Changes
+
+Infrastructure changes are managed through GitHub Actions:
+
+1. **Pull Requests**: Run `terraform plan` to preview changes
+2. **Main Branch**: Automatically applies changes on merge (when enabled)
+
+Workflow: `.github/workflows/ci-terraform.yml`
+
+### Application Deployment
+
+Static site deployment workflow:
 
 ```yaml
 - name: Configure AWS Credentials
   uses: aws-actions/configure-aws-credentials@v4
   with:
-    role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-    aws-region: us-east-1
+    role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+    aws-region: ${{ vars.AWS_REGION }}
 
 - name: Deploy to S3
-  run: |
-    aws s3 sync ./out s3://${{ secrets.BUCKET_NAME }} --delete
+  run: aws s3 sync ./out s3://${{ vars.S3_BUCKET_NAME }} --delete
 
 - name: Invalidate CloudFront Cache
   run: |
@@ -166,75 +157,90 @@ GitHub Actions can deploy to this infrastructure using the IAM role:
       --paths "/*"
 ```
 
+Workflow: `.github/workflows/ci-living-kavita-loca.yml`
+
 ## Troubleshooting
 
-### Certificate Stuck in "Pending Validation"
+### DNS Issues
 
-1. Check that nameservers are correctly set at your registrar
-2. Verify DNS propagation: `dig NS livingkavitaloca.com`
-3. Check validation records exist: `dig _validation.livingkavitaloca.com CNAME`
+```bash
+# Check nameservers
+dig NS livingkavitaloca.com
 
-### 403 Forbidden from CloudFront
+# Check A records
+dig livingkavitaloca.com
+dig www.livingkavitaloca.com
 
-1. Verify S3 bucket policy allows CloudFront OAC
-2. Check that files exist in S3
+# Check MX records
+dig MX livingkavitaloca.com
+
+# Check SPF record
+dig TXT livingkavitaloca.com
+```
+
+### CloudFront 403 Errors
+
+1. Verify S3 bucket policy allows CloudFront OAI access
+2. Check files exist in S3 bucket
 3. Verify CloudFront origin configuration
+4. Check CloudFront distribution status
 
-### Email Not Working
+### Email Issues
 
-1. Verify MX records: `dig livingkavitaloca.com MX`
-2. Check SPF record: `dig livingkavitaloca.com TXT`
-3. Ensure Google Workspace is properly configured
+1. Verify MX records are correctly configured
+2. Check SPF record exists and is valid
+3. Ensure Google Workspace is properly set up
 
 ## Cost Estimate
 
-Approximate monthly costs (us-east-1):
+Approximate monthly costs (us-west-2):
 
-- Route53 Hosted Zone: $0.50/month
-- S3 Storage: ~$0.02/GB/month
-- CloudFront: First 1TB free, then ~$0.085/GB
-- ACM Certificate: Free
-- Data Transfer: Variable based on traffic
+- **Route53 Hosted Zone**: $0.50/month
+- **S3 Storage**: ~$0.023/GB/month
+- **CloudFront**: $0.085/GB (after free tier)
+- **ACM Certificate**: Free
+- **Data Transfer**: Variable based on traffic
 
-**Estimated total**: probably less than $5/month
+**Estimated total**: < $5/month for typical small site traffic
 
 ## Security
 
-- S3 bucket is private with CloudFront OAC (Origin Access Control)
-- HTTPS enforced via CloudFront
-- GitHub Actions uses OIDC (no long-lived credentials)
-- IAM role has least-privilege access
+- **S3 Bucket**: Private access only via CloudFront Origin Access Identity (OAI)
+- **HTTPS**: Enforced via CloudFront with ACM certificate
+- **GitHub Actions**: OIDC authentication (no long-lived credentials)
+- **IAM**: Least-privilege access with scoped permissions
 
-## Maintenance
+## Local Development
 
-### Updating DNS Records
-
-Edit `route53.tf` and apply:
+For local testing or manual changes:
 
 ```bash
+# Initialize Terraform
+cd infra
+terraform init
+
+# Plan changes
+terraform plan \
+  -var="bucket_name=livingkavitaloca.com" \
+  -var="github_owner=kavitalikesfajitas" \
+  -var="github_repo=portfolio"
+
+# Apply changes (use with caution)
 terraform apply
 ```
 
-### Rotating Secrets
+**Note**: Production changes should go through CI/CD.
 
-No secrets are stored in this configuration. GitHub Actions uses OIDC.
+## Maintenance
 
-### Updating TLS Certificate
+### DNS Updates
 
-ACM automatically renews certificates if DNS validation records remain intact.
+Edit `route53.tf` and commit to trigger CI/CD pipeline.
 
-## Clean Up
+### Certificate Renewal
 
-To destroy all resources:
+ACM automatically renews certificates - no action required.
 
-```bash
-terraform destroy
-```
+### Secrets Management
 
-**Warning**: This will delete:
-
-- S3 bucket and all contents
-- CloudFront distribution
-- Route53 hosted zone and all records
-- ACM certificate
-- IAM roles and policies
+No long-lived secrets required. GitHub Actions uses OIDC for AWS authentication.
