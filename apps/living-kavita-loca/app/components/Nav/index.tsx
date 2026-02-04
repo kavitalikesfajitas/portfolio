@@ -14,7 +14,6 @@ type NavProps = {
 };
 
 export function Nav({ isMobile, className }: NavProps) {
-  console.log("isMobile", isMobile);
   return (
     <NavigationMenu
       viewport={isMobile}

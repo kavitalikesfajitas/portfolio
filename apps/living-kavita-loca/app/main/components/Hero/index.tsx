@@ -2,12 +2,12 @@
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
 import Image from "next/image";
 import "./Hero.css";
-import { forwardRef, type RefObject } from "react";
+import { forwardRef } from "react";
 
 export const Hero = forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
->((props, ref) => {
+>((_props, ref) => {
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, {
     stiffness: 80,

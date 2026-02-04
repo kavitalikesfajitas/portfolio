@@ -4,8 +4,8 @@ import { Hero } from "@/app/main/components/Hero";
 import clsx from "clsx";
 import { motion, useInView } from "motion/react";
 import { useRef } from "react";
-
 import { Bio } from "./main/components/Bio";
+
 export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
   const isHeroInView = useInView(heroRef, { amount: 0.3, initial: true });
