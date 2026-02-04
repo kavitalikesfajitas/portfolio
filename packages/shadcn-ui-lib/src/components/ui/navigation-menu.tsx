@@ -1,7 +1,7 @@
 import * as React from "react";
-import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import { cva } from "class-variance-authority";
 import { ChevronDownIcon } from "lucide-react";
+import { NavigationMenu as NavigationMenuPrimitive } from "radix-ui";
 
 import { cn } from "@/lib/utils";
 
@@ -59,7 +59,7 @@ function NavigationMenuItem({
 }
 
 const navigationMenuTriggerStyle = cva(
-  "group inline-flex h-9 w-max items-center justify-center rounded-md bg-background py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:focus:bg-accent data-[state=open]:bg-accent/50 focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1",
+  "group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:focus:bg-accent data-[state=open]:bg-accent/50 focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1",
 );
 
 function NavigationMenuTrigger({
@@ -106,13 +106,19 @@ function NavigationMenuViewport({
   return (
     <div
       className={cn(
-        "absolute left-0 top-full isolate z-50 flex justify-center",
+        "absolute left-0 isolate z-50 flex justify-center",
+        "top-full group-data-[position-top=false]/navigation-menu:top-full",
+        "bottom-full group-data-[position-top=true]/navigation-menu:bottom-full",
       )}
     >
       <NavigationMenuPrimitive.Viewport
         data-slot="navigation-menu-viewport"
         className={cn(
-          "origin-top-center bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border shadow md:w-[var(--radix-navigation-menu-viewport-width)]",
+          "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 relative h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border shadow md:w-[var(--radix-navigation-menu-viewport-width)]",
+          "mt-1.5 group-data-[position-top=false]/navigation-menu:mt-1.5",
+          "mb-1.5 group-data-[position-top=true]/navigation-menu:mb-1.5 group-data-[position-top=true]/navigation-menu:mt-0",
+          "origin-top-center group-data-[position-top=false]/navigation-menu:origin-top-center",
+          "origin-bottom-center group-data-[position-top=true]/navigation-menu:origin-bottom-center",
           className,
         )}
         {...props}

@@ -2,25 +2,18 @@
 
 import {
   NavigationMenu,
+  NavigationMenuItem,
   NavigationMenuList,
 } from "@kavita-likes-fajitas/shadcn-ui-lib/components/ui/navigation-menu";
-import { ListThatsFancy } from "./ListThatsFancy";
+
 import { StandardNavigationMenuItemLink } from "./StandardNavigationMenuItemLink";
-import clsx from "clsx";
 
-type NavProps = {
-  isMobile: boolean;
-  className?: string;
-};
+import { DropdownMenuBasic } from "./DropdownMenu";
 
-export function Nav({ isMobile, className }: NavProps) {
+export function Nav() {
   return (
-    <NavigationMenu
-      viewport={isMobile}
-      className={clsx(" py-2 bg-white text-gray-1000 ", className)}
-    >
-      <NavigationMenuList id="nav-list" className=" text-gray-1000 bg-white ">
-        <ListThatsFancy />
+    <NavigationMenu>
+      <NavigationMenuList>
         <StandardNavigationMenuItemLink>
           <a
             href="https://github.com/kavitalikesfajitas"
@@ -30,6 +23,9 @@ export function Nav({ isMobile, className }: NavProps) {
             Github
           </a>
         </StandardNavigationMenuItemLink>
+        <NavigationMenuItem>
+          <DropdownMenuBasic />
+        </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
   );
