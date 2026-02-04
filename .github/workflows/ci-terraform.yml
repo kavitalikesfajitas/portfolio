@@ -78,7 +78,6 @@ jobs:
         working-directory: ${{ inputs.infra-working-directory }}
 
       - name: Apply Terraform
-        # TODO: Remove this once we are ready to deploy
-        if: false #github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         run: terraform apply -auto-approve tfplan
         working-directory: ${{ inputs.infra-working-directory }}
