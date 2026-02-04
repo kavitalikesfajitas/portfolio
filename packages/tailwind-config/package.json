@@ -2,6 +2,12 @@
   "name": "@kavita-likes-fajitas/tailwind-config",
   "version": "1.0.0",
   "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kavitalikesfajitas/portfolio.git",
+    "directory": "packages/tailwind-config"
+  },
   "exports": {
     "./shared-styles": "./shared-styles.css",
     "./postcss": "./postcss.config.mjs"
