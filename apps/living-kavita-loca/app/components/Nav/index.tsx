@@ -5,14 +5,16 @@ import {
   NavigationMenuItem,
   NavigationMenuList,
 } from "@kavita-likes-fajitas/shadcn-ui-lib/components/ui/navigation-menu";
-
 import { StandardNavigationMenuItemLink } from "./StandardNavigationMenuItemLink";
-
 import { DropdownMenuBasic } from "./DropdownMenu";
 
-export function Nav() {
+type NavProps = {
+  className?: string;
+};
+
+export function Nav({ className }: NavProps) {
   return (
-    <NavigationMenu>
+    <NavigationMenu className={className}>
       <NavigationMenuList>
         <StandardNavigationMenuItemLink>
           <a

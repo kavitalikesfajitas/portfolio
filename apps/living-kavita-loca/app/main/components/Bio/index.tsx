@@ -79,7 +79,7 @@ export const Bio = forwardRef<
             performance-critical user experiences to backend platforms, APIs,
             and infrastructure. I&apos;m most at home in complex, ambiguous
             spaces, and I&apos;m known for jumping in wherever the challenge is
-            hardest. 1 care deeply about craft, reliability, and clarity -
+            hardest. I care deeply about craft, reliability, and clarity -
             building systems that are not only powerful, but understandable and
             maintainable by the teams who own them. Whether I&apos;m working on
             a greenfield project or untangling an existing system, l approach

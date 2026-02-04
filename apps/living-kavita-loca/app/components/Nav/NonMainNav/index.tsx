@@ -3,7 +3,6 @@ import React from "react";
 import clsx from "clsx";
 import { Nav } from "..";
 import { LivingKavitaLocaLogo } from "../LivingKavitaLocaLogo";
-import { useIsMobile } from "@kavita-likes-fajitas/shadcn-ui-lib/hooks/useBreakpoint";
 import Link from "next/link";
 
 type NonMainNavProps = {
@@ -11,7 +10,6 @@ type NonMainNavProps = {
 };
 
 export function NonMainNav({ className }: NonMainNavProps) {
-  const isMobile = useIsMobile();
   return (
     <div
       className={clsx(
@@ -29,12 +27,7 @@ export function NonMainNav({ className }: NonMainNavProps) {
           <LivingKavitaLocaLogo />
         </div>
       </Link>
-      {isMobile !== undefined && (
-        <Nav
-          isMobile={isMobile}
-          className="h-fit flex-1 grow-0 w-full sticky top-0 "
-        />
-      )}
+      <Nav className="h-fit flex-1 grow-0 w-full sticky top-0 " />
     </div>
   );
 }

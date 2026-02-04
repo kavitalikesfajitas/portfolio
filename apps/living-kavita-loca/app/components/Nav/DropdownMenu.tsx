@@ -10,14 +10,19 @@ import {
   DropdownMenuTrigger,
 } from "@kavita-likes-fajitas/shadcn-ui-lib/components/ui/dropdown-menu";
 import Link from "next/link";
+import clsx from "clsx";
 
 export function DropdownMenuBasic() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>Explore</DropdownMenuTrigger>
-      <DropdownMenuContent align="center" className="border-none shadow-none">
+      <DropdownMenuContent
+        align="start"
+        className="border-none shadow-none p-3"
+      >
         <DropdownMenuGroup>
           <DropdownMenuLabel>Recent Projects</DropdownMenuLabel>
+          <DropdownMenuSeparator />
           <DropdownMenuLink href="/work/opensea-swoosh-id" className="text-sm">
             Dynamic Svg for Swoosh Id
           </DropdownMenuLink>
@@ -27,8 +32,14 @@ export function DropdownMenuBasic() {
           >
             Contentful GraphQL Proxy
           </DropdownMenuLink>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className="text-sm text-muted-foreground italic cursor-default"
+            disabled
+          >
+            More projects coming soon...
+          </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -44,10 +55,8 @@ const DropdownMenuLink = ({
   className?: string;
 }): React.ReactNode => {
   return (
-    <DropdownMenuItem asChild>
-      <Link href={href} className={className}>
-        {children}
-      </Link>
+    <DropdownMenuItem className={clsx("p-2", className)} asChild>
+      <Link href={href}>{children}</Link>
     </DropdownMenuItem>
   );
 };
