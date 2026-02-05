@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cva } from "class-variance-authority";
 import { ChevronDownIcon } from "lucide-react";
-import { NavigationMenu as NavigationMenuPrimitive } from "radix-ui";
+import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 
 import { cn } from "@/lib/utils";
 
@@ -146,8 +146,8 @@ function NavigationMenuViewport({
   return (
     <div
       className={cn(
-        "absolute left-0 isolate z-50 flex justify-center",
-        "top-full group-data-[position-top=false]/navigation-menu:top-full",
+        "absolute left-0 top-full isolate z-50 flex justify-center",
+        "group-data-[position-top=false]/navigation-menu:top-full",
         "bottom-full group-data-[position-top=true]/navigation-menu:bottom-full",
       )}
     >

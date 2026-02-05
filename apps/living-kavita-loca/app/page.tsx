@@ -28,6 +28,8 @@ export default function Home() {
         initial={{ opacity: 0 }}
         animate={{ opacity: isHeroInView ? 0 : 1 }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
+        aria-hidden={isHeroInView}
+        className={clsx(isHeroInView && "pointer-events-none")}
       >
         <Bio ref={bioRef} />
       </motion.div>

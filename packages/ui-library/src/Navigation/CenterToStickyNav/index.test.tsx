@@ -33,6 +33,12 @@ const createMockMotionValue = <T = unknown,>(
 const mockUseScroll = vi.fn();
 const mockUseSpring = vi.fn();
 const mockUseTransform = vi.fn();
+const mockUseIsMobile = vi.fn();
+
+// Mock @kavita-likes-fajitas/shadcn-ui-lib/hooks/useBreakpoint
+vi.mock("@kavita-likes-fajitas/shadcn-ui-lib/hooks/useBreakpoint", () => ({
+  useIsMobile: () => mockUseIsMobile(),
+}));
 
 // Mock motion/react
 vi.mock("motion/react", async () => {
@@ -66,6 +72,9 @@ describe("CenterStickyNav", () => {
   beforeEach(() => {
     // Reset all mocks
     vi.clearAllMocks();
+
+    // Mock useIsMobile to return false (desktop) by default
+    mockUseIsMobile.mockReturnValue(false);
 
     // Set up default mock implementations
     mockUseScroll.mockReturnValue({

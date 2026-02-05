@@ -72,7 +72,7 @@ export const Bio = forwardRef<
                 about craft, reliability, and clarity - building systems that
                 are not only powerful, but understandable and maintainable by
                 the teams who own them. Whether I&apos;m working on a greenfield
-                project or untangling an existing system, l approach problems
+                project or untangling an existing system, I approach problems
                 with curiosity, empathy, and a long-term mindset. Off the
                 keyboard, I&apos;m hiking Colorado 14ers with my dog, Samosa.
                 Same mindset, different terrain: patience, persistence, and
@@ -118,7 +118,7 @@ export const Bio = forwardRef<
                   Check out my GitHub
                 </a>
                 . Thanks for being patient while I ship this incrementally, one
-                commit at a time. Promise it&apos;ll be worth the wait! ✨🚀
+                commit at a time. Promise it will be worth the wait! ✨🚀
               </div>
             </div>
           </div>
