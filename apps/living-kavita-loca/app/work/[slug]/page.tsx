@@ -1,7 +1,5 @@
 import { notFound } from "next/navigation";
-import clsx from "clsx";
 import { Container } from "@/app/main/components/Container";
-import { Badge } from "@kavita-likes-fajitas/shadcn-ui-lib/components/ui/badge";
 import { NonMainNav } from "@/app/components/Nav/NonMainNav";
 import { TechBadge } from "@kavita-likes-fajitas/ui-library/TechBadge";
 import { Hero } from "./components/Hero";

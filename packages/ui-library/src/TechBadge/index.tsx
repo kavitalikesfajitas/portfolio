@@ -5,9 +5,6 @@ import {
 import { IconMap, TECH_MAP, TechType } from "./constants";
 import { useMemo } from "react";
 
-const toSentenceCase = (str: string) =>
-  str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-
 const stripPunctuation = (str: string) => str.replace(/[^\w]/g, "");
 
 type TechBadgeProps = BadgeProps & {

@@ -9,11 +9,7 @@ type SnazzyDividerProps = {
 };
 
 const SnazzyDivider = ({ className }: SnazzyDividerProps) => {
-  return (
-    <div
-      className={clsx("max-w-[50%] bg-rose-400 text-rose-400 h-1.5", className)}
-    />
-  );
+  return <div className={clsx("bg-rose-400 text-rose-400 h-1.5", className)} />;
 };
 
 export const Bio = forwardRef<
@@ -21,19 +17,22 @@ export const Bio = forwardRef<
   React.HTMLAttributes<HTMLDivElement>
 >(function Bio(_props, ref) {
   return (
-    <section className="px-6 pt-24 bg-gray-1000 flex flex-col w-full gap-10 min-h-screen overflow-y-auto">
+    <section
+      className="px-6 pt-24 bg-gray-1000 flex flex-col w-full gap-10 min-h-screen overflow-y-auto"
+      ref={ref}
+    >
       <Container
         maxWidth="8xl"
         size="full"
-        className="flex flex-col gap-10 grow "
+        className="flex flex-col gap-10 grow items-center w-[600px] xl:w-full xl:items-start"
       >
-        <div className="flex flex-col gap-2" ref={ref}>
+        <div className="flex flex-col gap-2 w-full" ref={ref}>
           <div className="font-lobster text-4xl text-white">About Me</div>
           <SnazzyDivider className="max-w-[40%]" />
-          <SnazzyDivider className="max-w-[75%]" />
+          <SnazzyDivider className="max-w-[600px] lg:max-w-[75%]" />
         </div>
 
-        <div className="flex flex-col xl:flex-row flex-wrap gap-10 ">
+        <div className="flex flex-col xl:flex-row flex-wrap gap-10 w-full ">
           <div
             className={clsx(
               "relative aspect-square",
@@ -59,7 +58,7 @@ export const Bio = forwardRef<
               className={clsx(
                 "flex-col gap-2 flex-1",
                 "w-full rounded-2xl ",
-                " bg-white text-gray-1000 font-light rounded-2xl text-sm p-5",
+                "bg-white text-gray-1000 font-light rounded-2xl text-sm p-5",
               )}
             >
               <div className="font-midnight-gelactic text-2xl text-gray-1000 pb-1">
