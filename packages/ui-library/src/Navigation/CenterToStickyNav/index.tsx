@@ -16,7 +16,7 @@ export function CenterStickyNav({ children, InNavLogo }: CenterStickyNavProps) {
   });
 
   // Nav animation range: 0-70% of scroll progress
-  const range: [number, number] = [0, 0.7];
+  const range: [number, number] = [0, 0.5];
 
   const width = useTransform(progress, range, ["30%", "100%"]);
   const borderRadius = useTransform(progress, range, [999, 0]);
@@ -29,7 +29,7 @@ export function CenterStickyNav({ children, InNavLogo }: CenterStickyNavProps) {
   // Start logo animation at 40% of nav animation
   // we want this range to be slightly different
   // because we want it to happen slightly later than the nav animation
-  const logoRange: [number, number] = [0.4, 0.8];
+  const logoRange: [number, number] = [0.2, 0.5];
   const logoOpacity = useTransform(progress, logoRange, [0, 1]);
   // the logo will slide in from the left and scale up slightly from 80% to 100% of its original size
   const logoScale = useTransform(progress, logoRange, [0.8, 1]);
@@ -47,7 +47,7 @@ export function CenterStickyNav({ children, InNavLogo }: CenterStickyNavProps) {
   return (
     <motion.div
       className={clsx(
-        "sticky left-0 z-50 mx-auto flex min-w-fit items-center justify-between overflow-visible bg-white text-gray-950",
+        "text-gray-1000 sticky left-0 z-50 mx-auto flex min-w-fit items-center justify-between overflow-visible bg-white",
         "top-0 rounded-full",
       )}
       style={{ width, borderRadius, boxShadow }}
@@ -66,7 +66,8 @@ export function CenterStickyNav({ children, InNavLogo }: CenterStickyNavProps) {
 
       {/* Nav items in the center/right */}
       <motion.div
-        className="flex items-center justify-center"
+        id="nav-container"
+        className="flex items-center justify-center py-1"
         style={{ flexGrow: navFlexGrow }}
       >
         {children}

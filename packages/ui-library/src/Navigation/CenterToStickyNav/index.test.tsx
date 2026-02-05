@@ -486,7 +486,7 @@ describe("CenterStickyNav", () => {
 
       const mainNav = container.firstChild as HTMLElement;
       expect(mainNav).toHaveClass("bg-white");
-      expect(mainNav).toHaveClass("text-gray-950");
+      expect(mainNav).toHaveClass("text-gray-1000");
     });
   });
 });
