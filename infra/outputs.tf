@@ -39,3 +39,14 @@ output "certificate_arn" {
   description = "The ARN of the ACM certificate"
   value       = aws_acm_certificate.cert.arn
 }
+
+# PR Preview bucket outputs
+output "pr_preview_bucket_name" {
+  description = "The name of the PR preview S3 bucket"
+  value       = aws_s3_bucket.pr_preview.bucket
+}
+
+output "pr_preview_website_endpoint" {
+  description = "The website endpoint for the PR preview bucket"
+  value       = aws_s3_bucket_website_configuration.pr_preview.website_endpoint
+}

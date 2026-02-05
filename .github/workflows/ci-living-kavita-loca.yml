@@ -1,6 +1,18 @@
 name: "Living Kavita Loca App Tests, Build, Lint and Check Size - Reusable Workflow"
 
-on: workflow_call
+on:
+  workflow_call:
+    inputs:
+      deploy_to:
+        description: "Deployment target: production, preview, or none"
+        required: false
+        type: string
+        default: "none"
+      pr_number:
+        description: "PR number for preview deployments"
+        required: false
+        type: string
+        default: ""
 
 jobs:
   build-app-and-run-tests:
@@ -10,6 +22,9 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      pull-requests: write
+    outputs:
+      preview_url: ${{ steps.set-preview-url.outputs.url }}
     defaults:
       run:
         working-directory: apps/living-kavita-loca
@@ -65,19 +80,30 @@ jobs:
           ENABLE_CACHE: true
 
       - name: Configure AWS Credentials
-        if: github.ref == 'refs/heads/main'
+        if: inputs.deploy_to != 'none'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
 
-      - name: 🚀 Deploy to S3
-        if: github.ref == 'refs/heads/main'
+      - name: 🚀 Deploy to S3 (Production)
+        if: inputs.deploy_to == 'production'
         run: aws s3 sync out s3://${{ vars.S3_BUCKET_NAME }} --delete
 
+      - name: 🚀 Deploy to S3 (PR Preview)
+        if: inputs.deploy_to == 'preview'
+        run: |
+          aws s3 sync out s3://${{ vars.PR_PREVIEW_BUCKET_NAME }}/pr-${{ inputs.pr_number }}/ --delete
+
       - name: 🔄 Invalidate CloudFront cache
-        if: github.ref == 'refs/heads/main'
+        if: inputs.deploy_to == 'production'
         run: |
           aws cloudfront create-invalidation \
             --distribution-id ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }} \
             --paths "/" "/work/*" "/main/*"
+
+      - name: 📝 Set preview URL output
+        id: set-preview-url
+        if: inputs.deploy_to == 'preview'
+        run: |
+          echo "url=http://${{ vars.PR_PREVIEW_BUCKET_NAME }}.s3-website-${{ vars.AWS_REGION }}.amazonaws.com/pr-${{ inputs.pr_number }}/" >> $GITHUB_OUTPUT
