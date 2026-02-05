@@ -28,7 +28,7 @@ export const Bio = forwardRef<
       <Container
         maxWidth="8xl"
         size="full"
-        className="flex flex-col gap-10 grow"
+        className="flex flex-col gap-10 grow "
       >
         <div className="flex flex-col gap-2" ref={ref}>
           <div className="font-lobster text-4xl text-white">About Me</div>
@@ -36,7 +36,7 @@ export const Bio = forwardRef<
           <SnazzyDivider className="max-w-[75%]" />
         </div>
 
-        <div className="flex flex-col md:flex-row flex-wrap gap-10">
+        <div className="flex flex-col xl:flex-row flex-wrap gap-10 ">
           <div
             className={clsx(
               "relative aspect-square",
@@ -57,7 +57,7 @@ export const Bio = forwardRef<
             <div
               className={clsx(
                 "flex-col gap-2 flex-1",
-                "w-full md:max-w-[600px]e rounded-2xl ",
+                "w-full md:max-w-[600px] rounded-2xl ",
                 " bg-white text-gray-1000 font-light rounded-2xl text-sm p-5",
               )}
             >
@@ -85,7 +85,7 @@ export const Bio = forwardRef<
             <div
               className={clsx(
                 "flex-col gap-2 flex-1",
-                "w-full md:max-w-[600px]e rounded-2xl ",
+                "w-full md:max-w-[600px] rounded-2xl ",
                 " bg-white text-gray-1000 font-light rounded-2xl text-sm p-5",
               )}
             >
