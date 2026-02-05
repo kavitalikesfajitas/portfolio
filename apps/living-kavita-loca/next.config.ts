@@ -9,7 +9,12 @@ const workspaceRoot = path.resolve(
   "..",
 );
 
+// For PR previews, set basePath to /pr-{number}
+const isPrPreview = process.env.PR_NUMBER !== undefined;
+const basePath = isPrPreview ? `/pr-${process.env.PR_NUMBER}` : "";
+
 const nextConfig: NextConfig = {
+  basePath,
   // Enable MDX file extensions
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   turbopack: {
