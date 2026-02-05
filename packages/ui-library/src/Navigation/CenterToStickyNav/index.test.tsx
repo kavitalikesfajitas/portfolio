@@ -233,7 +233,7 @@ describe("CenterStickyNav", () => {
       );
 
       expect(widthCall).toBeDefined();
-      expect(widthCall![1]).toEqual([0, 0.7]); // range for width
+      expect(widthCall![1]).toEqual([0, 0.5]); // range for width
     });
 
     it("should call useTransform for borderRadius animation", () => {
@@ -250,7 +250,7 @@ describe("CenterStickyNav", () => {
       );
 
       expect(borderRadiusCall).toBeDefined();
-      expect(borderRadiusCall![1]).toEqual([0, 0.7]); // range for borderRadius
+      expect(borderRadiusCall![1]).toEqual([0, 0.5]); // range for borderRadius
     });
 
     it("should call useTransform for boxShadow animation", () => {
@@ -270,7 +270,7 @@ describe("CenterStickyNav", () => {
       });
 
       expect(boxShadowCall).toBeDefined();
-      expect(boxShadowCall![1]).toEqual([0, 0.7]); // range for boxShadow
+      expect(boxShadowCall![1]).toEqual([0, 0.5]); // range for boxShadow
     });
 
     it("should call useTransform for logo animations with correct range", () => {
@@ -282,10 +282,10 @@ describe("CenterStickyNav", () => {
 
       const calls = mockUseTransform.mock.calls;
 
-      // Logo animations should use [0.4, 0.8] range
+      // Logo animations should use [0.2, 0.5] range
       const logoAnimationCalls = calls.filter(
         (call: MockCallArray) =>
-          JSON.stringify(call[1]) === JSON.stringify([0.4, 0.8]),
+          JSON.stringify(call[1]) === JSON.stringify([0.2, 0.5]),
       );
 
       // Should have 5 logo animations: opacity, scale, y, flexBasis, and flexGrow
@@ -303,7 +303,7 @@ describe("CenterStickyNav", () => {
       const opacityCall = calls.find(
         (call: MockCallArray) =>
           JSON.stringify(call[2]) === JSON.stringify([0, 1]) &&
-          JSON.stringify(call[1]) === JSON.stringify([0.4, 0.8]),
+          JSON.stringify(call[1]) === JSON.stringify([0.2, 0.5]),
       );
 
       expect(opacityCall).toBeDefined();
@@ -320,7 +320,7 @@ describe("CenterStickyNav", () => {
       const scaleCall = calls.find(
         (call: MockCallArray) =>
           JSON.stringify(call[2]) === JSON.stringify([0.8, 1]) &&
-          JSON.stringify(call[1]) === JSON.stringify([0.4, 0.8]),
+          JSON.stringify(call[1]) === JSON.stringify([0.2, 0.5]),
       );
 
       expect(scaleCall).toBeDefined();
@@ -337,7 +337,7 @@ describe("CenterStickyNav", () => {
       const yCall = calls.find(
         (call: MockCallArray) =>
           JSON.stringify(call[2]) === JSON.stringify(["20%", "0%"]) &&
-          JSON.stringify(call[1]) === JSON.stringify([0.4, 0.8]),
+          JSON.stringify(call[1]) === JSON.stringify([0.2, 0.5]),
       );
 
       expect(yCall).toBeDefined();
@@ -354,7 +354,7 @@ describe("CenterStickyNav", () => {
       const flexBasisCall = calls.find(
         (call: MockCallArray) =>
           JSON.stringify(call[2]) === JSON.stringify(["0%", "40%"]) &&
-          JSON.stringify(call[1]) === JSON.stringify([0.4, 0.8]),
+          JSON.stringify(call[1]) === JSON.stringify([0.2, 0.5]),
       );
 
       expect(flexBasisCall).toBeDefined();
@@ -371,7 +371,7 @@ describe("CenterStickyNav", () => {
       const flexGrowCall = calls.find(
         (call: MockCallArray) =>
           JSON.stringify(call[2]) === JSON.stringify([1, 0]) &&
-          JSON.stringify(call[1]) === JSON.stringify([0.4, 0.8]),
+          JSON.stringify(call[1]) === JSON.stringify([0.2, 0.5]),
       );
 
       expect(flexGrowCall).toBeDefined();
@@ -414,7 +414,7 @@ describe("CenterStickyNav", () => {
   });
 
   describe("Animation Ranges", () => {
-    it("should use correct range for nav animations (0-70%)", () => {
+    it("should use correct range for nav animations (0-50%)", () => {
       render(
         <CenterStickyNav InNavLogo={mockInNavLogo}>
           {mockChildren}
@@ -424,14 +424,14 @@ describe("CenterStickyNav", () => {
       const calls = mockUseTransform.mock.calls;
       const navAnimationCalls = calls.filter(
         (call: MockCallArray) =>
-          JSON.stringify(call[1]) === JSON.stringify([0, 0.7]),
+          JSON.stringify(call[1]) === JSON.stringify([0, 0.5]),
       );
 
       // Should have 3 nav animations: width, borderRadius, boxShadow
       expect(navAnimationCalls.length).toBe(3);
     });
 
-    it("should use correct range for logo animations (40-80%)", () => {
+    it("should use correct range for logo animations (20-50%)", () => {
       render(
         <CenterStickyNav InNavLogo={mockInNavLogo}>
           {mockChildren}
@@ -441,7 +441,7 @@ describe("CenterStickyNav", () => {
       const calls = mockUseTransform.mock.calls;
       const logoAnimationCalls = calls.filter(
         (call: MockCallArray) =>
-          JSON.stringify(call[1]) === JSON.stringify([0.4, 0.8]),
+          JSON.stringify(call[1]) === JSON.stringify([0.2, 0.5]),
       );
 
       // Should have 5 logo animations: opacity, scale, y, flexBasis, flexGrow

@@ -4,7 +4,7 @@ import { Nav } from ".";
 
 describe.skip("given a <Nav>", () => {
   test("it renders the component successfully", () => {
-    const { container } = render(<Nav isMobile={false} />);
+    const { container } = render(<Nav />);
     expect(container).toBeInTheDocument();
   });
 });
