@@ -10,6 +10,10 @@ export default defineConfig({
     coverage: {
       include: ["app/**/*.{ts,tsx}"],
     },
+    server: {
+      deps: {
+        inline: ["clsx"],
+      },
+    },
   },
 });
-
