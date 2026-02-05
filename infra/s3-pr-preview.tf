@@ -4,10 +4,12 @@ resource "aws_s3_bucket" "pr_preview" {
 }
 
 resource "aws_s3_bucket_public_access_block" "pr_preview" {
-  bucket                  = aws_s3_bucket.pr_preview.id
-  block_public_acls       = false
+  bucket = aws_s3_bucket.pr_preview.id
+  # Block public ACLs - public access is controlled via bucket policy only
+  block_public_acls       = true
+  ignore_public_acls      = true
+  # Allow public bucket policy for static website hosting
   block_public_policy     = false
-  ignore_public_acls      = false
   restrict_public_buckets = false
 }
 

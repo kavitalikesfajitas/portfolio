@@ -79,6 +79,14 @@ jobs:
           NEXT_TELEMETRY_DISABLED: true
           ENABLE_CACHE: true
 
+      - name: ✅ Validate preview inputs
+        if: inputs.deploy_to == 'preview'
+        run: |
+          if [ -z "${{ inputs.pr_number }}" ]; then
+            echo "::error::pr_number is required for preview deployments"
+            exit 1
+          fi
+
       - name: Configure AWS Credentials
         if: inputs.deploy_to != 'none'
         uses: aws-actions/configure-aws-credentials@v4
