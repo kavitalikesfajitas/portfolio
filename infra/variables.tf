@@ -30,3 +30,8 @@ variable "domain_name" {
   type        = string
   default     = "livingkavitaloca.com"
 }
+
+variable "pr_preview_bucket_name" {
+  description = "S3 bucket name for PR preview deployments"
+  type        = string
+}

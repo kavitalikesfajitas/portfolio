@@ -4,11 +4,17 @@ This Terraform configuration manages the complete infrastructure for the livingk
 
 ## Infrastructure Components
 
+### Production
+
 - **S3 Bucket**: Static site hosting storage
 - **CloudFront**: CDN distribution with SSL/TLS
 - **Route53**: DNS hosting with all necessary records
 - **ACM Certificate**: SSL/TLS for HTTPS
 - **IAM Roles**: GitHub Actions OIDC deployment permissions
+
+### Development
+
+- **PR Preview S3 Bucket**: Isolated bucket for PR preview deployments with auto-cleanup
 
 ## Architecture
 
@@ -94,21 +100,23 @@ terraform {
 
 ### Required Variables
 
-| Variable       | Description              | Default                | Source in CI                          |
-| -------------- | ------------------------ | ---------------------- | ------------------------------------- |
-| `aws_region`   | AWS region for resources | `us-west-2`            | `${{ vars.AWS_REGION }}`              |
-| `bucket_name`  | S3 bucket name           | Required               | `${{ vars.S3_BUCKET_NAME }}`          |
-| `domain_name`  | Domain name              | `livingkavitaloca.com` | `${{ vars.DOMAIN_NAME }}` (optional)  |
-| `github_owner` | GitHub org/user          | Required               | `${{ github.repository_owner }}`      |
-| `github_repo`  | GitHub repository name   | Required               | `${{ github.event.repository.name }}` |
+| Variable                 | Description                  | Default                | Source in CI                          |
+| ------------------------ | ---------------------------- | ---------------------- | ------------------------------------- |
+| `aws_region`             | AWS region for resources     | `us-east-1`            | `${{ vars.AWS_REGION }}`              |
+| `bucket_name`            | S3 bucket name (production)  | Required               | `${{ vars.S3_BUCKET_NAME }}`          |
+| `pr_preview_bucket_name` | S3 bucket name (PR previews) | Required               | `${{ vars.PR_PREVIEW_BUCKET_NAME }}`  |
+| `domain_name`            | Domain name                  | `livingkavitaloca.com` | `${{ vars.DOMAIN_NAME }}` (optional)  |
+| `github_owner`           | GitHub org/user              | Required               | `${{ github.repository_owner }}`      |
+| `github_repo`            | GitHub repository name       | Required               | `${{ github.event.repository.name }}` |
 
 ### GitHub Repository Variables
 
 Set these in your repository: **Settings** → **Secrets and variables** → **Actions** → **Variables**
 
-- `AWS_REGION` = `us-west-2`
+- `AWS_REGION` = `us-east-1`
 - `AWS_ROLE_ARN` = `arn:aws:iam::250328915800:role/github-deploy-site`
 - `S3_BUCKET_NAME` = `livingkavitaloca.com`
+- `PR_PREVIEW_BUCKET_NAME` = `livingkavitaloca-pr-previews`
 - `DOMAIN_NAME` = `livingkavitaloca.com` (optional, has default)
 
 ## Outputs
@@ -193,7 +201,9 @@ dig TXT livingkavitaloca.com
 
 ## Cost Estimate
 
-Approximate monthly costs (us-west-2):
+### Production Infrastructure
+
+Approximate monthly costs (us-east-1):
 
 - **Route53 Hosted Zone**: $0.50/month
 - **S3 Storage**: ~$0.023/GB/month
@@ -201,14 +211,56 @@ Approximate monthly costs (us-west-2):
 - **ACM Certificate**: Free
 - **Data Transfer**: Variable based on traffic
 
-**Estimated total**: < $5/month for typical small site traffic
+**Production total**: < $5/month for typical small site traffic
+
+### PR Preview Infrastructure
+
+Additional costs for PR preview deployments:
+
+- **S3 Storage**: ~$0.01/month (10 PRs × 50 MB each)
+- **PUT Requests**: ~$0.25/month (deployments)
+- **GET Requests**: ~$0.004/month (testing)
+- **Data Transfer**: $0/month (within free tier)
+- **Lifecycle Management**: Free (auto-cleanup after 7 days)
+
+**PR Preview total**: ~$0.26 - $0.50/month
+
+### Combined Total
+
+**~$5.50/month** with active PR previews
+
+## Why Not Vercel?
+
+This portfolio qualifies for Vercel's free Hobby tier ($0/month), which includes:
+
+- Automatic PR previews with HTTPS
+- Zero configuration
+- Global edge network
+- Better developer experience
+
+**So why AWS?** This setup is intentionally over-engineered as a learning exercise in:
+
+- Infrastructure as Code (Terraform)
+- AWS services (S3, CloudFront, Route53, IAM)
+- CI/CD pipelines (GitHub Actions)
+- Cost optimization strategies
+
+The ~$5.50/month cost is essentially paying for hands-on DevOps experience that's valuable for career growth.
 
 ## Security
+
+**Production:**
 
 - **S3 Bucket**: Private access only via CloudFront Origin Access Identity (OAI)
 - **HTTPS**: Enforced via CloudFront with ACM certificate
 - **GitHub Actions**: OIDC authentication (no long-lived credentials)
 - **IAM**: Least-privilege access with scoped permissions
+
+**PR Previews:**
+
+- **S3 Bucket**: Public read access for HTTP testing (no sensitive data)
+- **Automatic Cleanup**: Previews auto-delete after 7 days
+- **Isolated**: Separate bucket from production
 
 ## Local Development
 
@@ -222,6 +274,7 @@ terraform init
 # Plan changes
 terraform plan \
   -var="bucket_name=livingkavitaloca.com" \
+  -var="pr_preview_bucket_name=livingkavitaloca-pr-previews" \
   -var="github_owner=kavitalikesfajitas" \
   -var="github_repo=portfolio"
 
@@ -244,3 +297,38 @@ ACM automatically renews certificates - no action required.
 ### Secrets Management
 
 No long-lived secrets required. GitHub Actions uses OIDC for AWS authentication.
+
+# Development Infrastructure
+
+## Setup
+
+The PR preview infrastructure (`s3-pr-preview.tf`) creates a separate S3 bucket for hosting PR previews:
+
+**Features:**
+
+- Public website hosting for direct HTTP access
+- Automatic cleanup after 7 days
+- Isolated from production
+- Each PR gets its own prefix: `pr-[number]/`
+
+**Configuration:**
+
+1. Set the `pr_preview_bucket_name` variable:
+
+   ```bash
+   terraform plan -var="pr_preview_bucket_name=livingkavitaloca-pr-previews"
+   ```
+
+2. Add GitHub Actions variable:
+   - **Settings** → **Secrets and variables** → **Actions** → **Variables**
+   - `PR_PREVIEW_BUCKET_NAME` = `livingkavitaloca-pr-previews`
+
+**Deployment:**
+
+The workflow `.github/workflows/ci-pr-preview.yml` automatically deploys on PR creation/updates:
+
+```bash
+aws s3 sync out s3://$PR_PREVIEW_BUCKET_NAME/pr-$PR_NUMBER/ --delete
+```
+
+**Preview URL format:** `http://[bucket].s3-website-[region].amazonaws.com/pr-[number]/`

@@ -26,6 +26,7 @@ jobs:
       TF_PLUGIN_CACHE_DIR: /tmp/terraform-plugin-cache
       TF_TOKEN_app_terraform_io: ${{ secrets.TF_STATE_TOKEN }}
       TF_VAR_bucket_name: ${{ vars.S3_BUCKET_NAME }}
+      TF_VAR_pr_preview_bucket_name: ${{ vars.PR_PREVIEW_BUCKET_NAME }}
       TF_VAR_github_owner: ${{ github.repository_owner }}
       TF_VAR_github_repo: ${{ github.event.repository.name }}
       TF_VAR_domain_name: ${{ vars.DOMAIN_NAME }}

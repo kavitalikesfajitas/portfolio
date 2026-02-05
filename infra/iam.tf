@@ -46,7 +46,8 @@ resource "aws_iam_policy" "s3_deploy" {
         Effect = "Allow"
         Action = ["s3:ListBucket"]
         Resource = [
-          aws_s3_bucket.site.arn
+          aws_s3_bucket.site.arn,
+          aws_s3_bucket.pr_preview.arn
         ]
       },
       {
@@ -58,7 +59,8 @@ resource "aws_iam_policy" "s3_deploy" {
           "s3:DeleteObject"
         ]
         Resource = [
-          "${aws_s3_bucket.site.arn}/*"
+          "${aws_s3_bucket.site.arn}/*",
+          "${aws_s3_bucket.pr_preview.arn}/*"
         ]
       }
     ]
