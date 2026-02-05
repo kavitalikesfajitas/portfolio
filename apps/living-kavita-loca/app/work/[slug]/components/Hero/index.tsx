@@ -24,6 +24,8 @@ export function Hero({
   ...rest
 }: HeroProps) {
   const isStaticImage = typeof image === "object";
+  // Only use blur placeholder if the image has blurDataURL (not for SVGs)
+  const supportsBlur = isStaticImage && "blurDataURL" in image;
 
   return (
     <div
@@ -43,7 +45,7 @@ export function Hero({
           sizes="100vw"
           priority
           fetchPriority="high"
-          {...(isStaticImage && { placeholder: "blur" })}
+          {...(supportsBlur && { placeholder: "blur" })}
           className="absolute inset-0 object-cover z-0 w-full h-full object-center"
         />
       )}

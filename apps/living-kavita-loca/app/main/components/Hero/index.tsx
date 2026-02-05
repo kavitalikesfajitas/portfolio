@@ -3,6 +3,8 @@ import { motion, useScroll, useSpring, useTransform } from "motion/react";
 import Image from "next/image";
 import "./Hero.css";
 import { forwardRef } from "react";
+import LivingKavitaLocaLogo from "@/public/images/hero/living-kavita-loca-logo.png";
+import LipsGlossy from "@/public/images/hero/lips-glossy.png";
 
 export const Hero = forwardRef<
   HTMLDivElement,
@@ -35,7 +37,7 @@ export const Hero = forwardRef<
         className="relative flex  w-full justify-center scale-75 md:scale-100 lg:scale-125"
       >
         <Image
-          src="/images/hero/living-kavita-loca-logo.png"
+          src={LivingKavitaLocaLogo}
           alt="living kavita loca"
           width={650}
           height={650}
@@ -47,7 +49,7 @@ export const Hero = forwardRef<
           className="absolute top-1/2 translate-x-[45%] -translate-y-1/2 scale-50 lips"
         >
           <Image
-            src="/images/hero/lips-glossy.png"
+            src={LipsGlossy}
             alt="lips open that are glossy"
             className="lips relative z-10"
             height={600}

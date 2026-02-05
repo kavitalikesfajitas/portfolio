@@ -42,15 +42,15 @@ export default async function ProjectDetail({
 }) {
   const { slug } = await params;
 
-  let Content;
-  let metadata;
+  let mdxModule;
   try {
-    const mdxModule = await import(`@/content/work/${slug}.mdx`);
-    Content = mdxModule.default;
-    metadata = mdxModule.metadata;
+    mdxModule = await import(`@/content/work/${slug}.mdx`);
   } catch {
     notFound();
   }
+
+  const Content = mdxModule.default;
+  const metadata = mdxModule.metadata;
 
   return (
     <main className="bg-gray-1000 text-white relative flex flex-col min-h-screen">

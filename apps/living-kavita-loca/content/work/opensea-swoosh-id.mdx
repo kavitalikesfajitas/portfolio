@@ -1,6 +1,9 @@
+import HeroImage from "@/public/images/work/thumbnails/opensea-swoosh-id.png";
+import { assetPath } from "@/app/utils/assetPath";
+
 export const metadata = {
   title: "OpenSea Swoosh ID",
-  heroImage: "/images/work/thumbnails/opensea-swoosh-id.png",
+  heroImage: HeroImage,
   role: "Lead Engineer / Architect",
   tech: ["TypeScript", "Node.js", "SVG", "AWS Lambda", "JSDOM"],
 };
@@ -32,7 +35,7 @@ The naive approach would be to pre-render an image for each member and store it 
 Early members of .SWOOSH could create a personalized digital membership card. Here’s mine:
 
 <video playsInline autoPlay muted loop className="justify-self-center">
-  <source src="/videos/membership-card.mov" />
+  <source src={assetPath("/videos/membership-card.mov")} />
 </video>
 
 As newcomers to OpenSea, we ran quickly into a problem. The membership card was built as a rich, WebGL experience, but OpenSea’s collection pages only supported static images. That meant we needed a way to generate a dynamic image for each card—without losing the personality of the original design
