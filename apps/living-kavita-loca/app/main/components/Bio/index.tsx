@@ -11,10 +11,7 @@ type SnazzyDividerProps = {
 const SnazzyDivider = ({ className }: SnazzyDividerProps) => {
   return (
     <div
-      className={clsx(
-        "max-w-[50%] bg-[#B56B78] text-[#B56B78] h-1.5",
-        className,
-      )}
+      className={clsx("max-w-[50%] bg-rose-400 text-rose-400 h-1.5", className)}
     />
   );
 };
@@ -53,11 +50,15 @@ export const Bio = forwardRef<
             />
           </div>
 
-          <div className={clsx("flex flex-1 shrink-0 flex-col gap-4")}>
+          <div
+            className={clsx(
+              "flex flex-1 w-full md:max-w-[600px] flex-col gap-4",
+            )}
+          >
             <div
               className={clsx(
                 "flex-col gap-2 flex-1",
-                "w-full md:max-w-[600px] rounded-2xl ",
+                "w-full rounded-2xl ",
                 " bg-white text-gray-1000 font-light rounded-2xl text-sm p-5",
               )}
             >
@@ -85,7 +86,7 @@ export const Bio = forwardRef<
             <div
               className={clsx(
                 "flex-col gap-2 flex-1",
-                "w-full md:max-w-[600px] rounded-2xl ",
+                "w-full rounded-2xl ",
                 " bg-white text-gray-1000 font-light rounded-2xl text-sm p-5",
               )}
             >
@@ -97,10 +98,10 @@ export const Bio = forwardRef<
                 legacy code, this site is getting a thoughtful overhaul.
                 The&nbsp;
                 <a
-                  href="https://livingkavitaloca.com/"
+                  href="https://github.com/kavitalikesfajitas/website"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#B56B78] hover:underline"
+                  className="text-rose-400 hover:underline"
                 >
                   old version
                 </a>
@@ -116,7 +117,7 @@ export const Bio = forwardRef<
                   href="https://github.com/kavitalikesfajitas"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#B56B78] hover:underline"
+                  className="text-rose-400 hover:underline"
                 >
                   Check out my GitHub
                 </a>
