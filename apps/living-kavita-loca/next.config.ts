@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
   },
   allowedDevOrigins: ["local.living-kavita-loca.com", "localhost"],
   output: "export",
+  trailingSlash: true,
   reactStrictMode: true,
   reactCompiler: true,
   experimental: {
