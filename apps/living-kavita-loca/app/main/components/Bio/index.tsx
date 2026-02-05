@@ -17,14 +17,11 @@ export const Bio = forwardRef<
   React.HTMLAttributes<HTMLDivElement>
 >(function Bio(_props, ref) {
   return (
-    <section
-      className="px-6 pt-24 bg-gray-1000 flex flex-col w-full gap-10 min-h-screen overflow-y-auto"
-      ref={ref}
-    >
+    <section className="px-6 pt-24 bg-gray-1000 flex flex-col w-full gap-10 min-h-screen overflow-y-auto">
       <Container
         maxWidth="8xl"
         size="full"
-        className="flex flex-col gap-10 grow items-center w-[600px] xl:w-full xl:items-start"
+        className="flex flex-col gap-10 grow items-center max-w-[600px] xl:w-full xl:items-start"
       >
         <div className="flex flex-col gap-2 w-full" ref={ref}>
           <div className="font-lobster text-4xl text-white">About Me</div>

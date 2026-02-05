@@ -15,7 +15,7 @@ export default function Home() {
   return (
     <main
       className={clsx(
-        "bg-gray-1000 text-white relative flex flex-col mt-20 md:mt-32 lg:mt-40",
+        "bg-gray-1000 text-white relative flex flex-col  md:mt-32 lg:mt-40",
       )}
     >
       {/* overflow-x-clip is important to ensure that on mobile it does not scroll horizontally */}

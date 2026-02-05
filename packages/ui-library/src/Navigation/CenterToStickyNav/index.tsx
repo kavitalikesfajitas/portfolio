@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { useScroll, useSpring, useTransform, motion } from "motion/react";
+import { useIsMobile } from "@kavita-likes-fajitas/shadcn-ui-lib/hooks/useBreakpoint";
 
 type CenterStickyNavProps = {
   children: React.ReactNode;
@@ -8,6 +9,7 @@ type CenterStickyNavProps = {
 
 export function CenterStickyNav({ children, InNavLogo }: CenterStickyNavProps) {
   const { scrollYProgress } = useScroll();
+  const isMobile = useIsMobile();
 
   const progress = useSpring(scrollYProgress, {
     stiffness: 200,
@@ -16,7 +18,7 @@ export function CenterStickyNav({ children, InNavLogo }: CenterStickyNavProps) {
   });
 
   // Nav animation range: 0-70% of scroll progress
-  const range: [number, number] = [0, 0.5];
+  const range: [number, number] = isMobile ? [0, 0.3] : [0, 0.5];
 
   const width = useTransform(progress, range, ["30%", "100%"]);
   const borderRadius = useTransform(progress, range, [999, 0]);
@@ -29,7 +31,7 @@ export function CenterStickyNav({ children, InNavLogo }: CenterStickyNavProps) {
   // Start logo animation at 40% of nav animation
   // we want this range to be slightly different
   // because we want it to happen slightly later than the nav animation
-  const logoRange: [number, number] = [0.2, 0.5];
+  const logoRange: [number, number] = isMobile ? [0.1, 0.3] : [0.2, 0.5];
   const logoOpacity = useTransform(progress, logoRange, [0, 1]);
   // the logo will slide in from the left and scale up slightly from 80% to 100% of its original size
   const logoScale = useTransform(progress, logoRange, [0.8, 1]);
