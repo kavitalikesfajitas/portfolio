@@ -15,6 +15,7 @@ const basePath = isPrPreview ? `/pr-${process.env.PR_NUMBER}` : "";
 
 const nextConfig: NextConfig = {
   basePath,
+  assetPrefix: basePath,
   // Enable MDX file extensions
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   turbopack: {
