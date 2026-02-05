@@ -27,7 +27,7 @@ function DropdownMenuPortal({
 }
 const dropdownMenuTriggerStyle = cva([
   // Layout & sizing
-  "group inline-flex h-9 w-max items-center justify-center",
+  "group inline-flex h-auto w-max items-center justify-center",
   // Spacing & borders
   "rounded-md px-1 md:px-3",
   // Typography

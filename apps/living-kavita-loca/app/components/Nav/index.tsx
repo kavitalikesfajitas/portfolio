@@ -45,7 +45,7 @@ export function Nav({ className }: NavProps) {
               "data-[active=true]:bg-accent/50 data-[active=true]:text-accent-foreground",
               "data-[active=true]:hover:bg-accent data-[active=true]:focus:bg-accent",
               "px-1 md:px-3 ",
-              "flex flex-col items-center justify-center gap-1 h-9",
+              "flex flex-col items-center justify-center gap-1 ",
             )}
           >
             Github
