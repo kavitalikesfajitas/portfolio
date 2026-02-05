@@ -34,6 +34,13 @@ export function NavDropdownMenu() {
               {item.title}
             </DropdownMenuLink>
           ))}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className="text-sm md:text-base text-muted-foreground italic cursor-default"
+            disabled
+          >
+            More projects coming soon...
+          </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
