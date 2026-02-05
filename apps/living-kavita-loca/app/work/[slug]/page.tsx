@@ -1,7 +1,5 @@
 import { notFound } from "next/navigation";
-import clsx from "clsx";
 import { Container } from "@/app/main/components/Container";
-import { Badge } from "@kavita-likes-fajitas/shadcn-ui-lib/components/ui/badge";
 import { NonMainNav } from "@/app/components/Nav/NonMainNav";
 import { TechBadge } from "@kavita-likes-fajitas/ui-library/TechBadge";
 import { Hero } from "./components/Hero";
@@ -53,21 +51,10 @@ export default async function ProjectDetail({
   const { default: Content, metadata } = await projectLoader();
 
   return (
-    <main className="bg-gray-950 text-white relative flex flex-col min-h-screen">
+    <main className="bg-gray-1000 text-white relative flex flex-col min-h-screen">
       <NonMainNav />
       <div>
-        <Hero height="md" className="opacity-40" image={metadata.heroImage}>
-          <div
-            className={clsx(
-              "container mx-auto max-w-6xl relative z-10 text-center",
-            )}
-          >
-            <Badge>Badge</Badge>
-            <Badge variant="secondary">Secondary</Badge>
-            <Badge variant="destructive">Destructive</Badge>
-            <Badge variant="outline">Outline</Badge>
-          </div>
-        </Hero>
+        <Hero height="md" className="opacity-40" image={metadata.heroImage} />
       </div>
       <Container maxWidth="4xl" size="full">
         <div className="flex flex-col basis-1/2 gap-2 pb-6">

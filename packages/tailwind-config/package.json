@@ -8,6 +8,7 @@
     "url": "https://github.com/kavitalikesfajitas/portfolio.git",
     "directory": "packages/tailwind-config"
   },
+  "type": "module",
   "exports": {
     "./shared-styles": "./shared-styles.css",
     "./postcss": "./postcss.config.mjs"

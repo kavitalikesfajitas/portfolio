@@ -107,6 +107,23 @@ const fontMidnightGelactic = localFont({
   variable: "--font-midnight-gelactic",
 });
 
+const fontLobster = localFont({
+  src: [
+    {
+      path: "./fonts/Lobster-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+  ],
+  display: "swap",
+  fallback: ["cursive", "serif"],
+  variable: "--font-lobster",
+});
+
 export function getAppFontVariables() {
-  return clsx(fontHelveticaNeue.variable, fontMidnightGelactic.variable);
+  return clsx(
+    fontHelveticaNeue.variable,
+    fontMidnightGelactic.variable,
+    fontLobster.variable,
+  );
 }

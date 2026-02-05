@@ -44,6 +44,9 @@ jobs:
             ${{ github.workspace }}/**/tsconfig.tsbuildinfo
           key: living-kavita-loca-cache-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
 
+      - name: 📝 Generate Next.js types
+        run: yarn next typegen
+
       - name: 🕵️ Typecheck
         run: yarn --top-level run turbo typecheck
 
@@ -69,6 +72,5 @@ jobs:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
 
       - name: 🚀 Deploy to S3
-        # TODO: Remove this once we are ready to deploy
-        if: false #github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         run: aws s3 sync out s3://${{ vars.S3_BUCKET_NAME }} --delete

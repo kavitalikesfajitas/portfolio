@@ -6,6 +6,8 @@ describe("given a <TornPaperEffect>", () => {
   test("it renders the component successfully", () => {
     const { container } = render(<TornPaperEffect />);
     const firstChild = container.firstChild as HTMLElement;
-    expect(firstChild).toHaveClass("ragged-text-filter bg-white text-gray-950");
+    expect(firstChild).toHaveClass(
+      "ragged-text-filter bg-white text-gray-1000",
+    );
   });
 });
