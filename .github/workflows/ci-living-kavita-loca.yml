@@ -22,7 +22,6 @@ jobs:
     permissions:
       id-token: write
       contents: read
-      pull-requests: write
     outputs:
       preview_url: ${{ steps.set-preview-url.outputs.url }}
     defaults:
