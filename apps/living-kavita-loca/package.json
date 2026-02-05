@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
+  "author": "Kavita Chaudhry <kchaudh312@gmail.com>",
   "description": "Portfolio and personal website of Kavita - software engineer and creative developer",
   "repository": {
     "type": "git",
