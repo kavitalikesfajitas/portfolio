@@ -300,7 +300,7 @@ No long-lived secrets required. GitHub Actions uses OIDC for AWS authentication.
 
 # Development Infrastructure
 
-### Setup
+## Setup
 
 The PR preview infrastructure (`s3-pr-preview.tf`) creates a separate S3 bucket for hosting PR previews:
 
