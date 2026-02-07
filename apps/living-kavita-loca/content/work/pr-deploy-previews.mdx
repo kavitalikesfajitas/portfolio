@@ -16,28 +16,43 @@ export const metadata = {
 
 ## Overview
 
-A cost-optimized infrastructure for automatic PR preview deployments that gives every pull request its own live preview environment—for less than $0.50/month.
+This sets up automatic preview deployments for pull requests so changes can be reviewed in a real browser without pulling the branch locally. Each PR gets its own live preview, and the entire setup runs for under ~$0.50/month.
+
+I built this while working on my portfolio site. Before launch, I wanted a reliable way to test mobile layouts and interactions in a real environment, without repeatedly deploying half-finished changes to production. I also wanted to be confident that the behavior of a Next.js static export matched what I expected before making the site fully public.
 
 ## The Challenge
 
-Manual code reviews are hard. Reviewers need to:
+While building the site, I was manually uploading builds to a separate S3 bucket to test changes. That worked at first, but it got old very quickly.
 
-- **Pull the branch locally** and run the dev server
-- **Check multiple pages** to ensure nothing broke
-- **Verify responsive behavior** across different viewports
-- **Test edge cases** that screenshots can't capture
+Even for a personal project, that workflow slowed iteration and made it harder to confidently validate changes—especially mobile behavior. It’s the same problem teams run into at work once projects grow past “just deploy it and see.”
 
-This friction meant:
-- Slower review cycles
-- Missed visual regressions
-- "LGTM" without actually testing
+I could have used Vercel for this (for free, in this case), but I intentionally chose not to.
 
-We needed preview deployments, but:
-- ❌ Vercel costs $20/month for hobby projects
-- ❌ Netlify has similar pricing
-- ❌ Most solutions are overkill for a personal portfolio
+---
 
-**The goal:** Build preview infrastructure that's free (or nearly free) and automated.
+## Why Not Vercel?
+
+Vercel handles preview deployments out of the box. However, most production systems don’t run on Vercel. They run on AWS, GCP, or Azure with infrastructure-as-code, producing either standalone services or static exports like this one.
+
+At scale, teams usually need:
+
+- Multi-region deployments
+- Custom CDN and routing configurations
+- Explicit security controls
+- Cost visibility and optimization
+- Infrastructure that integrates with existing systems
+
+Vercel is great for getting started quickly, but it abstracts these concerns away.
+
+In my case, I already had production infrastructure for the site running on S3. Rather than introducing a second hosting platform, I chose to build preview deployments on top of the existing setup and continue that path.
+
+Removing Vercel from the equation also surfaced real deployment concerns you still have to solve elsewhere: handling subdirectory hosting, ensuring asset paths resolve correctly, and wiring CI to deploy to isolated environments. That meant configuring Next.js `basePath` and `assetPrefix`, deploying each PR to its own S3 prefix via GitHub Actions, and managing the infrastructure with Terraform.
+
+The same considerations apply if this were a containerized app behind an ALB or CDN—preview environments still require correct pathing, routing, and lifecycle management.
+
+**The goal:** build preview infrastructure that’s automated, nearly free, and aligned with how production systems actually work.
+
+---
 
 ## Solution Architecture
 
@@ -73,14 +88,17 @@ resource "aws_s3_bucket_lifecycle_configuration" "pr_preview" {
 ```
 
 Key design decisions:
-- **Direct S3 website hosting** (no CloudFront) - saves costs, HTTP is fine for testing
-- **7-day auto-cleanup** - prevents storage bloat
-- **Public bucket policy** - no auth needed for quick reviews
-- **Blocked public ACLs** - security best practice, only bucket policy grants access
+
+- **Direct S3 website hosting** (no CloudFront) — HTTP is sufficient for previews and reduces cost
+- **7-day auto-cleanup** — prevents storage bloat from abandoned PRs
+- **Public bucket policy** — no auth required for quick reviews
+- **Blocked public ACLs** — access controlled explicitly via bucket policy
+
+---
 
 ### Reusable GitHub Actions Workflow
 
-The core insight: one workflow should handle tests, builds, and deployments for both PR previews and production.
+A single reusable workflow handles tests, builds, and deployments for both PR previews and production.
 
 ```yaml
 on:
@@ -96,10 +114,13 @@ on:
 ```
 
 This workflow:
+
 1. Runs tests and linters
 2. Builds the Next.js static export
-3. Conditionally deploys based on `deploy_to` input
-4. Returns preview URL as output
+3. Conditionally deploys based on the `deploy_to` input
+4. Returns the preview URL as output
+
+---
 
 ### PR Preview Flow
 
@@ -112,7 +133,8 @@ graph LR
     E --> F[Comment Preview URL]
 ```
 
-Each PR gets its own S3 prefix:
+Each PR is deployed to its own S3 prefix:
+
 ```
 s3://bucket/pr-123/
 s3://bucket/pr-124/
@@ -126,112 +148,79 @@ const comment = `## 🎉 Preview Deployed!
 Your preview is ready at:
 
 **🔗 ${previewUrl}**
-
-### Pages to check:
-- [Home](${previewUrl})
-- [Work: OpenSea Swoosh ID](${previewUrl}work/opensea-swoosh-id/)
-- [Work: Contentful GraphQL Proxy](${previewUrl}work/contentful-graphql-proxy/)
 `;
 ```
 
+---
+
 ### Cost Optimization
 
-Multiple strategies keep costs near zero:
+Costs are kept near zero through:
 
-1. **7-day auto-cleanup** - Old previews are automatically deleted
-2. **Draft PR exclusion** - Only deploy when marked "ready for review"
-3. **Abort incomplete uploads** - Prevents orphaned multipart upload costs
-4. **No CloudFront** - HTTP is sufficient for testing
-5. **Version cleanup** - Old versions deleted after 1 day
+1. **7-day auto-cleanup** — old previews are removed automatically
+2. **Draft PR exclusion** — deploys only when marked ready for review
+3. **Aborting incomplete uploads** — avoids orphaned multipart uploads
+4. **No CloudFront** — reduces request and transfer costs
+
+---
 
 ### Security Hardening
 
 ```hcl
 resource "aws_s3_bucket_public_access_block" "pr_preview" {
   bucket = aws_s3_bucket.pr_preview.id
-  # Block public ACLs - access controlled via bucket policy only
   block_public_acls  = true
   ignore_public_acls = true
-  # Allow public bucket policy for static website hosting
   block_public_policy     = false
   restrict_public_buckets = false
 }
 ```
 
 This follows AWS best practices:
-- Block ACL-based access (reduces attack surface)
-- Grant public access only through explicit bucket policy
-- Principle of least privilege
+
+- ACL-based access is disabled
+- Public access is granted only via explicit bucket policy
+- Permissions remain minimal and auditable
+
+---
 
 ## Results
 
-| Metric                  | Value              |
-| ----------------------- | ------------------ |
-| **Monthly Cost**        | ~$0.26-0.50        |
-| **Preview Build Time**  | ~3-5 minutes       |
-| **Storage per Preview** | ~50 MB             |
-| **Auto-cleanup**        | 7 days             |
-| **Uptime**              | 100%               |
+| Metric                  | Value        |
+| ----------------------- | ------------ |
+| **Monthly Cost**        | ~$0.26–0.50  |
+| **Preview Build Time**  | ~3–5 minutes |
+| **Storage per Preview** | ~50 MB       |
+| **Auto-cleanup**        | 7 days       |
+| **Uptime**              | 100%         |
 
 ### Cost Breakdown (Monthly)
 
-- **S3 Storage**: ~$0.01 (10 PRs × 50 MB)
-- **PUT Requests**: ~$0.25 (deployments)
-- **GET Requests**: ~$0.004 (testing)
-- **Data Transfer**: $0 (within free tier)
+- **S3 Storage:** ~$0.01 (10 PRs × 50 MB)
+- **PUT Requests:** ~$0.25 (deployments)
+- **GET Requests:** ~$0.004 (testing)
+- **Data Transfer:** $0 (within free tier)
 
-**Total: $0.26-0.50/month** vs $20/month for Vercel Pro
+**Total:** ~$0.26–0.50/month (Vercel’s Hobby plan is free, but that wasn’t the goal)
+
+---
 
 ### Developer Experience Wins
 
-✅ **Instant previews** - Every PR gets a live URL automatically  
-✅ **No manual setup** - Reviewers just click the link  
-✅ **Real devices** - Test on phones, tablets, anything with a browser  
-✅ **Shareable** - Send preview links to non-technical stakeholders  
+✅ **Instant previews** — every PR gets a live URL  
+✅ **No manual setup** — reviewers click and review  
+✅ **Real environments** — test on actual devices and browsers  
+✅ **Scalable** — this same pattern works at company scale.
+Swap the S3 bucket for an EKS cluster or a CDN-backed origin
+and the workflow stays the same
 
-## Key Learnings
-
-### Workflow Design
-
-Initially, I had separate workflows for PR tests and PR previews. This led to:
-- Duplicated build logic
-- Inconsistent behavior between preview and production
-- More maintenance burden
-
-**Solution:** One reusable workflow with conditional deployment based on inputs. The same workflow handles:
-- PR tests (no deployment)
-- PR previews (deploy to S3)
-- Production (deploy to CloudFront-backed S3)
-
-### Permission Management
-
-GitHub Actions reusable workflows have strict permission inheritance. The reusable workflow can't request permissions the caller doesn't grant.
-
-**Learning:** Keep reusable workflows minimal—only request the permissions you always need. Let calling workflows handle additional permissions (like `pull-requests: write` for comments).
-
-### Why Not Vercel?
-
-This portfolio qualifies for Vercel's free tier, which would give:
-- HTTPS on previews (vs HTTP)
-- Better performance (edge network)
-- Zero configuration
-
-**But I chose AWS because:**
-- Learning experience with Terraform and AWS
-- Full control over infrastructure
-- Career-relevant DevOps skills
-- Fun engineering challenge
-
-The ~$5.50/month cost is essentially paying for hands-on infrastructure education.
+---
 
 ## Future Enhancements
 
-Ideas for iteration:
-
-- **CloudFront for previews** - Add HTTPS without much cost (~$1-2/month)
-- **Automatic cleanup on PR close** - Don't wait 7 days
-- **Preview analytics** - Track which pages reviewers actually check
-- **Visual regression testing** - Auto-screenshot and compare
+- **CloudFront for previews** — add HTTPS with minimal added cost
+- **Automatic cleanup on PR close** — remove previews immediately
+- **Visual regression testing** — screenshot diffs per PR
 
 ---
 
