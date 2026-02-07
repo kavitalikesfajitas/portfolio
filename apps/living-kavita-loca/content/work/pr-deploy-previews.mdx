@@ -124,18 +124,15 @@ This workflow:
 
 ### PR Preview Flow
 
-```mermaid
-graph LR
-    A[Open PR] --> B[GitHub Actions]
-    B --> C[Run Tests]
-    C --> D[Build Static Site]
-    D --> E[Deploy to S3]
-    E --> F[Comment Preview URL]
-```
+1. Open a PR
+2. GitHub Actions kicks off: runs tests, lints, typechecks
+3. Builds the Next.js static export with `basePath` set to `/pr-{number}`
+4. Syncs the output to `s3://bucket/pr-{number}/`
+5. Comments the preview URL on the PR
 
 Each PR is deployed to its own S3 prefix:
 
-```
+```text
 s3://bucket/pr-123/
 s3://bucket/pr-124/
 ```
@@ -186,13 +183,11 @@ This follows AWS best practices:
 
 ## Results
 
-| Metric                  | Value        |
-| ----------------------- | ------------ |
-| **Monthly Cost**        | ~$0.26–0.50  |
-| **Preview Build Time**  | ~3–5 minutes |
-| **Storage per Preview** | ~50 MB       |
-| **Auto-cleanup**        | 7 days       |
-| **Uptime**              | 100%         |
+- **Monthly Cost:** ~$0.26–0.50
+- **Preview Build Time:** ~3–5 minutes
+- **Storage per Preview:** ~50 MB
+- **Auto-cleanup:** 7 days
+- **Uptime:** 100%
 
 ### Cost Breakdown (Monthly)
 

@@ -55,11 +55,6 @@ jobs:
             Your preview is ready at:
 
             **🔗 ${previewUrl}**
-
-            ### Pages to check:
-            - [Home](${previewUrl})
-            - [Work: OpenSea Swoosh ID](${previewUrl}work/opensea-swoosh-id/)
-            - [Work: Contentful GraphQL Proxy](${previewUrl}work/contentful-graphql-proxy/)
             `;
 
             // Find existing comment
