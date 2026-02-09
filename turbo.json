@@ -8,9 +8,15 @@
       "outputs": [".next/**", "!.next/cache/**", "out/**", "dist/**"],
       "env": ["PR_NUMBER"]
     },
-    "lint": {},
-    "typecheck": {},
-    "test-ci": {},
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"]
+    },
+    "test-ci": {
+      "dependsOn": ["^test-ci"]
+    },
     "@kavita-likes-fajitas/ui-library#typecheck": {
       "dependsOn": ["@kavita-likes-fajitas/shadcn-ui-lib#build"]
     },
