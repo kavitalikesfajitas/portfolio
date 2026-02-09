@@ -13,6 +13,10 @@ on:
         required: false
         type: string
         default: ""
+    outputs:
+      preview_url:
+        description: "Preview URL for PR deployments"
+        value: ${{ jobs.build-app-and-run-tests.outputs.preview_url }}
 
 jobs:
   build-app-and-run-tests:
@@ -77,6 +81,7 @@ jobs:
         env:
           NEXT_TELEMETRY_DISABLED: true
           ENABLE_CACHE: true
+          PR_NUMBER: ${{ inputs.pr_number }}
 
       - name: ✅ Validate preview inputs
         if: inputs.deploy_to == 'preview'

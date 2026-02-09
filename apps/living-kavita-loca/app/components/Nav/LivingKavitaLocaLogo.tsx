@@ -1,4 +1,5 @@
 import Image from "next/image";
+import LipsGlossy from "@/public/images/hero/lips-glossy.png";
 
 export const LivingKavitaLocaLogo = () => {
   return (
@@ -8,7 +9,7 @@ export const LivingKavitaLocaLogo = () => {
       </span>
       <div className="relative h-6 w-6 md:h-9 md:w-9 self-center -mt-0.5">
         <Image
-          src="/images/hero/lips-glossy.png"
+          src={LipsGlossy}
           alt="Living Kavita Loca lips"
           fill
           className="object-contain"

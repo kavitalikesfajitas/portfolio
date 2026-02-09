@@ -11,6 +11,7 @@ import {
 } from "@kavita-likes-fajitas/shadcn-ui-lib/components/ui/dropdown-menu";
 import Link from "next/link";
 import clsx from "clsx";
+import { WORK_ITEMS } from "@/app/work/workItems";
 
 export function NavDropdownMenu() {
   return (
@@ -24,18 +25,15 @@ export function NavDropdownMenu() {
             Recent Projects
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuLink
-            href="/work/opensea-swoosh-id"
-            className="text-sm md:text-base"
-          >
-            Dynamic Svg for Swoosh Id
-          </DropdownMenuLink>
-          <DropdownMenuLink
-            href="/work/contentful-graphql-proxy"
-            className="text-sm md:text-base"
-          >
-            Contentful GraphQL Proxy
-          </DropdownMenuLink>
+          {WORK_ITEMS.map((item) => (
+            <DropdownMenuLink
+              key={item.slug}
+              href={`/work/${item.slug}`}
+              className="text-sm md:text-base"
+            >
+              {item.title}
+            </DropdownMenuLink>
+          ))}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-sm md:text-base text-muted-foreground italic cursor-default"

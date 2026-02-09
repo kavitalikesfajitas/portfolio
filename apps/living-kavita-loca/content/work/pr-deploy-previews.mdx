@@ -1,0 +1,222 @@
+import HeroImage from "@/public/images/work/thumbnails/pr-previews.svg";
+
+export const metadata = {
+  title: "PR Deploy Previews Infrastructure",
+  heroImage: HeroImage,
+  role: "DevOps Engineer / Architect",
+  tech: ["Terraform", "AWS S3", "GitHub Actions", "Next.js", "TypeScript"],
+};
+
+# PR Deploy Previews Infrastructure
+
+**Role:** DevOps Engineer / Architect  
+**Tech Stack:** Terraform · AWS S3 · GitHub Actions · Next.js · TypeScript
+
+---
+
+## Overview
+
+This sets up automatic preview deployments for pull requests so changes can be reviewed in a real browser without pulling the branch locally. Each PR gets its own live preview, and the entire setup runs for under ~$0.50/month.
+
+I built this while working on my portfolio site. Before launch, I wanted a reliable way to test mobile layouts and interactions in a real environment, without repeatedly deploying half-finished changes to production. I also wanted to be confident that the behavior of a Next.js static export matched what I expected before making the site fully public.
+
+## The Challenge
+
+While building the site, I was manually uploading builds to a separate S3 bucket to test changes. That worked at first, but it got old very quickly.
+
+Even for a personal project, that workflow slowed iteration and made it harder to confidently validate changes—especially mobile behavior. It’s the same problem teams run into at work once projects grow past “just deploy it and see.”
+
+I could have used Vercel for this (for free, in this case), but I intentionally chose not to.
+
+---
+
+## Why Not Vercel?
+
+Vercel handles preview deployments out of the box. However, most production systems don’t run on Vercel. They run on AWS, GCP, or Azure with infrastructure-as-code, producing either standalone services or static exports like this one.
+
+At scale, teams usually need:
+
+- Multi-region deployments
+- Custom CDN and routing configurations
+- Explicit security controls
+- Cost visibility and optimization
+- Infrastructure that integrates with existing systems
+
+Vercel is great for getting started quickly, but it abstracts these concerns away.
+
+In my case, I already had production infrastructure for the site running on S3. Rather than introducing a second hosting platform, I chose to build preview deployments on top of the existing setup and continue that path.
+
+Removing Vercel from the equation also surfaced real deployment concerns you still have to solve elsewhere: handling subdirectory hosting, ensuring asset paths resolve correctly, and wiring CI to deploy to isolated environments. That meant configuring Next.js `basePath` and `assetPrefix`, deploying each PR to its own S3 prefix via GitHub Actions, and managing the infrastructure with Terraform.
+
+The same considerations apply if this were a containerized app behind an ALB or CDN—preview environments still require correct pathing, routing, and lifecycle management.
+
+**The goal:** build preview infrastructure that’s automated, nearly free, and aligned with how production systems actually work.
+
+---
+
+## Solution Architecture
+
+### Infrastructure as Code
+
+Everything is managed with Terraform for reproducibility:
+
+```hcl
+resource "aws_s3_bucket" "pr_preview" {
+  bucket = var.pr_preview_bucket_name
+}
+
+resource "aws_s3_bucket_website_configuration" "pr_preview" {
+  bucket = aws_s3_bucket.pr_preview.id
+
+  index_document {
+    suffix = "index.html"
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "pr_preview" {
+  bucket = aws_s3_bucket.pr_preview.id
+
+  rule {
+    id     = "delete-old-pr-previews"
+    status = "Enabled"
+
+    expiration {
+      days = 7
+    }
+  }
+}
+```
+
+Key design decisions:
+
+- **Direct S3 website hosting** (no CloudFront) — HTTP is sufficient for previews and reduces cost
+- **7-day auto-cleanup** — prevents storage bloat from abandoned PRs
+- **Public bucket policy** — no auth required for quick reviews
+- **Blocked public ACLs** — access controlled explicitly via bucket policy
+
+---
+
+### Reusable GitHub Actions Workflow
+
+A single reusable workflow handles tests, builds, and deployments for both PR previews and production.
+
+```yaml
+on:
+  workflow_call:
+    inputs:
+      deploy_to:
+        description: "Deployment target: production, preview, or none"
+        type: string
+        default: "none"
+      pr_number:
+        description: "PR number for preview deployments"
+        type: string
+```
+
+This workflow:
+
+1. Runs tests and linters
+2. Builds the Next.js static export
+3. Conditionally deploys based on the `deploy_to` input
+4. Returns the preview URL as output
+
+---
+
+### PR Preview Flow
+
+1. Open a PR
+2. GitHub Actions kicks off: runs tests, lints, typechecks
+3. Builds the Next.js static export with `basePath` set to `/pr-{number}`
+4. Syncs the output to `s3://bucket/pr-{number}/`
+5. Comments the preview URL on the PR
+
+Each PR is deployed to its own S3 prefix:
+
+```text
+s3://bucket/pr-123/
+s3://bucket/pr-124/
+```
+
+The workflow comments the preview URL directly on the PR:
+
+```typescript
+const comment = `## 🎉 Preview Deployed!
+
+Your preview is ready at:
+
+**🔗 ${previewUrl}**
+`;
+```
+
+---
+
+### Cost Optimization
+
+Costs are kept near zero through:
+
+1. **7-day auto-cleanup** — old previews are removed automatically
+2. **Draft PR exclusion** — deploys only when marked ready for review
+3. **Aborting incomplete uploads** — avoids orphaned multipart uploads
+4. **No CloudFront** — reduces request and transfer costs
+
+---
+
+### Security Hardening
+
+```hcl
+resource "aws_s3_bucket_public_access_block" "pr_preview" {
+  bucket = aws_s3_bucket.pr_preview.id
+  block_public_acls  = true
+  ignore_public_acls = true
+  block_public_policy     = false
+  restrict_public_buckets = false
+}
+```
+
+This follows AWS best practices:
+
+- ACL-based access is disabled
+- Public access is granted only via explicit bucket policy
+- Permissions remain minimal and auditable
+
+---
+
+## Results
+
+- **Monthly Cost:** ~$0.26–0.50
+- **Preview Build Time:** ~3–5 minutes
+- **Storage per Preview:** ~50 MB
+- **Auto-cleanup:** 7 days
+- **Uptime:** 100%
+
+### Cost Breakdown (Monthly)
+
+- **S3 Storage:** ~$0.01 (10 PRs × 50 MB)
+- **PUT Requests:** ~$0.25 (deployments)
+- **GET Requests:** ~$0.004 (testing)
+- **Data Transfer:** $0 (within free tier)
+
+**Total:** ~$0.26–0.50/month (Vercel’s Hobby plan is free, but that wasn’t the goal)
+
+---
+
+### Developer Experience Wins
+
+✅ **Instant previews** — every PR gets a live URL  
+✅ **No manual setup** — reviewers click and review  
+✅ **Real environments** — test on actual devices and browsers  
+✅ **Scalable** — this same pattern works at company scale.
+Swap the S3 bucket for an EKS cluster or a CDN-backed origin
+and the workflow stays the same
+
+---
+
+## Future Enhancements
+
+- **CloudFront for previews** — add HTTPS with minimal added cost
+- **Automatic cleanup on PR close** — remove previews immediately
+- **Visual regression testing** — screenshot diffs per PR
+
+---
+
+_Built as part of livingkavitaloca.com portfolio infrastructure, 2026._

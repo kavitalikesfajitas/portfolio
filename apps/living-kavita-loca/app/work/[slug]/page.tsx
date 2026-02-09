@@ -3,37 +3,36 @@ import { Container } from "@/app/main/components/Container";
 import { NonMainNav } from "@/app/components/Nav/NonMainNav";
 import { TechBadge } from "@kavita-likes-fajitas/ui-library/TechBadge";
 import { Hero } from "./components/Hero";
+import fs from "fs";
+import path from "path";
 
-// Define your project detail pages here - each key is the slug
-const projectDetails: Record<string, () => Promise<typeof import("*.mdx")>> = {
-  "contentful-graphql-proxy": () =>
-    import("@/content/work/contentful-graphql-proxy.mdx"),
-  "opensea-swoosh-id": () => import("@/content/work/opensea-swoosh-id.mdx"),
-  // Add more project details here as you create them
-};
-
-// Generate static paths for all projects
+// Generate static paths for all work items dynamically
 export async function generateStaticParams() {
-  return Object.keys(projectDetails).map((slug) => ({ slug }));
+  const workDir = path.join(process.cwd(), "content/work");
+  const files = fs.readdirSync(workDir).filter((f) => f.endsWith(".mdx"));
+
+  return files.map((file) => {
+    const slug = path.basename(file, ".mdx");
+    return { slug };
+  });
 }
 
-// Generate metadata for each project
+// Generate metadata for each work item
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const projectLoader = projectDetails[slug];
 
-  if (!projectLoader) {
-    return { title: "Project Not Found" };
+  try {
+    const { metadata } = await import(`@/content/work/${slug}.mdx`);
+    return {
+      title: metadata.title ?? "Work",
+    };
+  } catch {
+    return { title: "Work Not Found" };
   }
-
-  const { metadata } = await projectLoader();
-  return {
-    title: metadata.title ?? "Project",
-  };
 }
 
 export default async function ProjectDetail({
@@ -42,13 +41,16 @@ export default async function ProjectDetail({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const projectLoader = projectDetails[slug];
 
-  if (!projectLoader) {
+  let mdxModule;
+  try {
+    mdxModule = await import(`@/content/work/${slug}.mdx`);
+  } catch {
     notFound();
   }
 
-  const { default: Content, metadata } = await projectLoader();
+  const Content = mdxModule.default;
+  const metadata = mdxModule.metadata;
 
   return (
     <main className="bg-gray-1000 text-white relative flex flex-col min-h-screen">
@@ -60,7 +62,7 @@ export default async function ProjectDetail({
         <div className="flex flex-col basis-1/2 gap-2 pb-6">
           <div className="pl-1 underline font-bold">Stack</div>
           <div className="flex flex-row h-fit gap-1 flex-wrap">
-            {metadata.tech?.map((tag) => (
+            {metadata.tech?.map((tag: string) => (
               <TechBadge key={tag} tech={tag} size={"md"} />
             ))}
           </div>

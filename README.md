@@ -17,8 +17,8 @@ The infrastructure was originally set up manually via AWS Console for the previo
 
 **TLDR**: A playground for experimenting with modern web development tools and infrastructure management practices in a real production environment.
 
-**Live site:** [livingkavitaloca.com](https://livingkavitaloca.com) _(coming soon)_
-(Currently this is showcasing [my old website](https://github.com/kavitalikesfajitas/website) )
+**Live site:** [livingkavitaloca.com](https://livingkavitaloca.com)  
+_(Currently showcasing the [previous website](https://github.com/kavitalikesfajitas/website) while this portfolio is actively being developed)_
 
 ## Tech Stack
 
@@ -29,11 +29,17 @@ The infrastructure was originally set up manually via AWS Console for the previo
 - **Infrastructure:** Terraform, AWS S3
 - **CI/CD:** GitHub Actions
 
-## Coming Soon
+## Infrastructure & Deployment
 
-- **Infrastructure as Code:** Terraform configuration for AWS resources (S3, IAM, CloudFront)
-- **Automated Deployments:** GitHub Actions CI/CD pipeline with OIDC authentication to AWS
-- **Static Site Hosting:** S3 bucket deployment with automatic cache invalidation
+✅ **Fully operational and deployed!**
+
+- **Infrastructure as Code:** Terraform manages all AWS resources (S3, CloudFront, Route53, ACM, IAM)
+- **Production Deployment:** Automated GitHub Actions pipeline with OIDC authentication
+- **PR Preview Deployments:** Automatic preview environments for every pull request (~$0.50/month)
+- **Static Site Hosting:** CloudFront CDN with S3 origin and automatic cache invalidation
+- **Cost Optimized:** ~$5.50/month total (production + previews)
+
+See [`infra/README.md`](./infra/README.md) for complete infrastructure documentation including architecture diagrams, deployment workflows, and cost breakdowns.
 
 ## Monorepo Structure
 

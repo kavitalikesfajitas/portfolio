@@ -5,7 +5,8 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*", "!README.md"],
-      "outputs": [".next/**", "!.next/cache/**", "out/**", "dist/**"]
+      "outputs": [".next/**", "!.next/cache/**", "out/**", "dist/**"],
+      "env": ["PR_NUMBER"]
     },
     "lint": {
       "dependsOn": ["^lint"]
