@@ -17,6 +17,9 @@ jobs:
   test:
     runs-on: [ubuntu-latest]
     environment: ${{ inputs.environment }}
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
     defaults:
       run:
         working-directory: .
@@ -29,16 +32,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
-
-      - name: ⏩ Cache turbo build setup
-        uses: actions/cache@v4
-        with:
-          path:
-            .turbo
-            # TODO: sha may changes on every commit, may need to modify this
-          key: ${{ runner.os }}-turbo-portfolio-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-portfolio-
 
       - name: 📥 Monorepo install
         uses: ./.github/actions/yarn-monorepo-install
