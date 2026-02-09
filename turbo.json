@@ -20,6 +20,9 @@
     "@kavita-likes-fajitas/ui-library#typecheck": {
       "dependsOn": ["@kavita-likes-fajitas/shadcn-ui-lib#build"]
     },
+    "@kavita-likes-fajitas/ui-library#test-ci": {
+      "dependsOn": ["@kavita-likes-fajitas/shadcn-ui-lib#build"]
+    },
     "dev": {
       "inputs": ["$TURBO_DEFAULT$", ".env.local", ".env.development", ".env"],
       "cache": false,

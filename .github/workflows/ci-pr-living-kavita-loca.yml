@@ -27,18 +27,38 @@ permissions:
   pull-requests: write
 
 jobs:
-  run-living-kavita-loca-unit-tests-and-preview:
+  detect-changes:
     if: github.ref != 'refs/heads/main' && github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    outputs:
+      app_or_packages_changed: ${{ steps.filter.outputs.app_or_packages }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔍 Detect changes in app or packages
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            app_or_packages:
+              - 'apps/**'
+              - 'packages/**'
+              - 'tsconfig.base.json'
+
+  run-living-kavita-loca-unit-tests-and-preview:
+    needs: detect-changes
     uses: ./.github/workflows/ci-living-kavita-loca.yml
     name: "Living Kavita Loca App Tests and Preview"
     with:
-      deploy_to: preview
+      deploy_to: ${{ needs.detect-changes.outputs.app_or_packages_changed == 'true' && 'preview' || 'none' }}
       pr_number: ${{ github.event.pull_request.number }}
     secrets: inherit
 
   comment-preview-url:
     name: "Comment PR with Preview URL"
-    needs: run-living-kavita-loca-unit-tests-and-preview
+    needs: [detect-changes, run-living-kavita-loca-unit-tests-and-preview]
+    if: needs.detect-changes.outputs.app_or_packages_changed == 'true'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write

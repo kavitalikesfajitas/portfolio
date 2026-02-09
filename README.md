@@ -58,6 +58,11 @@ Turborepo is used for build system orchestration:
 - Incremental builds
 - Intelligent caching
 - Parallel execution of tasks
+- **Remote caching** via Vercel (free tier) for shared cache across CI runs and branches
+
+#### Task Dependencies
+
+Most tasks (`lint`, `typecheck`, `test-ci`) run in parallel across all packages. The exception is `@kavita-likes-fajitas/ui-library`, which depends on `@kavita-likes-fajitas/shadcn-ui-lib#build` for `typecheck`, `test-ci`, and `dev`. This is because ui-library imports from shadcn-ui-lib's built output (`dist/`). Since shadcn components are templated and rarely change, this build is almost always a remote cache hit.
 
 For more details, see the [`package.json`](./package.json) and [`turbo.json`](./turbo.json) configuration files.
 
