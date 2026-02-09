@@ -4,6 +4,7 @@ import Link from "next/link";
 import clsx from "clsx";
 import { NonMainNav } from "@/app/components/Nav/NonMainNav";
 import { ThemedButton } from "@kavita-likes-fajitas/ui-library/Button";
+import Samosa404Rock from "@/public/images/personal/samosa-rock-404.jpg";
 
 export const metadata: Metadata = {
   title: "404 - Page Not Found | Living Kavita Loca",
@@ -45,8 +46,8 @@ export default function NotFound() {
           )}
         >
           <Image
-            src="/images/personal/samosa-2-small.jpg"
-            alt="Samosa the dog behind a rock"
+            src={Samosa404Rock}
+            alt="Samosa the dog behind a rock in a 404 page"
             fill
             className="object-cover object-top"
             priority
