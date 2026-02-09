@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import clsx from "clsx";
 import { NonMainNav } from "@/app/components/Nav/NonMainNav";
+import { ThemedButton } from "@kavita-likes-fajitas/ui-library/Button";
 
 export const metadata: Metadata = {
   title: "404 - Page Not Found | Living Kavita Loca",
@@ -66,16 +67,9 @@ export default function NotFound() {
             <br /> Let&apos;s get you back on track.
           </p>
         </div>
-        <Link
-          href="/"
-          className={clsx(
-            "mt-4 rounded-full border border-rose-400 px-6 py-2",
-            "font-medium text-sm md:text-base text-rose-400",
-            "transition-all hover:bg-rose-400 hover:text-gray-1000",
-          )}
-        >
-          Back to Home
-        </Link>
+        <ThemedButton asChild>
+          <Link href="/">Back to Home</Link>
+        </ThemedButton>
       </div>
     </main>
   );
