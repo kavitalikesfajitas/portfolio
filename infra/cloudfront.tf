@@ -36,16 +36,18 @@ resource "aws_cloudfront_distribution" "main" {
 
   # Serve custom 404 page for missing routes
   custom_error_response {
-    error_code         = 404
-    response_code      = 404
-    response_page_path = "/404.html"
+    error_code            = 404
+    response_code         = 404
+    response_page_path    = "/404.html"
+    error_caching_min_ttl = 60
   }
 
   # S3 returns 403 for missing objects when using OAI
   custom_error_response {
-    error_code         = 403
-    response_code      = 404
-    response_page_path = "/404.html"
+    error_code            = 403
+    response_code         = 404
+    response_page_path    = "/404.html"
+    error_caching_min_ttl = 60
   }
 
   restrictions {

@@ -154,10 +154,11 @@ Your preview is ready at:
 
 Costs are kept near zero through:
 
-1. **7-day auto-cleanup** — old previews are removed automatically
-2. **Draft PR exclusion** — deploys only when marked ready for review
-3. **Aborting incomplete uploads** — avoids orphaned multipart uploads
-4. **No CloudFront** — reduces request and transfer costs
+1. **Immediate cleanup on PR close** — a separate workflow deletes the PR's S3 prefix when the PR is closed or merged
+2. **7-day auto-cleanup** — a lifecycle rule catches anything missed, removing old previews automatically
+3. **Draft PR exclusion** — deploys only when marked ready for review
+4. **Aborting incomplete uploads** — avoids orphaned multipart uploads
+5. **No CloudFront** — reduces request and transfer costs
 
 ---
 
@@ -211,10 +212,19 @@ and the workflow stays the same
 
 ---
 
+### Tradeoffs
+
+These are acceptable for a personal portfolio. We know S3 will return a 404 response when a page doesn't exist, and we can preview what the custom 404 page looks like by navigating directly to the `/404/` route in the preview. Production handles it correctly via CloudFront. Still worth calling out:
+
+⚠️ **No HTTPS** — S3 website hosting serves over HTTP only. Fine for previews, but not suitable for anything requiring secure context (e.g. service workers, geolocation APIs)
+
+⚠️ **Single error document per bucket** — S3 only supports one `error_document` at the bucket root. Since each PR deploys to its own prefix (`/pr-123/`), the custom 404 page won't automatically render for unknown routes. This is a known limitation, but the underlying logic works correctly in production via CloudFront. If the 404 page content or styling changes, it can be previewed by navigating directly to `/404/`
+
+---
+
 ## Future Enhancements
 
 - **CloudFront for previews** — add HTTPS with minimal added cost
-- **Automatic cleanup on PR close** — remove previews immediately
 - **Visual regression testing** — screenshot diffs per PR
 
 ---

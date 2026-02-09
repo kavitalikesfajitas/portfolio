@@ -21,6 +21,19 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
 
+      - name: 🔍 Check if PR preview exists
+        id: check-preview
+        run: |
+          OBJECTS=$(aws s3 ls s3://${{ vars.PR_PREVIEW_BUCKET_NAME }}/pr-${{ github.event.pull_request.number }}/ 2>&1 || true)
+          if [ -z "$OBJECTS" ]; then
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "No preview found for PR ${{ github.event.pull_request.number }}"
+          else
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Preview found for PR ${{ github.event.pull_request.number }}"
+          fi
+
       - name: 🗑️ Delete PR preview from S3
+        if: steps.check-preview.outputs.exists == 'true'
         run: |
           aws s3 rm s3://${{ vars.PR_PREVIEW_BUCKET_NAME }}/pr-${{ github.event.pull_request.number }}/ --recursive

@@ -259,7 +259,8 @@ The ~$5.50/month cost is essentially paying for hands-on DevOps experience that'
 **PR Previews:**
 
 - **S3 Bucket**: Public read access for HTTP testing (no sensitive data)
-- **Automatic Cleanup**: Previews auto-delete after 7 days
+- **Immediate Cleanup**: PR prefix is deleted from S3 when the PR is closed or merged
+- **7-day Auto-cleanup**: Lifecycle rule catches anything missed
 - **Isolated**: Separate bucket from production
 
 ## Local Development
@@ -307,7 +308,8 @@ The PR preview infrastructure (`s3-pr-preview.tf`) creates a separate S3 bucket 
 **Features:**
 
 - Public website hosting for direct HTTP access
-- Automatic cleanup after 7 days
+- Immediate cleanup on PR close/merge via `ci-pr-preview-cleanup.yml`
+- 7-day lifecycle rule as a safety net
 - Isolated from production
 - Each PR gets its own prefix: `pr-[number]/`
 
@@ -332,3 +334,8 @@ aws s3 sync out s3://$PR_PREVIEW_BUCKET_NAME/pr-$PR_NUMBER/ --delete
 ```
 
 **Preview URL format:** `http://[bucket].s3-website-[region].amazonaws.com/pr-[number]/`
+
+**Known Limitations:**
+
+- **No HTTPS** — S3 website hosting serves over HTTP only. Fine for previews, but not suitable for features requiring secure context (e.g. service workers, geolocation APIs)
+- **Single error document per bucket** — S3 only supports one `error_document` at the bucket root. Since each PR deploys to its own prefix (`/pr-{number}/`), the custom 404 page won't automatically render for unknown routes. This is a known limitation, but the underlying logic works correctly in production via CloudFront. If the 404 page content or styling changes, it can be previewed by navigating directly to `/pr-{number}/404/`
