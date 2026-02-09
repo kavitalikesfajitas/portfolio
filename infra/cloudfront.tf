@@ -34,19 +34,21 @@ resource "aws_cloudfront_distribution" "main" {
     compress               = true
   }
 
-  # Custom error response for SPA routing
-  # Commented out - uncomment if you need SPA routing support
-  # custom_error_response {
-  #   error_code         = 404
-  #   response_code      = 200
-  #   response_page_path = "/index.html"
-  # }
+  # Serve custom 404 page for missing routes
+  custom_error_response {
+    error_code            = 404
+    response_code         = 404
+    response_page_path    = "/404.html"
+    error_caching_min_ttl = 60
+  }
 
-  # custom_error_response {
-  #   error_code         = 403
-  #   response_code      = 200
-  #   response_page_path = "/index.html"
-  # }
+  # S3 returns 403 for missing objects when using OAI
+  custom_error_response {
+    error_code            = 403
+    response_code         = 404
+    response_page_path    = "/404.html"
+    error_caching_min_ttl = 60
+  }
 
   restrictions {
     geo_restriction {

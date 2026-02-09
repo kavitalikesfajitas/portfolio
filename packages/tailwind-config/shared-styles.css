@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant betterhover (@media (hover: hover));
+
 @layer base {
   @theme {
     --color-blue-1000: #2a8af6;
