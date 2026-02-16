@@ -26,8 +26,8 @@ resource "aws_cloudfront_function" "rewrite_uri" {
       if (uri.endsWith('/')) {
         request.uri += 'index.html';
       }
-      // If URI doesn't have a file extension, add trailing slash + index.html
-      else if (!uri.includes('.')) {
+      // If last path segment has no file extension, add trailing slash + index.html
+      else if (!uri.split('/').pop().includes('.')) {
         request.uri += '/index.html';
       }
 
