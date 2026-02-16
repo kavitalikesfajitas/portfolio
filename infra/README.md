@@ -25,10 +25,11 @@ This Terraform configuration manages the complete infrastructure for the livingk
        │
        │ HTTPS (livingkavitaloca.com)
        ▼
-┌─────────────────────┐
-│  CloudFront (CDN)   │
-│  + SSL Certificate  │
-└──────┬──────────────┘
+┌───────────────────────────────┐
+│  CloudFront (CDN)             │
+│  + SSL Certificate            │
+│  + CF Function (URI rewrite)  │
+└──────┬────────────────────────┘
        │
        │ Origin Access Identity (OAI)
        ▼
@@ -186,12 +187,20 @@ dig MX livingkavitaloca.com
 dig TXT livingkavitaloca.com
 ```
 
-### CloudFront 403 Errors
+### CloudFront 403/404 Errors
 
 1. Verify S3 bucket policy allows CloudFront OAI access
 2. Check files exist in S3 bucket
 3. Verify CloudFront origin configuration
 4. Check CloudFront distribution status
+
+### Subdirectory Routing (Trailing Slash)
+
+S3 accessed via OAI uses the REST API, not website hosting mode. This means S3 does **not** auto-resolve `/path/` to `/path/index.html` — it treats keys literally. CloudFront's `default_root_object` only applies to the root (`/`), not subdirectories.
+
+To handle this, a [CloudFront Function](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/example-function-add-index.html) (`rewrite-uri-to-index-html`) runs on `viewer-request` to append `index.html` to directory-style URIs. This works in conjunction with Next.js `trailingSlash: true`, which exports pages as `/path/index.html`.
+
+Non-existent routes still return the custom 404 page: the function rewrites the URI, S3 returns a 403 for missing objects, and the custom error response serves `/404/index.html`.
 
 ### Email Issues
 
@@ -246,6 +255,20 @@ This portfolio qualifies for Vercel's free Hobby tier ($0/month), which includes
 - Cost optimization strategies
 
 The ~$5.50/month cost is essentially paying for hands-on DevOps experience that's valuable for career growth.
+
+## Why OAI (REST API) Instead of S3 Website Hosting?
+
+S3 can serve static sites in two ways: **website hosting mode** or via the **REST API** with CloudFront OAI/OAC. We use the REST API approach because:
+
+|                             | S3 Website Hosting              | S3 REST API + OAI                             |
+| --------------------------- | ------------------------------- | --------------------------------------------- |
+| **Bucket access**           | Must be public                  | Private — only CloudFront can access it       |
+| **Direct S3 access**        | Anyone can bypass CloudFront    | Blocked — OAI enforces CloudFront-only access |
+| **HTTPS at origin**         | HTTP only (S3 website endpoint) | HTTPS supported                               |
+| **`index.html` resolution** | Automatic for subdirectories    | Requires a CloudFront Function                |
+| **Custom error pages**      | Built-in (single error doc)     | Via CloudFront custom error responses         |
+
+The only trade-off is needing a small [CloudFront Function](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/example-function-add-index.html) to rewrite `/path/` → `/path/index.html`, which runs at the edge with sub-millisecond latency. This is worth it to keep the bucket fully private and prevent direct S3 access.
 
 ## Security
 
