@@ -8,6 +8,34 @@
 #   signing_protocol                  = "sigv4"
 # }
 
+# CloudFront Function to append index.html to directory requests.
+# S3 (via OAI) doesn't auto-resolve /path/ to /path/index.html like S3 website hosting does.
+# CloudFront's default_root_object only applies to the root (/), not subdirectories.
+# See: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/example-function-add-index.html
+resource "aws_cloudfront_function" "rewrite_uri" {
+  name    = "rewrite-uri-to-index-html"
+  runtime = "cloudfront-js-2.0"
+  comment = "Append index.html to URIs ending with /"
+  publish = true
+  code    = <<-EOF
+    async function handler(event) {
+      var request = event.request;
+      var uri = request.uri;
+
+      // If URI ends with '/', append index.html
+      if (uri.endsWith('/')) {
+        request.uri += 'index.html';
+      }
+      // If last path segment has no file extension, add trailing slash + index.html
+      else if (!uri.split('/').pop().includes('.')) {
+        request.uri += '/index.html';
+      }
+
+      return request;
+    }
+  EOF
+}
+
 # CloudFront Distribution
 resource "aws_cloudfront_distribution" "main" {
   enabled             = true
@@ -32,13 +60,18 @@ resource "aws_cloudfront_distribution" "main" {
     cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" # Managed-CachingOptimized
     viewer_protocol_policy = "redirect-to-https"
     compress               = true
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.rewrite_uri.arn
+    }
   }
 
   # Serve custom 404 page for missing routes
   custom_error_response {
     error_code            = 404
     response_code         = 404
-    response_page_path    = "/404.html"
+    response_page_path    = "/404/index.html"
     error_caching_min_ttl = 60
   }
 
@@ -46,7 +79,7 @@ resource "aws_cloudfront_distribution" "main" {
   custom_error_response {
     error_code            = 403
     response_code         = 404
-    response_page_path    = "/404.html"
+    response_page_path    = "/404/index.html"
     error_caching_min_ttl = 60
   }
 
