@@ -30,7 +30,7 @@ This Terraform configuration manages the complete infrastructure for the livingk
 │  + SSL Certificate  │
 └──────┬──────────────┘
        │
-       │ Origin Access Identity (OAI)
+       │ Origin Access Control (OAC / SigV4)
        ▼
 ┌─────────────────────┐
 │    S3 Bucket        │
@@ -188,7 +188,7 @@ dig TXT livingkavitaloca.com
 
 ### CloudFront 403 Errors
 
-1. Verify S3 bucket policy allows CloudFront OAI access
+1. Verify S3 bucket policy allows CloudFront OAC access
 2. Check files exist in S3 bucket
 3. Verify CloudFront origin configuration
 4. Check CloudFront distribution status
@@ -251,7 +251,7 @@ The ~$5.50/month cost is essentially paying for hands-on DevOps experience that'
 
 **Production:**
 
-- **S3 Bucket**: Private access only via CloudFront Origin Access Identity (OAI)
+- **S3 Bucket**: Private access only via CloudFront Origin Access Control (OAC) with IAM SigV4 signing. All public access is blocked.
 - **HTTPS**: Enforced via CloudFront with ACM certificate
 - **GitHub Actions**: OIDC authentication (no long-lived credentials)
 - **IAM**: Least-privilege access with scoped permissions

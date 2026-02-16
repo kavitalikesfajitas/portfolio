@@ -4,11 +4,11 @@ resource "aws_s3_bucket" "site" {
 
 resource "aws_s3_bucket_public_access_block" "site" {
   bucket = aws_s3_bucket.site.id
-  # Block public ACLs only - CloudFront OAI uses bucket policy for access
+  # All public access blocked - CloudFront OAC uses IAM service principal
   block_public_acls       = true
-  block_public_policy     = false
+  block_public_policy     = true
   ignore_public_acls      = true
-  restrict_public_buckets = false
+  restrict_public_buckets = true
 }
 
 resource "aws_s3_bucket_versioning" "site" {
