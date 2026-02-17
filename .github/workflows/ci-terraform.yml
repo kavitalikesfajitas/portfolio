@@ -13,6 +13,11 @@ jobs:
   terraform-deploy:
     runs-on: [ubuntu-latest]
     name: Terraform Time 🧰
+    # Shared concurrency group to prevent Terraform state lock conflicts.
+    # Only one plan/apply can run at a time since they share Terraform Cloud state.
+    concurrency:
+      group: terraform-state-lock
+      cancel-in-progress: false
     environment: default
     permissions:
       id-token: write
