@@ -92,30 +92,34 @@ export const Bio = forwardRef<
               <div>
                 You&apos;ve caught me mid-migration! 🏗️ Much like refactoring
                 legacy code, this site is getting a thoughtful overhaul.
-                The&nbsp;
+                The&nbsp; old version &nbsp;served me well (like that trusty
+                monolith we all know), you can see the&nbsp;
                 <a
                   href="https://github.com/kavitalikesfajitas/website"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-rose-400 hover:underline"
                 >
-                  old version
+                  old code here
                 </a>
-                &nbsp;served me well (like that trusty monolith we all know),
-                but it&apos;s time for something more scalable, maintainable,
-                and delightful. Think of it like moving into a new apartment
-                while also rewriting the architecture — the essentials are here
-                and deployed, but I&apos;m still unpacking boxes and deciding
-                where the art goes. Some features are live, others are in PR
-                review, and a few are still on the backlog. Want to see the
-                code?&nbsp;
+                &nbsp;and&nbsp;
+                <a href="/old-site" className="text-rose-400 hover:underline">
+                  visit it here
+                </a>
+                . It was a good run, but it&apos;s time for something more
+                scalable, maintainable, and fun. Think of it like moving into a
+                new apartment while also rewriting the architecture — the
+                essentials are here and deployed, but I&apos;m still unpacking
+                boxes and deciding where the art goes. Some features are live,
+                others are in PR review, and a few are still on the backlog.
+                Want to see the code?&nbsp;
                 <a
-                  href="https://github.com/kavitalikesfajitas"
+                  href="https://github.com/kavitalikesfajitas/portfolio"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-rose-400 hover:underline"
                 >
-                  Check out my GitHub
+                  Check out my GitHub repository for the new site
                 </a>
                 . Thanks for being patient while I ship this incrementally, one
                 commit at a time. Promise it will be worth the wait! ✨🚀
