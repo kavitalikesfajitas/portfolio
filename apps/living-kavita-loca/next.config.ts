@@ -67,6 +67,10 @@ export default (phase: string) => {
     ...(isDev && {
       rewrites: async () => [
         {
+          source: "/old-site",
+          destination: "/old-site/index.html",
+        },
+        {
           source: "/old-site/",
           destination: "/old-site/index.html",
         },
