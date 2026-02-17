@@ -91,9 +91,9 @@ export const Bio = forwardRef<
               </div>
               <div>
                 You&apos;ve caught me mid-migration! 🏗️ Much like refactoring
-                legacy code, this site is getting a thoughtful overhaul.
-                The&nbsp; old version &nbsp;served me well (like that trusty
-                monolith we all know), you can see the&nbsp;
+                legacy code, this site is getting a thoughtful overhaul. The old
+                version served me well (like that trusty monolith we all know),
+                you can see the&nbsp;
                 <a
                   href="https://github.com/kavitalikesfajitas/website"
                   target="_blank"
