@@ -15,7 +15,7 @@
 resource "aws_cloudfront_function" "rewrite_uri" {
   name    = "rewrite-uri-to-index-html"
   runtime = "cloudfront-js-2.0"
-  comment = "Append index.html to URIs ending with /"
+  comment = "Redirect bare paths to trailing slash, then rewrite to index.html"
   publish = true
   code    = <<-EOF
     async function handler(event) {
@@ -26,9 +26,16 @@ resource "aws_cloudfront_function" "rewrite_uri" {
       if (uri.endsWith('/')) {
         request.uri += 'index.html';
       }
-      // If last path segment has no file extension, add trailing slash + index.html
+      // If last path segment has no file extension, redirect to add trailing slash.
+      // This ensures relative paths (e.g. ./client.min.js) resolve correctly in the browser.
       else if (!uri.split('/').pop().includes('.')) {
-        request.uri += '/index.html';
+        return {
+          statusCode: 301,
+          statusDescription: 'Moved Permanently',
+          headers: {
+            location: { value: uri + '/' }
+          }
+        };
       }
 
       return request;
