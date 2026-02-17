@@ -35,6 +35,9 @@ export function NavDropdownMenu() {
             </DropdownMenuLink>
           ))}
           <DropdownMenuSeparator />
+          <DropdownMenuLink href="/old-site" className="text-sm md:text-base">
+            Old Living Kavita Loca Site
+          </DropdownMenuLink>
           <DropdownMenuItem
             className="text-sm md:text-base text-muted-foreground italic cursor-default"
             disabled
