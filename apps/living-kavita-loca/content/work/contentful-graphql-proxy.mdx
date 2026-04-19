@@ -39,10 +39,11 @@ The core problem was always the same: **`api/content`** looked like a clean **RE
 
 ## The challenge (why the old shape had to go)
 
-- **Honesty gap** — Teams integrated like it was REST; **Contentful was always GraphQL POST**. That mismatch slowed **query evolution**, **typing**, and **reviews** because the system lied about what it was.
-- **Sprawl tax** — **`api/content`** meant **one handler per concern** (`get-page`, `get-collections`, `get-product-by-slug`, …) and **more SAM surface area** whenever the CMS added a shape we had to expose.
-- **Platform economics** — Every new endpoint duplicated **auth**, **caching**, **observability**, and **operational muscle memory**. The proxy collapses that into **one place to optimize** and **one place to tune TTLs** against **Contentful’s delivery limits**.
-- **Cache reality** — In-process LRU is fine for a **single** Node; **Redis** is how you get **consistent** cache behavior when traffic fans out across instances.
+- **It looked like REST, but it was really GraphQL** — Teams integrated through `api/content` like they were calling a normal REST API, but under the hood we were still building and maintaining GraphQL requests to Contentful. That made the surface area misleading and added unnecessary translation work in the backend.
+- **Backend owned every new content shape** — If a team needed a new field or a slightly different query, they could not just update a schema contract and move on. The backend had to approve it, add or change a handler, maintain the GraphQL for it, and review the request shape.
+- **Small content changes turned into API deployments** — Instead of treating this like a schema-driven integration, we were often redeploying `api/content` and its related infrastructure just to support another content query. That was too much operational work for changes that were often pretty small.
+- **The API surface kept growing** — `api/content` meant one handler per concern (`get-page`, `get-collections`, `get-product-by-slug`, and so on), which kept expanding the Lambda and SAM surface area whenever the CMS introduced another shape we wanted to expose.
+- **Caching needed to work across instances** — In-process LRU is fine for a single Node process, but not for traffic that fans out across replicas. We needed shared cache behavior, which is why Redis ended up being part of the production shape.
 
 ## Before and after
 
