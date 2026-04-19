@@ -41,7 +41,14 @@ jobs:
       - name: ✅ Valid PR title passes
         uses: ./.github/actions/lint-pr-title
         with:
-          title: "[NVS-123] validate PR title regex"
+          title: "feat: validate PR title regex"
+          validator: "regex"
+          node-version: ${{ steps.node-version.outputs.value }}
+
+      - name: ✅ Valid PR title passes - JIRA
+        uses: ./.github/actions/lint-pr-title
+        with:
+          title: "chore: validate PR title regex [JIRA-123]"
           validator: "regex"
           node-version: ${{ steps.node-version.outputs.value }}
 

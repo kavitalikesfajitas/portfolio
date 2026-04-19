@@ -37,7 +37,7 @@ inputs:
   title-regex:
     description: "Regex pattern to validate the PR title against"
     required: false
-    default: "^(\\[(JIRA)-\\d+\\]\\s*)?(feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)(\\([^)]+\\))?!?:\\s.+$|^debug:|^hotfix:"
+    default: "^(\\[JIRA-\\d+\\]:\\s.+|(feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)(\\([^)]+\\))?!?:\\s.+(\\s\\[JIRA-\\d+\\])?|debug:.*|hotfix:.*)$"
   title-regex-flags:
     description: "Regex flags (for example, g, i)"
     required: false
