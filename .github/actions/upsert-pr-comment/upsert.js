@@ -1,23 +1,23 @@
 module.exports = async ({ github, context, core }) => {
   const identifier = process.env.IDENTIFIER;
-  const body = identifier + '\n' + process.env.COMMENT_BODY;
+  const body = identifier + "\n" + process.env.COMMENT_BODY;
   const prNumber = context.issue.number;
 
   if (!prNumber) {
-    core.setFailed('No PR number found. This action must run from a pull_request context.');
+    core.setFailed(
+      "No PR number found. This action must run from a pull_request context.",
+    );
     return;
   }
 
-  // Intentionally non-paginated: we only check the first page of comments.
-  // This action is designed for PRs with a small number of bot comments.
   const { data: comments } = await github.rest.issues.listComments({
     owner: context.repo.owner,
     repo: context.repo.repo,
     issue_number: prNumber,
   });
 
-  const existing = comments.find(c =>
-    c.user.type === 'Bot' && c.body.includes(identifier)
+  const existing = comments.find(
+    (c) => typeof c.body === "string" && c.body.includes(identifier),
   );
 
   if (existing) {

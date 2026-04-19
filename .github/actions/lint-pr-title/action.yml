@@ -33,6 +33,7 @@ runs:
   steps:
     - uses: actions/setup-node@v4
       with:
+        ## note we are using lts/* because the thought is you might not have node installed
         node-version: "lts/*"
 
     - name: Lint PR title

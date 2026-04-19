@@ -1,19 +1,24 @@
 ########################################################################################
 # "match-changed-paths" composite action                                               #
 #--------------------------------------------------------------------------------------#
-# Checks whether files changed between two refs match any configured path prefix.       #
+# Checks whether files changed between two refs match configured repo path prefixes.   #
+#                                                                                      #
+# Notes:                                                                               #
+# - `paths` are prefix matches, not globs (for example, `packages` matches            #
+#   `packages/ui-library/package.json`).                                               #
+# - A file matches when it equals a path or starts with `<path>/`.                    #
 #                                                                                      #
 # Usage in workflow steps:                                                             #
 #                                                                                      #
 #      - name: Match changed paths                                                     #
-#        id: match
-#        uses: ./.github/actions/match-changed-paths
-#        with:
-#          base-sha: ${{ github.event.pull_request.base.sha }}
-#          head-sha: ${{ github.sha }}
-#          paths: |
-#            apps/living-kavita-loca
-#            packages
+#        id: match                                                                      #
+#        uses: ./.github/actions/match-changed-paths                                  #
+#        with:                                                                         #
+#          base-sha: ${{ github.event.pull_request.base.sha }}                        #
+#          head-sha: ${{ github.sha }}                                                 #
+#          paths: |                                                                    #
+#            apps/living-kavita-loca                                                   #
+#            packages                                                                  #
 #                                                                                      #
 ########################################################################################
 
@@ -31,8 +36,8 @@ inputs:
     required: true
   paths:
     description: >
-      Newline-separated repo-relative paths. A change matches if the file is
-      exactly that path or starts with path + "/".
+      Newline-separated repo-relative path prefixes (not glob patterns). A
+      change matches if the file is exactly that path or starts with path + "/".
     required: true
 
 outputs:
@@ -46,10 +51,37 @@ runs:
     - id: detect
       shell: bash
       env:
+        BASE_SHA: ${{ inputs.base-sha }}
+        HEAD_SHA: ${{ inputs.head-sha }}
         MATCH_PATHS: ${{ inputs.paths }}
       run: |
         set -euo pipefail
-        CHANGED="$(git diff --name-only "${{ inputs.base-sha }}" "${{ inputs.head-sha }}" || true)"
+
+        ensure_commit_exists() {
+          local sha="$1"
+          if git cat-file -e "${sha}^{commit}" 2>/dev/null; then
+            return 0
+          fi
+
+          echo "Commit ${sha} not found locally; fetching from origin."
+          if ! git fetch --no-tags --depth=1 origin "$sha"; then
+            echo "::error::Failed to fetch commit ${sha} from origin. Ensure this workflow has access to both refs."
+            exit 1
+          fi
+
+          if ! git cat-file -e "${sha}^{commit}" 2>/dev/null; then
+            echo "::error::Commit ${sha} is still unavailable after fetch."
+            exit 1
+          fi
+        }
+
+        ensure_commit_exists "$BASE_SHA"
+        ensure_commit_exists "$HEAD_SHA"
+
+        if ! CHANGED="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"; then
+          echo "::error::git diff failed for base ${BASE_SHA} and head ${HEAD_SHA}."
+          exit 1
+        fi
         matched=false
         while IFS= read -r file || [[ -n "${file:-}" ]]; do
           [[ -z "${file:-}" ]] && continue
