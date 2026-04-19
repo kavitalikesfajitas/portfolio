@@ -1,0 +1,48 @@
+name: "Audit PR Body"
+description: "Validates PR description against template requirements and posts a comment with results"
+
+inputs:
+  github-token:
+    description: "GitHub token with pull-requests: write permission"
+    required: false
+    default: ${{ github.token }}
+
+runs:
+  using: composite
+  steps:
+    - name: Extract PR Body (base64)
+      id: pr
+      shell: bash
+      run: |
+        set -euo pipefail
+        PR_BODY=$(jq -r '.pull_request.body // ""' "$GITHUB_EVENT_PATH")
+        PR_BODY_B64=$(printf "%s" "$PR_BODY" | base64 -w0 2>/dev/null || base64 <<<"$PR_BODY" | tr -d '\n')
+        {
+          echo "body_b64<<EOF"
+          echo "$PR_BODY_B64"
+          echo "EOF"
+        } >> "$GITHUB_OUTPUT"
+
+    - name: Validate PR Description/Template
+      id: validate
+      shell: bash
+      env:
+        PR_BODY_B64: ${{ steps.pr.outputs.body_b64 }}
+      run: ${{ github.workspace }}/scripts/validate-pr-body.sh
+
+    - name: Build comment body
+      if: always()
+      id: comment-body
+      shell: bash
+      env:
+        ERRORS: ${{ steps.validate.outputs.errors }}
+        WARNINGS: ${{ steps.validate.outputs.warnings }}
+      run: ${{ github.workspace }}/scripts/build-pr-audit-comment.sh
+
+    - name: Comment on PR
+      if: always()
+      uses: ./.github/actions/upsert-pr-comment
+      with:
+        identifier: "<!-- pr-body-audit-comment -->"
+        body: ${{ steps.comment-body.outputs.body }}
+        github-token: ${{ inputs.github-token }}

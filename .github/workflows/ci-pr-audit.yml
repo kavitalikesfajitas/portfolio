@@ -55,8 +55,12 @@ jobs:
     name: "🕵️‍♀️ Check if Commits Follow Conventional Commit Guidelines"
     secrets: inherit
   pull-request-body-audit:
-    needs: check-draft
     if: github.event.pull_request.draft == false
-    uses: ./.github/workflows/ci-pr-body-audit-reusable.yml
     name: "🕵️‍♀️ Check if PR Body/Descriptions Follows Guidelines"
-    secrets: inherit
+    runs-on: [ubuntu-latest]
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/audit-pr-body
