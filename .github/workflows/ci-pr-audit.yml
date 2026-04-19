@@ -46,6 +46,7 @@ jobs:
         uses: ./.github/actions/lint-pr-title
         with:
           title: ${{ github.event.pull_request.title }}
+          validator: "commitlint"
           node-version: ${{ steps.node-version.outputs.value }}
 
   commitlint:

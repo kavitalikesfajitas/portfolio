@@ -37,7 +37,7 @@ inputs:
   title-regex:
     description: "Regex pattern to validate the PR title against"
     required: false
-    default: "\\[NVS-\\d*\\]|^debug:|^hotfix:|\\[SWAG-\\d*\\]"
+    default: "^(\\[(JIRA)-\\d+\\]\\s*)?(feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)(\\([^)]+\\))?!?:\\s.+$|^debug:|^hotfix:"
   title-regex-flags:
     description: "Regex flags (for example, g, i)"
     required: false
@@ -49,7 +49,7 @@ inputs:
   error-message:
     description: "Error message shown when the PR title does not pass validation"
     required: false
-    default: "PR title validation failed"
+    default: "PR title must follow Conventional Commit format (Jira ticket is optional)"
 
 runs:
   using: "composite"
