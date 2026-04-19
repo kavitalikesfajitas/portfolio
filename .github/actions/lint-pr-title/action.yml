@@ -67,4 +67,4 @@ runs:
         TITLE_REGEX_FLAGS: ${{ inputs.title-regex-flags }}
         COMMITLINT_CONFIG: ${{ inputs.commitlint-config }}
         ERROR_MESSAGE: ${{ inputs.error-message }}
-      run: bash "${{ github.action_path }}/lint-pr-title.sh"
+      run: bash "${{ github.workspace }}/scripts/lint-pr-title.sh"
