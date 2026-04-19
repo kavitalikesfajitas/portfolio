@@ -4,7 +4,15 @@ export const metadata = {
   title: "Contentful GraphQL Proxy",
   heroImage: HeroImage,
   role: "Technical owner — RFC, epic, multi-sprint delivery",
-  tech: ["TypeScript", "Node.js", "GraphQL", "Apollo Server", "Express", "Redis", "AWS"],
+  tech: [
+    "TypeScript",
+    "Node.js",
+    "GraphQL",
+    "Apollo Server",
+    "Express",
+    "Redis",
+    "AWS",
+  ],
 };
 
 # Contentful GraphQL Proxy
@@ -24,7 +32,7 @@ This is the kind of arc interviewers look for: **prove it fast**, **name the gap
 
 **2 — The wake-up call (load).** Pretty quickly it was obvious that **in-process caching on a Next route** was not the answer for the **traffic profile we expect on swoosh.nike**: replicas, cold paths, and **shared cache hit rate** matter as much as “it works on my laptop.” That gap is what turned a cool POC into **a platform decision**.
 
-**3 — RFC.** I wrote and circulated the internal RFC (*Replace Content-APIs with a single GraphQL Apollo proxy for Contentful*): **context**, **anti-pattern** (`api/content`-style REST-over-GraphQL), **staged plan** (Next proof vs **dedicated hosting**), and **Contentful rate-limit** reality so caching arguments stayed grounded.
+**3 — RFC.** I wrote and circulated the internal RFC (_Replace Content-APIs with a single GraphQL Apollo proxy for Contentful_): **context**, **anti-pattern** (`api/content`-style REST-over-GraphQL), **staged plan** (Next proof vs **dedicated hosting**), and **Contentful rate-limit** reality so caching arguments stayed grounded.
 
 **4 — Program.** I **created the Jira epic**, **wrote the implementation tickets**, and **executed across a little over two sprints**—from the pattern we trusted to the **standalone Express** service: **`POST /contentful/graphql`**, **Redis-backed** Apollo cache for **cross-instance** hits, **`GET /contentful/health`**, CORS, optional **HTTPS** for local dev, and **CI/Docker**-friendly packaging. **One surface for content reads** instead of **N** Lambdas pretending to be REST.
 
@@ -127,9 +135,47 @@ const layeredCache = new Cacheable({
   secondary: redisStore,
   nonBlocking: true,
 });
-const keyValueCache = new Keyv({ store: layeredCache, namespace: "contentful-cache" });
+const keyValueCache = new Keyv({
+  store: layeredCache,
+  namespace: "contentful-cache",
+});
 return new KeyvAdapter(keyValueCache, { disableBatchReads });
 ```
+
+### `cacheable` in practice: debugging without SSH
+
+This part was a lot of the real engineering work.
+
+At Nike, I could not just SSH into managed Redis infrastructure and poke around directly. So I had to prove cache behavior from the **application edge**, not from host access:
+
+- **App-level hooks** — I instrumented `cacheable` hook points (`AFTER_SET`, `AFTER_GET`, `AFTER_GET_MANY`, `BEFORE_SECONDARY_SETS_PRIMARY`) behind a **`DEBUG_PROXY`** switch to confirm read/write flow and TTL behavior in each layer.
+- **Local parity loop** — I ran local Redis via Docker and used `redis-cli monitor` while firing real GraphQL queries, then compared that output with proxy debug logs to verify key writes, read paths, and fallback behavior.
+- **Synthetic request patterns** — I used repeated query runs (warm/cold mixes) to prove when responses came from L1 memory, L2 Redis, or Contentful.
+- **Telemetry cross-check** — I correlated cache debug logs with request duration metrics so “it seems faster” turned into measurable p50/p95 movement.
+
+Representative debug pattern:
+
+```typescript
+if (debugProxy) {
+  layeredCache.onHook(CacheableHooks.AFTER_SET, ({ key, ttl }) => {
+    console.log(`set ${key} ttl=${ttl}`);
+  });
+  layeredCache.onHook(CacheableHooks.AFTER_GET, ({ key, result }) => {
+    console.log(`get ${key} hit=${Boolean(result?.value)}`);
+  });
+}
+```
+
+### Redis architecture decision (`001_redis_config.md`)
+
+I also documented and drove the Redis decision in RFC **`001_redis_config.md`**:
+
+- **Evaluated options** — provisioned ElastiCache replication group vs **ElastiCache Serverless**.
+- **Chose serverless** — for **operational simplicity**, **automatic scaling**, **built-in failover/Multi-AZ**, and **pay-per-use** economics.
+- **Explicit tradeoffs** — serverless is **not** “I own a single Redis box” and not full cluster-mode tuning either; you gain managed scaling and HA, but lose some low-level configuration knobs (for example, node shape and certain advanced controls).
+- **Cost stance** — a fixed 3-node setup is predictable but can overpay during low usage; serverless aligns cost to actual usage, which matched the proxy’s variable traffic profile.
+
+This is the key nuance: serverless cache is its own operating model. It is neither “just one instance” nor “self-managed cluster controls everywhere.” Designing around that model (and instrumenting it correctly) is what made it production-usable.
 
 ### Caching, correctness, and ops (summary)
 
