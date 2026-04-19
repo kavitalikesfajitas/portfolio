@@ -22,21 +22,20 @@ export const metadata = {
 
 ---
 
-**TL;DR:** I turned a growing **REST façade over Contentful GraphQL**—the legacy **`api/content`** Lambda zoo—into a **single, honest GraphQL BFF**. The real story is the sequence: **fast Next.js POC** (first rendition **predates 2024**—**Apollo**, **graphql-tools**, and **Contentful** docs; **not** LLM- or agent-led codegen) → **hard truth about cache + load for swoosh.nike** → **RFC** → **Jira epic + tickets** → **a little over two sprints of execution** → **today: a dedicated server** (Express, **Redis**, health, CORS, telemetry) that PDP traffic can actually lean on.
+**TL;DR:** I replaced a growing set of Contentful wrapper Lambdas in `api/content` with a single GraphQL proxy. I started with a Next.js proof of concept, realized the cache and traffic model would not hold up for `swoosh.nike`, wrote the RFC, created the Jira epic and implementation tickets, and led the work over a little more than two sprints to ship the production version: an Express server with Redis, health checks, CORS, and telemetry.
 
 ## Overview
 
-This is the kind of arc interviewers look for: **prove it fast**, **name the gap**, **write the doc**, **run the program**, **ship the production shape**.
+The story here is pretty simple: I proved the pattern quickly, hit the scaling limits of the first version, wrote the RFC, and then led the work to ship the production version.
 
-**1 — POC (Next.js, fast).** The **first rendition** of this idea—**before 2024**—was a **Pages API** route at `pages/api/contentful/graphql` that I stood up in **short focused time** (on the order of **one strong evening to about a week**): **Apollo Server**, schema in repo, **HTTP executor** POST to Contentful, **in-memory LRU** response caching, and explicit cache-control defaults. That was still **read-the-docs engineering**: **Apollo**, **graphql-tools**, and **Contentful**—not codegen assistants or agents owning the design. Enough to show **the proxy pattern**, **real caching behavior**, and **tokens / space IDs kept server-side**—without asking the org to bet on a blank slide.
 
-**2 — The wake-up call (load).** Pretty quickly it was obvious that **in-process caching on a Next route** was not the answer for the **traffic profile we expect on swoosh.nike**: replicas, cold paths, and **shared cache hit rate** matter as much as “it works on my laptop.” That gap is what turned a cool POC into **a platform decision**.
+**2 — The scaling limit.** It became clear pretty quickly that **in-process caching on a Next route** was not the right long-term shape for the traffic profile we expected on `swoosh.nike`. Once you care about replicas, cold paths, and shared cache hit rate, a simple in-memory cache stops being good enough.
 
-**3 — RFC.** I wrote and circulated the internal RFC (_Replace Content-APIs with a single GraphQL Apollo proxy for Contentful_): **context**, **anti-pattern** (`api/content`-style REST-over-GraphQL), **staged plan** (Next proof vs **dedicated hosting**), and **Contentful rate-limit** reality so caching arguments stayed grounded.
+**3 — RFC.** From there I wrote and circulated the internal RFC, _Replace Content-APIs with a single GraphQL Apollo proxy for Contentful_. It laid out the current pain points, the `api/content` REST-over-GraphQL pattern we wanted to get away from, the staged approach from POC to dedicated service, and the caching implications of Contentful rate limits.
 
-**4 — Program.** I **created the Jira epic**, **wrote the implementation tickets**, and **executed across a little over two sprints**—from the pattern we trusted to the **standalone Express** service: **`POST /contentful/graphql`**, **Redis-backed** Apollo cache for **cross-instance** hits, **`GET /contentful/health`**, CORS, optional **HTTPS** for local dev, and **CI/Docker**-friendly packaging. **One surface for content reads** instead of **N** Lambdas pretending to be REST.
+**4 — Execution.** I created the Jira epic, wrote the implementation tickets, and drove the work over a little more than two sprints to get from the original pattern to the standalone Express service: **`POST /contentful/graphql`**, **Redis-backed** Apollo caching for cross-instance hits, **`GET /contentful/health`**, CORS, optional **HTTPS** for local development, and packaging that worked cleanly with CI and Docker.
 
-The technical villain the whole time was the same: **`api/content`** looked like a tidy **OpenAPI / REST** catalog, but every route still boiled down to **hand-maintained GraphQL** and **`makeItemsRequest`**. **I drove the proxy so we would not keep paying that sprawl tax.**
+The core problem was always the same: **`api/content`** looked like a clean **REST/OpenAPI** surface, but each route still boiled down to hand-maintained GraphQL and `makeItemsRequest`. I pushed for the proxy because it gave us one place to manage content reads instead of continuing to spread that work across more Lambdas.
 
 ## The challenge (why the old shape had to go)
 
