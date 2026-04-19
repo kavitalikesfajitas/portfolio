@@ -16,6 +16,7 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "jest.runMode": "on-demand",
   "files.associations": {
+    "**/*.json.hbs": "json",
     "*.json.hbs": "json"
   },
   "eslint.validate": [

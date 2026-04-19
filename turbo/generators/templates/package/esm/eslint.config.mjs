@@ -1,4 +1,6 @@
 import sharedEslintConfig from "@kavita-likes-fajitas/eslint-config/esm";
 
 /** @type {import('eslint').Linter.Config[]} */
-export default [...sharedEslintConfig];
+const config = [...sharedEslintConfig];
+
+export default config;
