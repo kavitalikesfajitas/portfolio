@@ -28,13 +28,10 @@ jobs:
       - name: Checkout main
         uses: actions/checkout@v4
 
-      - name: ⚙️ Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ".nvmrc"
-
       - name: 📥 Monorepo install
         uses: ./.github/actions/yarn-monorepo-install
+        with:
+          node-version-file: ".nvmrc"
 
       - name: ♻️ Restore packages cache
         uses: actions/cache@v4

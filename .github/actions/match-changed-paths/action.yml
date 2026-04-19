@@ -1,0 +1,53 @@
+name: Match changed paths
+description: >
+  Runs git diff --name-only between two refs and sets matches=true if any
+  changed file equals one of the given paths or lives under it (path prefix).
+
+inputs:
+  base-sha:
+    description: Base ref for git diff
+    required: true
+  head-sha:
+    description: Head ref for git diff
+    required: true
+  paths:
+    description: >
+      Newline-separated repo-relative paths. A change matches if the file is
+      exactly that path or starts with path + "/".
+    required: true
+
+outputs:
+  matches:
+    description: "true if at least one changed file matched a path"
+    value: ${{ steps.detect.outputs.matches }}
+
+runs:
+  using: composite
+  steps:
+    - id: detect
+      shell: bash
+      env:
+        MATCH_PATHS: ${{ inputs.paths }}
+      run: |
+        set -euo pipefail
+        CHANGED="$(git diff --name-only "${{ inputs.base-sha }}" "${{ inputs.head-sha }}" || true)"
+        matched=false
+        while IFS= read -r file || [[ -n "${file:-}" ]]; do
+          [[ -z "${file:-}" ]] && continue
+          while IFS= read -r pattern || [[ -n "${pattern:-}" ]]; do
+            pattern="${pattern//$'\r'/}"
+            pattern="${pattern#"${pattern%%[![:space:]]*}"}"
+            pattern="${pattern%"${pattern##*[![:space:]]}"}"
+            [[ -z "$pattern" ]] && continue
+            if [[ "$file" == "$pattern" ]] || [[ "$file" == "$pattern/"* ]]; then
+              matched=true
+              break 2
+            fi
+          done <<< "$MATCH_PATHS"
+        done < <(printf '%s\n' "$CHANGED")
+
+        if [[ "$matched" == true ]]; then
+          echo "matches=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "matches=false" >> "$GITHUB_OUTPUT"
+        fi

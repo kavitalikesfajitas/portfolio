@@ -39,12 +39,10 @@ jobs:
       - name: Checkout main
         uses: actions/checkout@v4
 
-      - name: ⚙️ Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ".nvmrc"
       - name: 📥 Monorepo install
         uses: ./.github/actions/yarn-monorepo-install
+        with:
+          node-version-file: ".nvmrc"
 
       - name: ♻️ Restore living-kavita-loca related caches
         uses: actions/cache@v4

@@ -17,6 +17,7 @@ on:
       - "!.github/workflows/ci-pr-body-audit-reusable.yml"
       - "!.github/workflows/ci-pr-reusable-commit-lint.yml"
 
+# Shared concurrency group with to prevent Terraform state lock conflicts
 concurrency: "portfolio-deploy-living-kavita-loca"
 
 permissions:

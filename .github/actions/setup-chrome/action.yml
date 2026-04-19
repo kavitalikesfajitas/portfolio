@@ -1,0 +1,133 @@
+########################################################################################
+# "setup-chrome" composite action                                                     #
+#---------------------------------------------------------------------------------------#
+# Installs Google Chrome stable on the runner. Skips if the requested version is       #
+# already present. On self-hosted runners the install persists across runs.            #
+#                                                                                      #
+# Usage in workflow steps:                                                             #
+#                                                                                      #
+#      - name: 🎭 Setup Chrome                                                         #
+#        uses: ./.github/actions/setup-chrome                                          #
+#        with:                                                                         #
+#          chrome-version: stable  # stable | beta | dev (default = 'stable')          #
+#                                                                                      #
+########################################################################################
+
+name: "Setup Chrome"
+description: "Install Google Chrome on the runner. Skips download when already installed."
+
+inputs:
+  chrome-version:
+    description: "Chrome release channel: stable, beta, or dev"
+    required: false
+    default: "stable"
+
+outputs:
+  chrome-path:
+    description: "Path to the installed Chrome binary"
+    value: ${{ steps.detect.outputs.chrome-path }}
+  chrome-version:
+    description: "Installed Chrome version string"
+    value: ${{ steps.detect.outputs.chrome-version }}
+
+runs:
+  using: "composite"
+  steps:
+    # actions/cache runs tar without sudo, so we cache to a user-writable path
+    # and then sudo-copy into /opt/google/chrome on restore.
+    - name: Restore Chrome cache (Linux)
+      if: runner.os == 'Linux'
+      id: chrome-cache
+      uses: actions/cache@v4
+      with:
+        path: ~/chrome-cache
+        key: ${{ runner.os }}-chrome-${{ inputs.chrome-version }}
+
+    - name: Restore Chrome from cache (Linux)
+      if: runner.os == 'Linux' && steps.chrome-cache.outputs.cache-hit == 'true'
+      shell: bash
+      run: |
+        if command -v google-chrome-stable &>/dev/null || command -v google-chrome &>/dev/null; then
+          echo "✅ Chrome already installed, skipping restore"
+          exit 0
+        fi
+        echo "Restoring Chrome from cache..."
+        sudo mkdir -p /opt/google
+        sudo cp -a ~/chrome-cache /opt/google/chrome
+        sudo ln -sf /opt/google/chrome/google-chrome /usr/bin/google-chrome-stable
+        echo "Installing Chrome shared library dependencies..."
+        npx playwright install-deps chromium
+
+    - name: Install Chrome (Linux)
+      if: runner.os == 'Linux' && steps.chrome-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        CHANNEL="${{ inputs.chrome-version }}"
+        case "$CHANNEL" in
+          stable) PKG="google-chrome-stable" ;;
+          beta)   PKG="google-chrome-beta" ;;
+          dev)    PKG="google-chrome-unstable" ;;
+          *)      echo "::error::Unknown chrome-version '$CHANNEL'. Use stable, beta, or dev."; exit 1 ;;
+        esac
+
+        if command -v google-chrome-stable &>/dev/null || command -v google-chrome &>/dev/null; then
+          echo "✅ Chrome already installed, skipping download"
+          exit 0
+        fi
+
+        echo "Installing $PKG..."
+        wget -q -O /tmp/chrome.deb "https://dl.google.com/linux/direct/${PKG}_current_amd64.deb"
+
+        if command -v apt-get &>/dev/null; then
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq /tmp/chrome.deb
+        elif command -v dnf &>/dev/null; then
+          sudo dnf install -y /tmp/chrome.deb
+        elif command -v yum &>/dev/null; then
+          sudo yum install -y /tmp/chrome.deb
+        else
+          echo "::error::No supported package manager found (apt-get, dnf, yum)"
+          exit 1
+        fi
+
+        rm -f /tmp/chrome.deb
+
+    - name: Save Chrome to cache path (Linux)
+      if: runner.os == 'Linux' && steps.chrome-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        if [ -d /opt/google/chrome ]; then
+          echo "Copying Chrome to cache path..."
+          rm -rf ~/chrome-cache
+          cp -a /opt/google/chrome ~/chrome-cache
+        fi
+
+    - name: Install Chrome (macOS)
+      if: runner.os == 'macOS'
+      shell: bash
+      run: |
+        if [ -d "/Applications/Google Chrome.app" ]; then
+          echo "✅ Chrome already installed, skipping download"
+        else
+          brew install --cask google-chrome
+        fi
+
+    - name: Detect Chrome path and version
+      id: detect
+      shell: bash
+      run: |
+        if [ "$RUNNER_OS" = "macOS" ]; then
+          CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        else
+          CHROME_BIN=$(command -v google-chrome-stable 2>/dev/null || command -v google-chrome 2>/dev/null || echo "")
+        fi
+
+        if [ -z "$CHROME_BIN" ] || [ ! -x "$CHROME_BIN" ]; then
+          echo "::error::Chrome binary not found after install"
+          exit 1
+        fi
+
+        VERSION=$("$CHROME_BIN" --version 2>/dev/null | sed 's/[^0-9.]//g' || echo "unknown")
+        echo "chrome-path=$CHROME_BIN" >> "$GITHUB_OUTPUT"
+        echo "chrome-version=$VERSION" >> "$GITHUB_OUTPUT"
+        echo "Installed: $VERSION at $CHROME_BIN"

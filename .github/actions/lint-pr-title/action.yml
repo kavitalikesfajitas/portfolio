@@ -1,0 +1,35 @@
+name: "Lint PR Title"
+description: "Validates PR title against a regex pattern (e.g. Jira ticket ID)"
+
+inputs:
+  title:
+    description: "The PR title to validate"
+    required: true
+  title-regex:
+    description: "Regex pattern to validate the PR title against"
+    required: false
+    default: '\[NVS-\d*\]|^debug:|^hotfix:|\[SWAG-\d*\]'
+  title-regex-flags:
+    description: "Regex flags (e.g. g, i)"
+    required: false
+    default: "g"
+  error-message:
+    description: "Error message shown when the PR title does not match"
+    required: false
+    default: "Add Jira ID to your title"
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "lts/*"
+
+    - name: Lint PR title
+      shell: bash
+      env:
+        PR_TITLE: ${{ inputs.title }}
+        TITLE_REGEX: ${{ inputs.title-regex }}
+        TITLE_REGEX_FLAGS: ${{ inputs.title-regex-flags }}
+        ERROR_MESSAGE: ${{ inputs.error-message }}
+      run: ${{ github.action_path }}/../../scripts/lint-pr-title.sh
