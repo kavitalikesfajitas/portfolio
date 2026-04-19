@@ -1,4 +1,12 @@
 {
   "plugins": ["prettier-plugin-tailwindcss"],
-  "tailwindConfig": "./tailwind.config.ts"
+  "tailwindConfig": "./tailwind.config.ts",
+  "overrides": [
+    {
+      "files": ["**/package.json.hbs"],
+      "options": {
+        "parser": "json"
+      }
+    }
+  ]
 }
