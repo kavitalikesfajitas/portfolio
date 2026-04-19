@@ -65,6 +65,9 @@ jobs:
     permissions:
       pull-requests: write
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: 💬 Comment PR with preview URL
         uses: ./.github/actions/upsert-pr-comment
         with:
