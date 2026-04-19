@@ -17,7 +17,10 @@ on:
       - "!.github/workflows/ci-pr-body-audit-reusable.yml"
       - "!.github/workflows/ci-pr-reusable-commit-lint.yml"
 
-# Shared concurrency group with to prevent Terraform state lock conflicts
+# Serialize deploy-orchestration runs so only one end-to-end deploy is in flight
+# at a time. Terraform state-lock conflicts are separately guarded in ci-terraform.yml
+# via its own `terraform-state-lock` group. `cancel-in-progress` defaults to false
+# here intentionally — we want in-flight deploys to complete rather than be cancelled.
 concurrency: "portfolio-deploy-living-kavita-loca"
 
 permissions:

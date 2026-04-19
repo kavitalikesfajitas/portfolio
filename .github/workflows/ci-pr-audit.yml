@@ -20,6 +20,34 @@ jobs:
       is_draft: ${{ github.event.pull_request.draft }}
     steps:
       - run: echo "PR draft status - ${{ github.event.pull_request.draft }}"
+
+  pr-title-lint:
+    needs: check-draft
+    if: github.event.pull_request.draft == false
+    runs-on: [ubuntu-latest]
+    name: "🕵️‍♀️ Check if PR Title Follows Conventional Commit Guidelines"
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 📥 Monorepo install
+        uses: ./.github/actions/yarn-monorepo-install
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Read Node version from .nvmrc
+        id: node-version
+        shell: bash
+        run: echo "value=$(tr -d '\r\n' < .nvmrc)" >> "$GITHUB_OUTPUT"
+
+      - name: Lint PR title
+        uses: ./.github/actions/lint-pr-title
+        with:
+          title: ${{ github.event.pull_request.title }}
+          node-version: ${{ steps.node-version.outputs.value }}
+
   commitlint:
     needs: check-draft
     if: github.event.pull_request.draft == false

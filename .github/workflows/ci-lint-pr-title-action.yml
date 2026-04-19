@@ -1,4 +1,4 @@
-name: PR Title Lint Action CI
+name: PR Title Lint Action Unit Tests CI
 
 on:
   pull_request:
@@ -8,6 +8,8 @@ on:
       - "commitlint.config.js"
       - "package.json"
       - "yarn.lock"
+      - ".github/actions/yarn-monorepo-install/**"
+      - ".nvmrc"
       - ".yarnrc.yml"
   workflow_dispatch:
 
@@ -16,6 +18,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Smoke test workflow: validates changes to the lint-pr-title action and related CI wiring.
+  # This exists to test action behavior safely before relying on it in the main PR audit flow.
   smoke-test-lint-pr-title-action:
     runs-on: [ubuntu-latest]
     permissions:
@@ -29,10 +33,16 @@ jobs:
         with:
           node-version-file: ".nvmrc"
 
+      - name: Read Node version from .nvmrc
+        id: node-version
+        shell: bash
+        run: echo "value=$(tr -d '\r\n' < .nvmrc)" >> "$GITHUB_OUTPUT"
+
       - name: ✅ Valid PR title passes
         uses: ./.github/actions/lint-pr-title
         with:
           title: "feat: validate PR title with commitlint"
+          node-version: ${{ steps.node-version.outputs.value }}
 
       - name: ❌ Invalid PR title fails
         id: invalid-title
@@ -40,6 +50,7 @@ jobs:
         uses: ./.github/actions/lint-pr-title
         with:
           title: "BAD TITLE"
+          node-version: ${{ steps.node-version.outputs.value }}
 
       - name: Assert invalid title failed
         if: steps.invalid-title.outcome != 'failure'

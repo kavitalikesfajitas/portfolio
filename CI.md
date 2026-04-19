@@ -54,7 +54,7 @@ Action smoke test:
   - Returns a boolean-style output for conditional job/step behavior.
 
 - `.github/actions/setup-chrome`
-  - I created this because alot of companies use self-hosted runners, and those self-hosted runners do not always have this installed already
+  - This action exists because many organizations use self-hosted runners, which may not have Chrome preinstalled.
   - Installs/restores Chrome on runner for browser-oriented jobs.
   - Includes Linux cache restore/install and macOS install path.
 

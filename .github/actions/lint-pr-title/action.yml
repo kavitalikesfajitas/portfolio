@@ -19,6 +19,10 @@ inputs:
   title:
     description: "The PR title to validate"
     required: true
+  node-version:
+    description: "Node.js version for actions/setup-node"
+    required: false
+    default: "lts/*"
   commitlint-config:
     description: "Path to commitlint configuration file"
     required: false
@@ -33,8 +37,7 @@ runs:
   steps:
     - uses: actions/setup-node@v4
       with:
-        ## note we are using lts/* because the thought is you might not have node installed
-        node-version: "lts/*"
+        node-version: ${{ inputs.node-version }}
 
     - name: Lint PR title
       shell: bash
