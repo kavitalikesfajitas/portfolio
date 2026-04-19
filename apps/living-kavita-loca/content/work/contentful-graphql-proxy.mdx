@@ -14,17 +14,21 @@ export const metadata = {
 
 ---
 
-**TL;DR:** I turned a growing **REST façade over Contentful GraphQL**—the legacy **`api/content`** Lambda zoo—into a **single, honest GraphQL BFF**: **RFC → Jira epic → tickets → a little over two sprints → done**, starting with a **Next.js Pages API** proof and maturing into a **production-shaped Express proxy** (optional **Redis**, health, CORS, telemetry hooks) that **PDPs could actually scale on**.
+**TL;DR:** I turned a growing **REST façade over Contentful GraphQL**—the legacy **`api/content`** Lambda zoo—into a **single, honest GraphQL BFF**. The real story is the sequence: **fast Next.js POC** (first rendition **predates 2024**—**Apollo**, **graphql-tools**, and **Contentful** docs; **not** LLM- or agent-led codegen) → **hard truth about cache + load for swoosh.nike** → **RFC** → **Jira epic + tickets** → **a little over two sprints of execution** → **today: a dedicated server** (Express, **Redis**, health, CORS, telemetry) that PDP traffic can actually lean on.
 
 ## Overview
 
-This is the kind of project that shows **ownership beyond the IDE**. I did not “just implement an endpoint.” I **wrote the internal RFC** (*Replace Content-APIs with a single GraphQL Apollo proxy for Contentful*), **created the Jira epic**, **wrote the implementation tickets**, and **carried the program** from first merge through **just over two sprints** to a credible production story.
+This is the kind of arc interviewers look for: **prove it fast**, **name the gap**, **write the doc**, **run the program**, **ship the production shape**.
 
-The technical villain was familiar and expensive: **`api/content`** looked like a clean **OpenAPI / REST** catalog, but every route still boiled down to **hand-maintained GraphQL** and **`makeItemsRequest`** calls to Contentful. New merchandising surfaces tended to mean **new Lambdas**, **new deployables**, and **new bespoke contracts**—**compounding toil** every time the CMS model moved. **I drove the proxy so that growth curve would stop.**
+**1 — POC (Next.js, fast).** The **first rendition** of this idea—**before 2024**—was a **Pages API** route at `pages/api/contentful/graphql` that I stood up in **short focused time** (on the order of **one strong evening to about a week**): **Apollo Server**, schema in repo, **HTTP executor** POST to Contentful, **in-memory LRU** response caching, and explicit cache-control defaults. That was still **read-the-docs engineering**: **Apollo**, **graphql-tools**, and **Contentful**—not codegen assistants or agents owning the design. Enough to show **the proxy pattern**, **real caching behavior**, and **tokens / space IDs kept server-side**—without asking the org to bet on a blank slide.
 
-**Stage 1 (what I shipped first):** a **Next.js** route at `pages/api/contentful/graphql`—**Apollo Server**, schema in repo, **HTTP executor** POST to Contentful, **in-memory LRU** caching, and explicit cache-control defaults. Fast proof, real cache behavior, real security boundary (tokens and space IDs stay server-side).
+**2 — The wake-up call (load).** Pretty quickly it was obvious that **in-process caching on a Next route** was not the answer for the **traffic profile we expect on swoosh.nike**: replicas, cold paths, and **shared cache hit rate** matter as much as “it works on my laptop.” That gap is what turned a cool POC into **a platform decision**.
 
-**Stage 2 (where it had to land for scale):** the same architectural bet in a **standalone Express** service in my monorepo—**`POST /contentful/graphql`**, **Redis-backed** Apollo cache when you need **shared hits across replicas**, **`GET /contentful/health`**, CORS, optional **HTTPS** for local dev, and **CI/Docker**-friendly packaging. One surface for content reads instead of **N** Lambdas pretending to be REST.
+**3 — RFC.** I wrote and circulated the internal RFC (*Replace Content-APIs with a single GraphQL Apollo proxy for Contentful*): **context**, **anti-pattern** (`api/content`-style REST-over-GraphQL), **staged plan** (Next proof vs **dedicated hosting**), and **Contentful rate-limit** reality so caching arguments stayed grounded.
+
+**4 — Program.** I **created the Jira epic**, **wrote the implementation tickets**, and **executed across a little over two sprints**—from the pattern we trusted to the **standalone Express** service: **`POST /contentful/graphql`**, **Redis-backed** Apollo cache for **cross-instance** hits, **`GET /contentful/health`**, CORS, optional **HTTPS** for local dev, and **CI/Docker**-friendly packaging. **One surface for content reads** instead of **N** Lambdas pretending to be REST.
+
+The technical villain the whole time was the same: **`api/content`** looked like a tidy **OpenAPI / REST** catalog, but every route still boiled down to **hand-maintained GraphQL** and **`makeItemsRequest`**. **I drove the proxy so we would not keep paying that sprawl tax.**
 
 ## The challenge (why the old shape had to go)
 
@@ -35,9 +39,9 @@ The technical villain was familiar and expensive: **`api/content`** looked like 
 
 ## What I built
 
-### Next.js proof → Express production shape
+### Next.js POC → dedicated server
 
-The **first implementation lived in the web app**; the **standalone service is the same bet** with a host that matches how you run **long-lived** GraphQL at the edge of your platform.
+The **POC lived in the web app**; **production load on swoosh.nike** is what forced the move to a **long-lived server** and **Redis**. The **architecture is the same bet**—schema in repo, **wrap**, **delegate** to Contentful with a bearer token—just hosted where **cache, replicas, and ops** make sense.
 
 ```typescript
 const executor = buildHTTPExecutor({
@@ -64,9 +68,10 @@ const schema = wrapSchema({
 
 ### How I ran the program (not just the repo)
 
-- **RFC** — Named the **anti-pattern**, staged **Stage 1 / Stage 2**, and grounded caching in **vendor rate-limit reality** so the design was **reviewable**, not vibes.
-- **Planning** — **Epic + tickets** sequenced to **prove value early** (Next proof) and **de-risk** the extraction (Express + Redis + ops).
-- **Execution** — **A little over two sprints** of focused delivery: proxy pattern, caching defaults, and the **operational hooks** that make Contentful reads a **platform concern**, not a **per-Lambda accident**.
+- **POC first** — Next.js route to **de-risk the idea** in days, not quarters.
+- **RFC after the demo** — Once **cache + swoosh.nike scale** made the limit obvious, the RFC turned “we should” into **reviewable stages** and **vendor-grounded** caching strategy.
+- **Planning** — **Epic + tickets** broke out **server extraction**, **Redis**, and **operational** work so execution was **trackable**.
+- **Execution** — **A little over two sprints** to **today’s dedicated server**: same GraphQL story, **production** topology.
 
 ## Results
 
@@ -84,7 +89,7 @@ Representative production impact where this pattern ran (**Nike PDP** context):
 ## What I’d repeat on the next platform bet
 
 - **Write the short, blunt RFC** — It turned a recurring gripe into **funded work** with **exit criteria** stakeholders could recognize.
-- **Stage the risk** — **Prove on Next** (fast feedback), **extract when the shape is honest** (scale, Redis, ops).
+- **POC before the committee** — A **Next route** bought **truth** cheaply; **swoosh.nike-scale cache** forced the **honest** next step before we over-invested.
 - **Name the wire protocol in the API** — When integration is GraphQL, **own it in the surface**; hiding it behind REST **taxes every future query change**.
 - **Default the cache story** — Upstream schemas without hints are normal; **your server must still enforce** sane **TTLs** and **response caching** so you stay inside **delivery limits** and keep **tail latency** under control.
 
@@ -96,4 +101,4 @@ Representative production impact where this pattern ran (**Nike PDP** context):
 
 ---
 
-_Origin: motivated by retiring compounding growth in legacy **`api/content`** Lambdas; first shipped on the Nike Digital Platform team as **`pages/api/contentful/graphql`**. Standalone **`contentful-proxy`** monorepo: solo-maintained, Docker/CI, Redis-backed caching._
+_Origin: legacy **`api/content`** sprawl; **first Next.js POC pre-2024** (`pages/api/contentful/graphql`) on the Nike Digital Platform team; load targets included **swoosh.nike**. **RFC → Jira → sprints →** standalone **`contentful-proxy`** server (solo-maintained monorepo, Docker/CI, Redis)._
