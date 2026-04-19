@@ -11,6 +11,8 @@
 #        with:                                                                         #
 #          chrome-version: stable  # stable | beta | dev (default = 'stable')          #
 #                                                                                      #
+# Current repo status: no live workflow call site yet (snippet above is paste-ready). #
+#                                                                                      #
 ########################################################################################
 
 name: "Setup Chrome"

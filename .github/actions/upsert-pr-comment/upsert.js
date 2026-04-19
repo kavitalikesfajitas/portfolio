@@ -8,6 +8,8 @@ module.exports = async ({ github, context, core }) => {
     return;
   }
 
+  // Intentionally non-paginated: we only check the first page of comments.
+  // This action is designed for PRs with a small number of bot comments.
   const { data: comments } = await github.rest.issues.listComments({
     owner: context.repo.owner,
     repo: context.repo.repo,

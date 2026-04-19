@@ -1,3 +1,22 @@
+########################################################################################
+# "match-changed-paths" composite action                                               #
+#--------------------------------------------------------------------------------------#
+# Checks whether files changed between two refs match any configured path prefix.       #
+#                                                                                      #
+# Usage in workflow steps:                                                             #
+#                                                                                      #
+#      - name: Match changed paths                                                     #
+#        id: match
+#        uses: ./.github/actions/match-changed-paths
+#        with:
+#          base-sha: ${{ github.event.pull_request.base.sha }}
+#          head-sha: ${{ github.sha }}
+#          paths: |
+#            apps/living-kavita-loca
+#            packages
+#                                                                                      #
+########################################################################################
+
 name: Match changed paths
 description: >
   Runs git diff --name-only between two refs and sets matches=true if any

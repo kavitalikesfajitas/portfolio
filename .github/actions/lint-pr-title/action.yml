@@ -1,3 +1,17 @@
+########################################################################################
+# "lint-pr-title" composite action                                                     #
+#--------------------------------------------------------------------------------------#
+# Validates pull request titles using your commitlint configuration.                    #
+#                                                                                      #
+# Usage in workflow steps (from ci-lint-pr-title-action.yml):                          #
+#                                                                                      #
+#      - name: ✅ Valid PR title passes                                                #
+#        uses: ./.github/actions/lint-pr-title                                         #
+#        with:                                                                         #
+#          title: "feat: validate PR title with commitlint"                            #
+#                                                                                      #
+########################################################################################
+
 name: "Lint PR Title"
 description: "Validates PR title using commitlint config"
 

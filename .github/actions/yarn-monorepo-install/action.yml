@@ -17,7 +17,12 @@
 #          cache-prefix: add cache key prefix       # (default = 'default')            #
 #          cache-node-modules: false                # (default = 'false')              #
 #          cache-install-state: false               # (default = 'false')              #
-#          node-version-file: '.nvmrc'              # (default = '', skips setup)      #
+#          node-version-file: '.nvmrc'              # Recommended; default '' skips setup#
+#                                                                                      #
+# Real workflow call sites:                                                            #
+# - .github/workflows/ci-living-kavita-loca.yml                                        #
+# - .github/workflows/ci-packages.yml                                                  #
+# - .github/workflows/ci-pr-reusable-commit-lint.yml                                   #
 #                                                                                      #
 # Originally based on belgattitude/nextjs-monorepo-example (MIT)                       #
 ########################################################################################
@@ -50,7 +55,7 @@ inputs:
     required: false
     default: "true" # Required for Yarn 2+ (Berry). Set to false if yarn is already available on the runner.
   node-version-file:
-    description: "File to read Node.js version from (e.g. .nvmrc, .node-version). If empty, Node.js setup is skipped."
+    description: "File to read Node.js version from (e.g. .nvmrc, .node-version). Usually set this (typically .nvmrc). If empty, Node.js setup is skipped."
     required: false
     default: ""
 

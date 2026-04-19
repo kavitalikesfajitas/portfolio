@@ -1,8 +1,30 @@
+########################################################################################
+# "upsert-pr-comment" composite action                                                 #
+#--------------------------------------------------------------------------------------#
+# Creates or updates a PR comment identified by a hidden marker comment.               #
+#                                                                                      #
+# Usage in workflow steps (from ci-pr-living-kavita-loca.yml):                         #
+#                                                                                      #
+#      - name: 💬 Comment PR with preview URL                                          #
+#        uses: ./.github/actions/upsert-pr-comment                                     #
+#        with:                                                                         #
+#          identifier: "<!-- living-kavita-loca-preview-url -->"                       #
+#          body: |                                                                     #
+#            ## 🎉 Preview Deployed!                                                   #
+#            **🔗 ${{ needs.run-living-kavita-loca-unit-tests-and-preview.outputs.preview_url }}**
+#                                                                                      #
+# Note: This action intentionally checks only the first page of PR comments. Keep bot  #
+# comments on a PR limited to avoid duplicate comment creation when older bot comments  #
+# move beyond the first page.                                                          #
+#                                                                                      #
+########################################################################################
+
 name: "Upsert PR Comment"
 description: >
   Create or update a comment on a pull request. Uses a hidden HTML identifier
   to find an existing comment so it can be updated in-place instead of posting
-  duplicates.
+  duplicates. Note: this action intentionally scans only the first page of PR
+  comments (no pagination).
 
 inputs:
   identifier:
