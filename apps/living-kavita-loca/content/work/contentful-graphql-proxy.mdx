@@ -16,22 +16,22 @@ export const metadata = {
 
 ## Overview
 
-A high-performance GraphQL layer in front of Contentful that caches, normalizes, and instruments content delivery for Product Detail Pages (PDPs).
+I led design and implementation of a GraphQL proxy in front of Contentful to accelerate Product Detail Page (PDP) content at Nike scale. It gave PDP clients one place to fetch content and commerce signals, stayed steady through launch traffic, and shipped with observability so we could tune caching and upstream behavior from real production data—not guesswork.
 
 ## The Challenge
 
-Contentful's GraphQL API is powerful, but when you're serving millions of product pages, every millisecond counts. We needed a solution that could:
+Contentful’s GraphQL API is capable, but calling it the same way you would for a small storefront does not hold up when PDP traffic spikes. We needed a dedicated layer that could:
 
-- **Reduce latency** for repeated content fetches
-- **Handle traffic spikes** during product launches
-- **Provide observability** into content delivery performance
-- **Maintain data freshness** while maximizing cache hits
+- **Cut latency** on hot product content paths
+- **Ride out launch spikes** without hammering upstream systems
+- **Make cache and dependency behavior visible** in production
+- **Keep content fresh** while still earning a high, safe cache hit rate
 
 ## Solution Architecture
 
 ### Caching Layer
 
-We implemented a multi-tier caching strategy using Redis:
+I implemented a Redis-backed, multi-tier caching strategy with stale-while-revalidate behavior:
 
 ```typescript
 interface CacheConfig {
@@ -63,19 +63,19 @@ async function getCachedContent<T>(
 
 ### Schema Stitching
 
-We stitched together multiple GraphQL schemas to provide a unified API:
+The proxy stitched multiple GraphQL sources into a single contract for PDP consumers:
 
-- **Contentful CMS** - Product content, images, descriptions
-- **Inventory Service** - Real-time stock levels
-- **Pricing Service** - Dynamic pricing and promotions
+- **Contentful CMS** - Product copy, imagery, and merchandising content
+- **Inventory Service** - Near-real-time availability and stock status
+- **Pricing Service** - Dynamic pricing, promotions, and campaign logic
 
 ### Resilient Failover
 
-The proxy was designed with resilience in mind:
+The runtime was designed to degrade gracefully during dependency issues:
 
-1. **Circuit breakers** prevent cascade failures
-2. **Fallback content** serves cached data when upstream fails
-3. **Health checks** automatically route around unhealthy nodes
+1. **Circuit breakers** isolate failing integrations and prevent cascade failures
+2. **Fallback responses** serve cached content when upstream systems are unavailable
+3. **Health-aware routing** routes traffic away from unhealthy nodes automatically
 
 ## Results
 
@@ -86,19 +86,21 @@ The proxy was designed with resilience in mind:
 | Cache Hit Rate | N/A    | 94%   | -                 |
 | Error Rate     | 0.8%   | 0.1%  | **87% reduction** |
 
+These gains translated into faster PDP render times, more stable launch windows, and fewer production incidents tied to CMS content delivery.
+
 ## Key Learnings
 
-- **Structured logging** is invaluable for debugging production issues
-- **Metrics-driven development** helps prioritize optimization efforts
-- **Gradual rollouts** catch edge cases before they become incidents
+- **Structured logging and tracing** are essential for diagnosing distributed cache behavior
+- **Metrics-driven iteration** keeps optimization work aligned to measurable user impact
+- **Progressive rollouts** surface edge cases early and reduce launch risk
 
 ## Future Enhancements
 
 We're exploring:
 
 - Edge caching with Cloudflare Workers
-- Predictive cache warming based on traffic patterns
-- GraphQL persisted queries for additional performance gains
+- Predictive cache warming based on traffic and merchandising events
+- Persisted queries to further reduce payload overhead and execution time
 
 ---
 
