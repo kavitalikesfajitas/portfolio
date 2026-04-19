@@ -29,6 +29,8 @@ _(Currently showcasing the [previous website](https://github.com/kavitalikesfaji
 - **Infrastructure:** Terraform, AWS S3
 - **CI/CD:** GitHub Actions
 
+CI architecture and custom action notes: [`CI.md`](./CI.md)
+
 ## Infrastructure & Deployment
 
 ✅ **Fully operational and deployed!**
