@@ -18,14 +18,14 @@ export const metadata = {
 
 **I owned this end to end:** I wrote the internal RFC (*“Replace Content-APIs with a single GraphQL Apollo proxy for Contentful”*), stood up the **Jira epic**, broke the work into **trackable tickets**, and carried it through **a little over two sprints** to **done**—from first merge to a production-shaped service story.
 
-The problem was organizational and technical at once: we had a **content API pattern that translated Contentful’s GraphQL into REST**. That looked convenient to consumers but was **slow to extend** (new content models tended to mean **new endpoints** and repeated backend work), and it **hid** that the real wire protocol was still **GraphQL POST** upstream.
+The problem was organizational and technical at once: we had a **content API pattern that translated Contentful’s GraphQL into REST**. The embodiment of that was the legacy **`api/content`** package—**one AWS Lambda and OpenAPI route per concern** (`get-page`, `get-collections`, `get-product-by-slug`, …), each handler still **building GraphQL** and calling Contentful under the hood. It **looked** like a tidy REST catalog; in practice it meant **copy-paste growth**, **slow schema evolution**, and **more deployables** every time merchandising needed a new shape. **I drove the proxy work so we would not keep extending that model.**
 
 **I wrote the first version as a Next.js endpoint:** a **Pages API** route at `pages/api/contentful/graphql` with **Apollo Server** in front of Contentful—checked-in schema, **HTTP executor** (POST upstream), **in-memory LRU** response caching, and cache-control defaults so we could **prove the proxy, caching, and security boundary** without boiling the ocean. That shipped as **Stage 1** in the RFC. **Stage 2** was intentionally exploratory (e.g. **standalone / serverless** shapes); I **extracted the design** into a standalone **Express** service in my own monorepo: **`POST /contentful/graphql`**, optional **Redis** for a shared response cache (versus in-process LRU on the Next route), **health checks**, CORS, and CI-friendly packaging.
 
 ## The Challenge
 
-- **REST-over-GraphQL anti-pattern** — We were wrapping **GraphQL/POST** in **REST-shaped** APIs; that did not scale with how fast merchandising and PDP teams needed to ship new content models.
-- **Endpoint sprawl** — Serving a new Contentful model through the old pattern meant more bespoke API surface instead of one intentional contract.
+- **REST-over-GraphQL anti-pattern** — **`api/content`** exposed GET routes and OpenAPI docs while **`makeItemsRequest` + hand-authored queries** did the real work. That did not scale with how fast merchandising and PDP teams needed to ship new content models.
+- **Lambda and endpoint sprawl** — Every new slice of Contentful data threatened **another handler**, **another SAM target**, and **another contract**—instead of one intentional GraphQL surface.
 - **Slow query and schema iteration** — Evolving operations, typings, and cache defaults was painful without a single BFF and a honest integration model.
 - **Cache topology** — In-process caching worked for a single Node instance; **Redis** was the next step for consistent hits across replicas and deploys.
 - **Operational clarity** — We needed a small surface (`/contentful/graphql`, `/contentful/health`) and sane defaults for TTLs and telemetry.
@@ -66,7 +66,7 @@ const schema = wrapSchema({
 
 ### How I drove it (program, not just code)
 
-- **RFC** — Documented context, goals, and a staged plan: **Stage 1** (Next API proxy + guardrails) and **Stage 2** (extractable / alternate hosting), including **Contentful rate-limit** notes so caching strategy stayed grounded in vendor reality.
+- **RFC** — Documented context, goals, and a staged plan: **Stage 1** (Next API proxy + guardrails) and **Stage 2** (extractable / alternate hosting), explicitly calling out why **`api/content`-style REST facades** were the wrong long-term shape, plus **Contentful rate-limit** notes so caching strategy stayed grounded in vendor reality.
 - **Planning** — Created the **Jira epic**, wrote and linked **implementation tickets**, and sequenced work so we could **prove value early** and **de-risk** extraction.
 - **Execution** — Delivered across **just over two sprints**: shipped the proxy pattern, caching defaults, and the operational hooks the team needed to treat Contentful reads as a first-class platform concern.
 
@@ -98,4 +98,4 @@ Qualitatively, the extracted service made it easier to **iterate on GraphQL oper
 
 ---
 
-_Origin: first shipped as a Next.js Pages API route (`pages/api/contentful/graphql`) on the Nike Digital Platform team. Standalone service: solo-maintained monorepo (`contentful-proxy`) with Docker/CI and Redis-backed caching._
+_Origin: motivated by retiring growth in the legacy `api/content` Lambdas; first shipped as a Next.js Pages API route (`pages/api/contentful/graphql`) on the Nike Digital Platform team. Standalone service: solo-maintained monorepo (`contentful-proxy`) with Docker/CI and Redis-backed caching._
