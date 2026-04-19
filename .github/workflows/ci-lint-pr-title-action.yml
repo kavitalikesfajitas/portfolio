@@ -1,0 +1,48 @@
+name: PR Title Lint Action CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - ".github/actions/lint-pr-title/**"
+      - "commitlint.config.js"
+      - "package.json"
+      - "yarn.lock"
+      - ".yarnrc.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke-test-lint-pr-title-action:
+    runs-on: [ubuntu-latest]
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 📥 Monorepo install
+        uses: ./.github/actions/yarn-monorepo-install
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: ✅ Valid PR title passes
+        uses: ./.github/actions/lint-pr-title
+        with:
+          title: "feat: validate PR title with commitlint"
+
+      - name: ❌ Invalid PR title fails
+        id: invalid-title
+        continue-on-error: true
+        uses: ./.github/actions/lint-pr-title
+        with:
+          title: "BAD TITLE"
+
+      - name: Assert invalid title failed
+        if: steps.invalid-title.outcome != 'failure'
+        run: |
+          echo "Expected invalid PR title check to fail, but it passed."
+          exit 1
