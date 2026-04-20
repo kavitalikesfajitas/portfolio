@@ -28,6 +28,8 @@ export const metadata = {
 
 The story here is pretty simple: I proved the pattern quickly, hit the scaling limits of the first version, wrote the RFC, and then led the work to ship the production version.
 
+**1 — Proof of concept.** I started with a quick Next.js route and an in-process cache to prove the pattern, validate the GraphQL wrapper approach, and learn what the real operational requirements would be before committing to a bigger server shape.
+
 
 **2 — The scaling limit.** It became clear pretty quickly that **in-process caching on a Next route** was not the right long-term shape for the traffic profile we expected on `swoosh.nike`. Once you care about replicas, cold paths, and shared cache hit rate, a simple in-memory cache stops being good enough.
 
@@ -98,19 +100,21 @@ const schema = wrapSchema({
 
 ### Request lifecycle (standalone server)
 
-1. **Express** accepts **`POST /contentful/graphql`** with **`express.json({ limit: "50mb" })`** so large batched or deeply nested queries do not get rejected at the edge by default body limits.
-2. **`cors`** runs on that path; preflight uses **`OPTIONS`** with **`optionsSuccessStatus: 200`** for older clients that choke on **204**.
+1. **Express** accepts **`POST /contentful/graphql`** with **`express.json({ limit: "50mb" })`** in the implementation shown here, but that is **not** a safe public default on its own. If you allow bodies that large, pair them with **rate limiting**, **persisted-operation allowlists** (or authenticated-only large bodies), **memory-safe batching rules**, and smaller fallback limits wherever clients do not truly need huge payloads.
+2. **`cors`** runs on that path; preflight uses **`OPTIONS`** with **`optionsSuccessStatus: 200`** for older clients that choke on **204**. That helps browser compatibility, but it does **not** protect the route from oversized or expensive GraphQL requests.
 3. **`@as-integrations/express` `expressMiddleware`** hands the HTTP request to **Apollo Server 4**.
-4. Apollo **parses, validates, and executes** against the **wrapped** schema; cache plugins participate on the way out (see below).
+4. Apollo **parses, validates, and executes** against the **wrapped** schema; this is also where you enforce **depth / cost limits**, operation rules, and execution guards before a request turns into an expensive fan-out to Contentful. Cache plugins participate on the way out (see below).
 5. The executor issues **`POST`** to Contentful’s GraphQL HTTP API and returns data **or** partial errors per GraphQL rules.
+
+If I were documenting this as a production playbook instead of a case study, I would link the body-limit decision at **`express.json({ limit: "50mb" })`** to the **Express** middleware that rate-limits or authenticates the route, and link the **Apollo parse / validate / execute** step to whichever **depth / cost** plugin or custom validation rules the server uses. In practice, **persisted queries**, **smaller body limits**, and **pagination** are usually safer defaults than a blanket public **50MB** allowance.
 
 Health checks are a separate **`GET /contentful/health`** JSON response (status, message, listen URL, timestamp)—cheap **liveness** without hitting Contentful.
 
 ### Next.js POC vs Express server (same graph, different host constraints)
 
-**POC (`pages/api/contentful/graphql`):** **`startServerAndCreateNextHandler`** from `@as-integrations/next` embeds Apollo inside a **Pages API** route. **`export const config = { maxDuration: 5 }`** caps **serverless** execution time; that alone is a hint you are not building a **long-lived** cache host. The Apollo **`cache`** was a plain **`InMemoryLRUCache`** (in the POC: **~100MB** cap, **5-minute** store TTL) shared by **parsed-query work**, **response cache**, and **cache-control**—fine for **one** warm instance, wrong shape for **many** replicas **sharing** PDP traffic.
+**POC (`pages/api/contentful/graphql`):** **`startServerAndCreateNextHandler`** from `@as-integrations/next` embeds Apollo inside a **Pages API** route. **`export const config = { maxDuration: 5 }`** caps **serverless** execution time; that alone is a hint you are not building a **long-lived** cache host. In that first version, Apollo **`cache`** was a plain **`InMemoryLRUCache`** (in the POC: **~100MB** cap, **5-minute** store TTL) for features like **APQ**, **response caching**, and other Apollo cache consumers. Parsed-and-validated operation reuse is a **separate** concern under **`documentStore`**, which is what Apollo uses to skip repeated **parse + validate** work.
 
-**Production-shaped service:** **Express** + **`http` / `https.createServer`**, **`ApolloServerPluginDrainHttpServer`** for graceful shutdown, and the same **Apollo plugin stack**—but the **`cache`** is backed by **`Keyv`** and optionally **Redis** (below) so **hit rate** survives **horizontal scale**.
+**Production-shaped service:** **Express** + **`http` / `https.createServer`**, **`ApolloServerPluginDrainHttpServer`** for graceful shutdown, and the same **Apollo plugin stack**. The important production detail is that **`cache`** and **`documentStore`** are **two different knobs**: use **`cache`** for **APQ / response caching** and Apollo cache consumers such as **RESTDataSource**, and wire **`documentStore`** separately if you want parsed-and-validated operations to survive beyond one warm process.
 
 ### Apollo plugins (why each one exists)
 
@@ -122,24 +126,39 @@ Health checks are a separate **`GET /contentful/health`** JSON response (status,
 
 ### The cache implementation (in-memory → layered → Redis)
 
-Apollo’s **`cache`** option is not “only HTTP responses.” In both the POC and the server, the same backing store feeds **parsed/validated query caching**, **response cache**, and **cache-control** behavior—so choosing the **implementation** is choosing **PDP scalability**.
+Apollo’s **`cache`** option is not “only HTTP responses.” It matters for **APQ**, **response caching**, and other Apollo cache consumers such as **RESTDataSource**. But **parsed / validated operation reuse** belongs to **`documentStore`**, which is a **separate** setting. If you move from the POC to a production **Express / `http.createServer`** deployment, configure **both** independently.
 
-**Redis on:** the code builds a **layered** cache via **`cacheable`**: **primary** in-memory **`Keyv` + `InMemoryLRUCache`**, **secondary** **`KeyvRedis`** (TLS + `servername` in non-dev, **`disableOfflineQueue: true`** to avoid unbounded buffering when Redis is unhappy). **`KeyvAdapter`** bridges that into Apollo, with **`disableBatchReads`** wired to env for tuning **`mget`** behavior. Everything sits under a **`contentful-cache`** namespace so keys do not collide with unrelated Redis users. Optional **`DEBUG_PROXY`** hooks log **get/set** paths when you are proving behavior locally.
+**Redis on:** the code builds a **layered** cache via **`cacheable`**: **primary** in-memory **`Keyv` + `InMemoryLRUCache`**, **secondary** **`KeyvRedis`** (TLS + `servername` in non-dev, **`disableOfflineQueue: true`** to avoid unbounded buffering when Redis is unhappy). One **`KeyvAdapter`** can back Apollo **`cache`** for **APQ / response caching**; a second store can back **`documentStore`** for parsed queries. Everything sits under explicit namespaces so keys do not collide with unrelated Redis users. Optional **`DEBUG_PROXY`** hooks log **get/set** paths when you are proving behavior locally.
 
-**Redis off:** **`Keyv`** over **`InMemoryLRUCache` only**—the POC story, explicit in logs as “Redis cache disabled.”
+**Redis off:** the same separation still matters. A small in-memory **`cache`** may be enough for a POC, while **`documentStore`** can remain default / in-memory until parse + validate reuse becomes a real bottleneck.
 
 ```typescript
-// Shaped like the standalone service: layered memory + Redis, then Apollo adapter.
-const layeredCache = new Cacheable({
-  primary: memoryStore,
-  secondary: redisStore,
+// Production shape: configure Apollo `cache` and `documentStore` separately.
+const responseLayer = new Cacheable({
+  primary: responseMemoryStore,
+  secondary: responseRedisStore,
   nonBlocking: true,
 });
-const keyValueCache = new Keyv({
-  store: layeredCache,
-  namespace: "contentful-cache",
+
+const apolloCache = new KeyvAdapter(
+  new Keyv({
+    store: responseLayer,
+    namespace: "contentful-cache",
+  }),
+  { disableBatchReads }
+);
+
+const documentStore = createParsedQueryDocumentStore({
+  store: parsedQueryRedisStore,
+  namespace: "contentful-document-store",
 });
-return new KeyvAdapter(keyValueCache, { disableBatchReads });
+
+const server = new ApolloServer({
+  schema,
+  cache: apolloCache,
+  documentStore,
+  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+});
 ```
 
 ### `cacheable` in practice: debugging without SSH
