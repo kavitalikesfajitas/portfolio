@@ -1,0 +1,279 @@
+export const metadata = {
+  title: "Optimizely Singleton Provider",
+  role: "Frontend / Platform Engineer",
+  tech: ["Next.js", "TypeScript", "Optimizely", "React"],
+};
+
+# Optimizely Singleton Provider
+
+**Role:** Frontend / Platform Engineer  
+**Tech Stack:** Next.js · TypeScript · Optimizely · React
+
+---
+
+**TL;DR:** I set up Optimizely in a Next.js app so the server initializes the SDK once per pod, keeps a build-generated fallback datafile in the repo, and refreshes the live datafile on a controlled interval instead of refetching it on every page visit. The interesting part is the singleton: because we were not on Vercel and could not rely on the standard Optimizely + Next examples, I used a `Symbol.for(...)` key on `global` to preserve one shared Optimizely client per runtime.
+
+## Overview
+
+Feature flagging looks simple until you think about what actually happens in a server-rendered app.
+
+If every request or render path initializes its own Optimizely client, you pay for repeated SDK startup, repeated datafile fetches, and a lot of ambiguity around which instance is actually "the" source of truth for feature evaluation. In the bad version of this story, a page visit turns into another trip to fetch configuration that barely changed.
+
+The key constraint here was not "Next.js is weird about scope." It was that we were running Next as a standalone app, not inside the kind of environment assumed by the standard Optimizely + Next examples. Those examples are fine if your hosting model lines up with them. Ours did not. Outside that shape, you do not really get a true singleton for free, which meant we needed to make one explicitly at the pod level.
+
+And that is the broader lesson: this was not some one-off Optimizely oddity. It is one example of the kinds of issues that show up when you use Next outside the default Vercel-centered path. A lot of companies run Next on AWS or Google Cloud, usually in containers or as a standalone server, so this sort of runtime mismatch is not rare at all.
+
+The shape I wanted was:
+
+- **One Optimizely SDK bootstrap per pod**
+- **One place to control refresh cadence**
+- **A safe fallback datafile available immediately at startup**
+- **Browser consumers that reuse server-provided data instead of refetching**
+
+That led to a small pattern I like a lot: a symbol-backed global reference for the server SDK, paired with a build step that writes a fallback datafile into the app before the server even boots.
+
+## The challenge
+
+There were really two problems to solve, and both came from that standalone deployment reality.
+
+First, I did not want the server constantly recreating Optimizely clients. The Node SDK can auto-update its datafile in the background, which is useful, but only if you let a single long-lived instance exist long enough to benefit from that behavior. Before this pattern, the expensive path was effectively tied to page traffic. That means more visits can translate into more unnecessary fetches, which is a terrible exchange when the datafile changes far less often than the pages are viewed.
+
+Second, I did not want startup to depend entirely on live CDN availability. If the app boots and Optimizely's CDN is temporarily unavailable, I still want a known-good datafile on disk so the SDK can start from something deterministic.
+
+So the goal was not just "integrate Optimizely." The goal was to make the integration operationally sane:
+
+- **Initialize once per pod**
+- **Refresh on our schedule**
+- **Start from a fallback file if the network is unhappy**
+- **Avoid duplicate client-side datafile downloads**
+
+The performance win from that is pretty wild when you zoom out:
+
+- **Before:** page visits could repeatedly trigger Optimizely bootstrap and config fetch work
+- **After:** each pod initializes once, then refreshes on a fixed cadence
+
+That is a huge reduction in avoidable calls. Instead of tying vendor traffic to user traffic, the integration ties vendor traffic to a refresh window we control.
+
+## The core pattern
+
+### 1. A symbol-backed global reference
+
+The singleton is anchored by a small `GlobalRef<T>` utility that stores data on `global` using `Symbol.for(uniqueName)`.
+
+```typescript
+export class GlobalRef<T> {
+  private readonly sym: symbol;
+
+  constructor(uniqueName: string) {
+    this.sym = Symbol.for(uniqueName);
+  }
+
+  get value() {
+    return (global as any)[this.sym] as T | undefined;
+  }
+
+  set value(value: T) {
+    (global as any)[this.sym] = value;
+  }
+}
+```
+
+That matters because the symbol comes from the global symbol registry. Instead of leaning on a hosting-specific singleton story, I can look up the same symbol key again and resolve the same process-level slot on `global`.
+
+In practice, that gives me a much sturdier singleton mechanism for this deployment model:
+
+- **`Symbol.for("optimizelyClient")`** gives the key a stable identity
+- **`global[symbol]`** becomes the backing store
+- **`GlobalRef<Optimizely.Client>`** wraps the pattern so the rest of the app does not need to know the storage details
+
+It is a tiny abstraction, but it solves a real deployment problem cleanly. The app no longer depends on whether some example code's runtime assumptions happen to match how our pods actually live.
+
+### 2. Initialize the Optimizely SDK only if missing
+
+The actual Optimizely bootstrap is straightforward once the global ref exists:
+
+```typescript
+export const optimizelyInstanceGlobal = new GlobalRef<Optimizely.Client>(
+  "optimizelyClient",
+);
+
+export const setOptimizelyClient = () => {
+  if (!optimizelyInstanceGlobal.value) {
+    optimizelyInstanceGlobal.value = Optimizely.createInstance({
+      sdkKey,
+      datafile: fallbackOptimizelyDatafile,
+      odpOptions: { disabled: true },
+      datafileOptions: {
+        autoUpdate: true,
+        updateInterval: OPTIMIZELY_REFRESH_INTERVAL,
+      },
+    }) as Optimizely.Client;
+  }
+};
+```
+
+That `if (!optimizelyInstanceGlobal.value)` guard is the whole point: the SDK is created once for the pod, not once per request or page visit.
+
+After that, the Node SDK handles background datafile refreshes on the configured interval. So instead of repeatedly rebuilding the client, I let one long-lived instance do the job it was designed to do.
+
+## The fallback datafile story
+
+The other part I think is worth documenting is the backup plan.
+
+This app pre-fetches the Optimizely datafile during build and writes it into the provider directory as `fallbackDatafile.json`. That happens from `next.config.mjs`, which calls a small build-time helper before returning the Next config:
+
+```javascript
+try {
+  await preFetchOptimizelyDatafile();
+} catch (error) {
+  console.error(
+    "Error pre-fetching Optimizely Datafile Fallback File:",
+    error,
+  );
+}
+```
+
+And the helper itself is intentionally simple:
+
+```javascript
+const response = await fetch(
+  `https://cdn.optimizely.com/datafiles/${sdkKey}.json`,
+);
+const responseJson = await response.text();
+fs.writeFileSync(`${DATAFILE_DIR}/fallbackDatafile.json`, responseJson);
+```
+
+That gives the runtime a practical startup sequence:
+
+1. **Build time:** fetch the latest datafile and write it into the app
+2. **Server startup:** initialize the singleton using that fallback file immediately
+3. **Runtime:** let the SDK auto-refresh in the background on the configured interval
+
+I like this because it separates concerns well.
+
+The fallback file is not pretending to be permanently current. It is there so startup is resilient and deterministic. Freshness is handled by the singleton's background refresh behavior, and that refresh window is something we control explicitly.
+
+In this implementation, the refresh interval is:
+
+```typescript
+export const OPTIMIZELY_REFRESH_INTERVAL = 180000; // 3 min
+```
+
+That means we can tune staleness tolerance intentionally instead of letting it be an accidental side effect of however often components remount or requests happen to come in.
+
+And that is the real performance story here. We are no longer saying, "go ask Optimizely again because another user opened the page." We are saying, "refresh on this interval, per pod, because that is the freshness policy we chose."
+
+## Server and client have different jobs
+
+Another nice part of this setup is that the server and browser clients are not treated the same.
+
+On the **server**, the singleton owns the live SDK instance. It can wait for readiness and evaluate flags centrally:
+
+```typescript
+const enabled = await optimizelyInstanceGlobal.value
+  .onReady()
+  .then(() => {
+    return optimizelyInstanceGlobal.value.isFeatureEnabled(
+      featureFlag as string,
+      upmId,
+      { upmId },
+    );
+  });
+```
+
+On the **client**, the React provider is intentionally initialized from a passed-in datafile with `autoUpdate: false`:
+
+```typescript
+const [optimizelyClient] = useState(() => {
+  return createInstance({
+    datafile: dataFromOptimizely!,
+    logLevel: getOptimizelyLogLevel(),
+    datafileOptions: {
+      autoUpdate: false,
+    },
+    odpOptions: {
+      disabled: true,
+    },
+  });
+});
+```
+
+That split is important.
+
+The browser does not need to keep downloading the datafile on its own if the server-side singleton is already managing freshness. The browser just needs a stable client initialized from the data it was given so React hooks and feature checks can work without redundant network churn.
+
+So the architecture becomes:
+
+```text
+Build step
+  -> fetch latest datafile
+  -> write fallbackDatafile.json
+
+Pod starts
+  -> initialize one Optimizely singleton from fallbackDatafile.json
+  -> enable autoUpdate on a controlled interval
+
+Requests / renders
+  -> reuse the same server client
+  -> pass data into the React provider
+  -> keep browser autoUpdate off
+```
+
+That is the part I find elegant: each layer has one job, and none of them are fighting each other.
+
+## Why the symbol ref is the interesting bit
+
+The build-time fallback is useful, and the refresh interval is operationally important, but the part I think is genuinely fun is the symbol-backed singleton.
+
+It is a small pattern, but it reflects a deeper lesson about integration code:
+
+- **Do not assume vendor examples match your hosting model**
+- **Expect standalone Next.js deployments to surface edge cases the default path hides**
+- **Do not assume singleton behavior appears automatically outside those assumptions**
+- **Do not reinitialize long-lived SDKs if the runtime can keep them alive**
+- **If you need process-wide state, make that decision explicit**
+
+Using `Symbol.for(...)` on `global` makes the singleton visible in the code as an intentional platform choice, not as something implied by example code that was written for a different runtime story.
+
+That is the kind of implementation detail I like documenting because it looks tiny in a diff, but it changes how stable the integration feels in production.
+
+## Results
+
+This setup gave the Optimizely integration a much cleaner operating model:
+
+- **One Optimizely client per pod** instead of repeated initialization
+- **Controlled refresh cadence** through `OPTIMIZELY_REFRESH_INTERVAL`
+- **Resilient startup** through a build-generated fallback datafile
+- **Less duplicate fetching** because the browser client does not auto-update separately
+- **A clear separation of responsibilities** between server evaluation and React consumption
+
+The practical effect was a dramatic reduction in unnecessary API traffic. Before, the system was much closer to "fetch because the page got visited." After, it became "fetch when the pod starts, then refresh every N minutes." That is a much saner performance profile, especially at scale, because growth in page views no longer implies the same growth in config-fetch churn.
+
+It is not a massive subsystem, but it is a good example of the kind of infrastructure polish that makes feature-flagging code easier to trust. It is also a good reminder that once you run Next on AWS or Google Cloud as a real standalone app, you start owning runtime behavior that managed-platform examples often gloss over.
+
+## What I'd reuse
+
+I would absolutely reuse this pattern for other SDKs with a long-lived in-memory model:
+
+- Experimentation and feature flag clients
+- Configuration SDKs
+- Vendor SDKs that hydrate from a remote document and refresh over time
+
+The general recipe is solid:
+
+1. **Persist one runtime instance intentionally**
+2. **Seed it with a safe local fallback**
+3. **Refresh in the background on a cadence you control**
+4. **Do not make the browser repeat server work unless it has to**
+
+## What I'd do now
+
+If I were building this today in newer Next.js, I would also look seriously at the newer fetch caching model and `revalidateTag`-style invalidation.
+
+That would open up another way to think about freshness: instead of relying primarily on a long-lived in-memory singleton refresh loop, you could model parts of the datafile lifecycle around framework-native cache invalidation and explicit revalidation triggers.
+
+But this implementation predated that direction in Next, and for the tooling available at the time, the singleton-plus-refresh-interval approach was the right shape. It solved the actual problem we had then: stop refetching on page traffic, reduce API calls hard, and keep the system predictable.
+
+---
+
+_Built for a Next.js preorder application using Optimizely's Node and React SDKs. The notable implementation detail was a `GlobalRef` utility backed by `Symbol.for(...)` on `global`, plus a build-time datafile prefetch step wired through `next.config.mjs`._
