@@ -1,0 +1,75 @@
+name: PR Title Lint Action Unit Tests CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - ".github/actions/lint-pr-title/**"
+      - "commitlint.config.js"
+      - "package.json"
+      - "yarn.lock"
+      - ".github/actions/yarn-monorepo-install/**"
+      - ".nvmrc"
+      - ".yarnrc.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Smoke test workflow: validates changes to the lint-pr-title action and related CI wiring.
+  # This exists to test action behavior safely before relying on it in the main PR audit flow.
+  smoke-test-lint-pr-title-action:
+    runs-on: [ubuntu-latest]
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 📥 Monorepo install
+        uses: ./.github/actions/yarn-monorepo-install
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Read Node version from .nvmrc
+        id: node-version
+        shell: bash
+        run: echo "value=$(tr -d '\r\n' < .nvmrc)" >> "$GITHUB_OUTPUT"
+
+      - name: ✅ Valid PR title passes
+        uses: ./.github/actions/lint-pr-title
+        with:
+          title: "feat: validate PR title regex"
+          validator: "regex"
+          node-version: ${{ steps.node-version.outputs.value }}
+
+      - name: ✅ Valid PR title passes - JIRA
+        uses: ./.github/actions/lint-pr-title
+        with:
+          title: "chore: validate PR title regex [JIRA-123]"
+          validator: "regex"
+          node-version: ${{ steps.node-version.outputs.value }}
+
+      - name: ✅ Commitlint mode valid title passes
+        uses: ./.github/actions/lint-pr-title
+        with:
+          title: "feat: validate PR title with commitlint"
+          validator: "commitlint"
+          node-version: ${{ steps.node-version.outputs.value }}
+
+      - name: ❌ Invalid PR title fails
+        id: invalid-title
+        continue-on-error: true
+        uses: ./.github/actions/lint-pr-title
+        with:
+          title: "BAD TITLE"
+          validator: "regex"
+          node-version: ${{ steps.node-version.outputs.value }}
+
+      - name: Assert invalid title failed
+        if: steps.invalid-title.outcome != 'failure'
+        run: |
+          echo "Expected invalid PR title check to fail, but it passed."
+          exit 1

@@ -29,22 +29,24 @@ permissions:
 jobs:
   detect-changes:
     if: github.ref != 'refs/heads/main' && github.event.pull_request.draft == false
+    name: "Determine if we need to deploy a preview PR or not"
     runs-on: ubuntu-latest
     outputs:
-      app_or_packages_changed: ${{ steps.filter.outputs.app_or_packages }}
+      app_or_packages_changed: ${{ steps.filter.outputs.matches }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: 🔍 Detect changes in app or packages
         id: filter
-        uses: dorny/paths-filter@v3
+        uses: ./.github/actions/match-changed-paths
         with:
-          filters: |
-            app_or_packages:
-              - 'apps/**'
-              - 'packages/**'
-              - 'tsconfig.base.json'
+          base-sha: ${{ github.event.pull_request.base.sha }}
+          head-sha: ${{ github.sha }}
+          paths: |
+            apps
+            packages
+            tsconfig.base.json
 
   run-living-kavita-loca-unit-tests-and-preview:
     needs: detect-changes
@@ -63,46 +65,16 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - name: 💬 Comment PR with preview URL
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const prNumber = context.payload.pull_request.number;
-            const previewUrl = '${{ needs.run-living-kavita-loca-unit-tests-and-preview.outputs.preview_url }}';
+      - name: Checkout
+        uses: actions/checkout@v4
 
-            const comment = `## 🎉 Preview Deployed!
+      - name: 💬 Comment PR with preview URL
+        uses: ./.github/actions/upsert-pr-comment
+        with:
+          identifier: "<!-- living-kavita-loca-preview-url -->"
+          body: |
+            ## 🎉 Preview Deployed!
 
             Your preview is ready at:
 
-            **🔗 ${previewUrl}**
-            `;
-
-            // Find existing comment
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: prNumber,
-            });
-
-            const botComment = comments.find(comment => 
-              comment.user.type === 'Bot' && 
-              comment.body.includes('Preview Deployed')
-            );
-
-            if (botComment) {
-              // Update existing comment
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: comment
-              });
-            } else {
-              // Create new comment
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: prNumber,
-                body: comment
-              });
-            }
+            **🔗 ${{ needs.run-living-kavita-loca-unit-tests-and-preview.outputs.preview_url }}**

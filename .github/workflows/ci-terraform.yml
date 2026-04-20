@@ -13,6 +13,7 @@ jobs:
   terraform-deploy:
     runs-on: [ubuntu-latest]
     name: Terraform Time 🧰
+    timeout-minutes: 45
     # Shared concurrency group to prevent Terraform state lock conflicts.
     # Only one plan/apply can run at a time since they share Terraform Cloud state.
     concurrency:

@@ -1,0 +1,104 @@
+########################################################################################
+# "match-changed-paths" composite action                                               #
+#--------------------------------------------------------------------------------------#
+# Checks whether files changed between two refs match configured repo path prefixes.   #
+#                                                                                      #
+# Notes:                                                                               #
+# - `paths` are prefix matches, not globs (for example, `packages` matches            #
+#   `packages/ui-library/package.json`).                                               #
+# - A file matches when it equals a path or starts with `<path>/`.                    #
+#                                                                                      #
+# Usage in workflow steps:                                                             #
+#                                                                                      #
+#      - name: Match changed paths                                                     #
+#        id: match                                                                      #
+#        uses: ./.github/actions/match-changed-paths                                  #
+#        with:                                                                         #
+#          base-sha: ${{ github.event.pull_request.base.sha }}                        #
+#          head-sha: ${{ github.sha }}                                                 #
+#          paths: |                                                                    #
+#            apps/living-kavita-loca                                                   #
+#            packages                                                                  #
+#                                                                                      #
+########################################################################################
+
+name: Match changed paths
+description: >
+  Runs git diff --name-only between two refs and sets matches=true if any
+  changed file equals one of the given paths or lives under it (path prefix).
+
+inputs:
+  base-sha:
+    description: Base ref for git diff
+    required: true
+  head-sha:
+    description: Head ref for git diff
+    required: true
+  paths:
+    description: >
+      Newline-separated repo-relative path prefixes (not glob patterns). A
+      change matches if the file is exactly that path or starts with path + "/".
+    required: true
+
+outputs:
+  matches:
+    description: "true if at least one changed file matched a path"
+    value: ${{ steps.detect.outputs.matches }}
+
+runs:
+  using: composite
+  steps:
+    - id: detect
+      shell: bash
+      env:
+        BASE_SHA: ${{ inputs.base-sha }}
+        HEAD_SHA: ${{ inputs.head-sha }}
+        MATCH_PATHS: ${{ inputs.paths }}
+      run: |
+        set -euo pipefail
+
+        ensure_commit_exists() {
+          local sha="$1"
+          if git cat-file -e "${sha}^{commit}" 2>/dev/null; then
+            return 0
+          fi
+
+          echo "Commit ${sha} not found locally; fetching from origin."
+          if ! git fetch --no-tags --depth=1 origin "$sha"; then
+            echo "::error::Failed to fetch commit ${sha} from origin. Ensure this workflow has access to both refs."
+            exit 1
+          fi
+
+          if ! git cat-file -e "${sha}^{commit}" 2>/dev/null; then
+            echo "::error::Commit ${sha} is still unavailable after fetch."
+            exit 1
+          fi
+        }
+
+        ensure_commit_exists "$BASE_SHA"
+        ensure_commit_exists "$HEAD_SHA"
+
+        if ! CHANGED="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"; then
+          echo "::error::git diff failed for base ${BASE_SHA} and head ${HEAD_SHA}."
+          exit 1
+        fi
+        matched=false
+        while IFS= read -r file || [[ -n "${file:-}" ]]; do
+          [[ -z "${file:-}" ]] && continue
+          while IFS= read -r pattern || [[ -n "${pattern:-}" ]]; do
+            pattern="${pattern//$'\r'/}"
+            pattern="${pattern#"${pattern%%[![:space:]]*}"}"
+            pattern="${pattern%"${pattern##*[![:space:]]}"}"
+            [[ -z "$pattern" ]] && continue
+            if [[ "$file" == "$pattern" ]] || [[ "$file" == "$pattern/"* ]]; then
+              matched=true
+              break 2
+            fi
+          done <<< "$MATCH_PATHS"
+        done < <(printf '%s\n' "$CHANGED")
+
+        if [[ "$matched" == true ]]; then
+          echo "matches=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "matches=false" >> "$GITHUB_OUTPUT"
+        fi

@@ -1,0 +1,70 @@
+########################################################################################
+# "lint-pr-title" composite action                                                     #
+#--------------------------------------------------------------------------------------#
+# Validates pull request titles using either regex or commitlint.                       #
+#                                                                                      #
+# Usage in workflow steps (from ci-lint-pr-title-action.yml):                          #
+#                                                                                      #
+#      - name: ✅ Valid PR title passes                                                #
+#        uses: ./.github/actions/lint-pr-title                                         #
+#        with:                                                                         #
+#          title: "[NVS-123] add PR title lint action"                                 #
+#          validator: "regex"                                                          #
+#                                                                                      #
+#      - name: ✅ Commitlint mode valid title passes                                   #
+#        uses: ./.github/actions/lint-pr-title                                         #
+#        with:                                                                         #
+#          title: "feat: add pr title lint action"                                     #
+#          validator: "commitlint"                                                     #
+#                                                                                      #
+########################################################################################
+
+name: "Lint PR Title"
+description: "Validates PR title with regex or commitlint"
+
+inputs:
+  title:
+    description: "The PR title to validate"
+    required: true
+  node-version:
+    description: "Node.js version for actions/setup-node"
+    required: false
+    default: "lts/*"
+  validator:
+    description: "Validation mode: regex or commitlint"
+    required: false
+    default: "regex"
+  title-regex:
+    description: "Regex pattern to validate the PR title against"
+    required: false
+    default: "^(\\[JIRA-\\d+\\]:\\s.+|(feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)(\\([^)]+\\))?!?:\\s.+(\\s\\[JIRA-\\d+\\])?|debug:.*|hotfix:.*)$"
+  title-regex-flags:
+    description: "Regex flags (for example, g, i)"
+    required: false
+    default: "g"
+  commitlint-config:
+    description: "Path to commitlint configuration file (used when validator=commitlint)"
+    required: false
+    default: "commitlint.config.js"
+  error-message:
+    description: "Error message shown when the PR title does not pass validation"
+    required: false
+    default: "PR title must follow Conventional Commit format (Jira ticket is optional)"
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Lint PR title
+      shell: bash
+      env:
+        PR_TITLE: ${{ inputs.title }}
+        VALIDATOR: ${{ inputs.validator }}
+        TITLE_REGEX: ${{ inputs.title-regex }}
+        TITLE_REGEX_FLAGS: ${{ inputs.title-regex-flags }}
+        COMMITLINT_CONFIG: ${{ inputs.commitlint-config }}
+        ERROR_MESSAGE: ${{ inputs.error-message }}
+      run: bash "${{ github.workspace }}/scripts/lint-pr-title.sh"
