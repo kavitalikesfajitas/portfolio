@@ -2,7 +2,7 @@
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
 import Image from "next/image";
 import "./Hero.css";
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 import LivingKavitaLocaLogo from "@/public/images/hero/living-kavita-loca-logo.png";
 import LipsGlossy from "@/public/images/hero/lips-glossy.png";
 
@@ -10,6 +10,8 @@ export const Hero = forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >((_props, ref) => {
+  const [logoLoaded, setLogoLoaded] = useState(false);
+  const [lipsLoaded, setLipsLoaded] = useState(false);
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, {
     stiffness: 80,
@@ -28,25 +30,33 @@ export const Hero = forwardRef<
   // Optional: give the lips a tiny bit of extra motion so they feel alive
   const lipsScale = useTransform(progress, range, [1, 0.9]);
   const lipsY = useTransform(progress, range, ["0%", "-8%"]);
+  const heroLoaded = logoLoaded && lipsLoaded;
 
   return (
     <div className="flex flex-col grow h-full w-full items-center">
       <motion.div
         ref={ref}
         style={{ scale: heroScale, y: heroY, opacity: heroOpacity }}
-        className="relative flex  w-full justify-center scale-75 md:scale-100 lg:scale-125"
+        className="relative flex w-full justify-center scale-75 md:scale-100 lg:scale-125"
       >
+        <div
+          className={`pointer-events-none absolute inset-0 z-20 rounded-[3rem] bg-white/10 backdrop-blur-sm transition-opacity duration-300 ${
+            heroLoaded ? "opacity-0" : "animate-pulse opacity-100"
+          }`}
+        />
         <Image
           src={LivingKavitaLocaLogo}
           alt="living kavita loca"
           width={650}
           height={650}
+          priority
           className="object-contain max-w-full"
+          onLoad={() => setLogoLoaded(true)}
         />
 
         <motion.div
           style={{ scale: lipsScale, y: lipsY }}
-          className="absolute top-1/2 translate-x-[45%] -translate-y-1/2 scale-50 lips"
+          className="absolute top-1/2 z-10 translate-x-[45%] -translate-y-1/2 scale-50 lips"
         >
           <Image
             src={LipsGlossy}
@@ -54,6 +64,8 @@ export const Hero = forwardRef<
             className="lips relative z-10"
             height={600}
             width={600}
+            priority
+            onLoad={() => setLipsLoaded(true)}
           />
         </motion.div>
       </motion.div>
