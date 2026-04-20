@@ -6,6 +6,10 @@ inputs:
     description: "GitHub token with pull-requests: write permission"
     required: false
     default: ${{ github.token }}
+  require-jira:
+    description: "Whether the PR body validator should require or warn on Jira tickets"
+    required: false
+    default: "false"
 
 runs:
   using: composite
@@ -28,6 +32,7 @@ runs:
       shell: bash
       env:
         PR_BODY_B64: ${{ steps.pr.outputs.body_b64 }}
+        REQUIRE_JIRA: ${{ inputs.require-jira }}
       run: ${{ github.workspace }}/scripts/validate-pr-body.sh
 
     - name: Build comment body

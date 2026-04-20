@@ -12,6 +12,7 @@ sed -i 's/\r$//' pr_body.txt || true
 
 ERRORS=""
 WARNINGS=""
+REQUIRE_JIRA="${REQUIRE_JIRA:-false}"
 
 # Extract a markdown section by its H2 heading
 extract_section() {
@@ -36,11 +37,13 @@ normalize_for_empty_check() {
 if [ ! -s pr_body.txt ] || [ -z "$(tr -d '[:space:]' < pr_body.txt)" ]; then
   ERRORS+="\n❌ **PR description is empty. Please fill out the template or add a brief description for your changes.**"
 else
-  # Placeholder check
-  if grep -q "JIRA_TICKET_HERE" pr_body.txt; then
-    ERRORS+="\n❌ **JIRA ticket placeholder (JIRA_TICKET_HERE) has not been replaced.**"
-  elif ! grep -qE '[A-Z]{2,10}-[0-9]+' pr_body.txt; then
-    WARNINGS+="\n⚠️ **No JIRA ticket detected in PR body.**"
+  # Optional Jira ticket check controlled by the action consumer.
+  if [[ "$REQUIRE_JIRA" == "true" ]]; then
+    if grep -q "JIRA_TICKET_HERE" pr_body.txt; then
+      ERRORS+="\n❌ **JIRA ticket placeholder (JIRA_TICKET_HERE) has not been replaced.**"
+    elif ! grep -qE '[A-Z]{2,10}-[0-9]+' pr_body.txt; then
+      WARNINGS+="\n⚠️ **No JIRA ticket detected in PR body.**"
+    fi
   fi
 
   # What It Does
