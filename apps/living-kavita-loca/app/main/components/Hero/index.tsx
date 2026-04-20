@@ -40,7 +40,7 @@ export const Hero = forwardRef<
         className="relative flex w-full justify-center scale-75 md:scale-100 lg:scale-125"
       >
         <div
-          className={`pointer-events-none absolute inset-0 z-20 rounded-[3rem] bg-white/10 backdrop-blur-sm transition-opacity duration-300 ${
+          className={`pointer-events-none absolute left-1/2 top-1/2 h-[650px] w-[650px] max-h-full max-w-full -translate-x-1/2 -translate-y-1/2 z-10 rounded-[3rem] bg-white/10 backdrop-blur-sm transition-opacity duration-300 ${
             heroLoaded ? "opacity-0" : "animate-pulse opacity-100"
           }`}
         />
