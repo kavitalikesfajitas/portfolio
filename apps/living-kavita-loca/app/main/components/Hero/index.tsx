@@ -55,12 +55,14 @@ export const Hero = forwardRef<
 
         <motion.div
           style={{ scale: lipsScale, y: lipsY }}
-          className="absolute top-1/2 z-10 translate-x-[45%] -translate-y-1/2 scale-50 lips"
+          className={`absolute top-1/2 z-10 translate-x-[45%] -translate-y-1/2 scale-50 lips transition-opacity duration-900 delay-150 ease-out ${
+            lipsLoaded ? "opacity-100" : "opacity-0"
+          }`}
         >
           <Image
             src={LipsGlossy}
             alt="lips open that are glossy"
-            className={`lips relative z-10 transition-all duration-700 ease-out ${
+            className={`lips relative z-10 transition-all duration-900 delay-150 ease-out ${
               lipsLoaded
                 ? "opacity-100 scale-100 blur-0"
                 : "opacity-0 scale-[0.97] blur-sm"
