@@ -93,7 +93,7 @@ export const Bio = forwardRef<
                 You&apos;ve caught me mid-migration! 🏗️ Much like refactoring
                 legacy code, this site is getting a thoughtful overhaul. The old
                 version served me well (like that trusty monolith we all know),
-                you can see the&nbsp;
+                you can see the{" "}
                 <a
                   href="https://github.com/kavitalikesfajitas/website"
                   target="_blank"
@@ -102,7 +102,7 @@ export const Bio = forwardRef<
                 >
                   old code here
                 </a>
-                &nbsp;and&nbsp;
+                {" and "}
                 <a href="/old-site" className="text-rose-400 hover:underline">
                   visit it here
                 </a>
@@ -112,7 +112,7 @@ export const Bio = forwardRef<
                 essentials are here and deployed, but I&apos;m still unpacking
                 boxes and deciding where the art goes. Some features are live,
                 others are in PR review, and a few are still on the backlog.
-                Want to see the code?&nbsp;
+                Want to see the code?{" "}
                 <a
                   href="https://github.com/kavitalikesfajitas/portfolio"
                   target="_blank"
