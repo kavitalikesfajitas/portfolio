@@ -39,18 +39,17 @@ export const Hero = forwardRef<
         style={{ scale: heroScale, y: heroY, opacity: heroOpacity }}
         className="relative flex w-full justify-center scale-75 md:scale-100 lg:scale-125"
       >
-        <div
-          className={`pointer-events-none absolute left-1/2 top-1/2 h-[650px] w-[650px] max-h-full max-w-full -translate-x-1/2 -translate-y-1/2 z-10 rounded-[3rem] bg-white/10 backdrop-blur-sm transition-opacity duration-300 ${
-            heroLoaded ? "opacity-0" : "animate-pulse opacity-100"
-          }`}
-        />
         <Image
           src={LivingKavitaLocaLogo}
           alt="living kavita loca"
           width={650}
           height={650}
           priority
-          className="object-contain max-w-full"
+          className={`object-contain max-w-full transition-all duration-700 ease-out ${
+            logoLoaded
+              ? "opacity-100 scale-100 blur-0"
+              : "opacity-0 scale-[0.985] blur-sm"
+          }`}
           onLoad={() => setLogoLoaded(true)}
         />
 
@@ -61,7 +60,11 @@ export const Hero = forwardRef<
           <Image
             src={LipsGlossy}
             alt="lips open that are glossy"
-            className="lips relative z-10"
+            className={`lips relative z-10 transition-all duration-700 ease-out ${
+              lipsLoaded
+                ? "opacity-100 scale-100 blur-0"
+                : "opacity-0 scale-[0.97] blur-sm"
+            }`}
             height={600}
             width={600}
             priority
