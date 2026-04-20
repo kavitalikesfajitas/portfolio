@@ -11,6 +11,10 @@ export const WORK_ITEMS = [
     title: "Contentful GraphQL Proxy",
   },
   {
+    slug: "optimizely-singleton",
+    title: "Optimizely Singleton Provider",
+  },
+  {
     slug: "pr-deploy-previews",
     title: "PR Deploy Previews",
   },
