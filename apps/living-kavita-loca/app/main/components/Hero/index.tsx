@@ -39,6 +39,11 @@ export const Hero = forwardRef<
         style={{ scale: heroScale, y: heroY, opacity: heroOpacity }}
         className="relative flex w-full justify-center scale-75 md:scale-100 lg:scale-125"
       >
+        <div
+          className={`pointer-events-none absolute left-1/2 top-1/2 z-20 h-[460px] w-[620px] max-h-[70vw] max-w-[90vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.2)_0%,rgba(255,255,255,0.1)_45%,rgba(255,255,255,0)_75%)] backdrop-blur-[1px] transition-opacity duration-400 ${
+            heroLoaded ? "opacity-0" : "opacity-100"
+          }`}
+        />
         <Image
           src={LivingKavitaLocaLogo}
           alt="living kavita loca"
