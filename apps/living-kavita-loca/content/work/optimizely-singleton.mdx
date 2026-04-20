@@ -11,26 +11,19 @@ export const metadata = {
 
 ---
 
-**TL;DR:** I set up Optimizely in a Next.js app so the server initializes the SDK once per pod, keeps a build-generated fallback datafile in the repo, and refreshes the live datafile on a controlled interval instead of refetching it on every page visit. The interesting part is the singleton: because we were not on Vercel and could not rely on the standard Optimizely + Next examples, I used a `Symbol.for(...)` key on `global` to preserve one shared Optimizely client per runtime.
+**TL;DR:** One Optimizely client per pod, datafile refreshed on a fixed interval, build-time `fallbackDatafile.json`, and a `GlobalRef` backed by `Symbol.for(...)` on `global` so the same Node process always resolves the same SDK instance. That cut refetches tied to page traffic. Common Optimizely + Next examples assume a different deployment model; we were on standalone / containerized Next, where the framework does not give you a real singleton out of the box.
 
 ## Overview
 
-Feature flagging looks simple until you think about what actually happens in a server-rendered app.
+Optimizely’s Node SDK wants one long-lived client: create it, point it at a datafile, let `autoUpdate` refresh on an interval. In a plain Express app you do that once at startup and move on.
 
-If every request or render path initializes its own Optimizely client, you pay for repeated SDK startup, repeated datafile fetches, and a lot of ambiguity around which instance is actually "the" source of truth for feature evaluation. In the bad version of this story, a page visit turns into another trip to fetch configuration that barely changed.
+Next.js does not give you a framework-level singleton for that. You cannot lean on “initialize in module scope” or the docs’ happy path the way you might on a hosted platform the examples were written against. Without an explicit hook, you risk spinning up the SDK again as code paths run, which ties datafile churn to traffic instead of to a policy you control.
 
-The key constraint here was not "Next.js is weird about scope." It was that we were running Next as a standalone app, not inside the kind of environment assumed by the standard Optimizely + Next examples. Those examples are fine if your hosting model lines up with them. Ours did not. Outside that shape, you do not really get a true singleton for free, which meant we needed to make one explicitly at the pod level.
+What we shipped:
 
-And that is the broader lesson: this was not some one-off Optimizely oddity. It is one example of the kinds of issues that show up when you use Next outside the default Vercel-centered path. A lot of companies run Next on AWS or Google Cloud, usually in containers or as a standalone server, so this sort of runtime mismatch is not rare at all.
-
-The shape I wanted was:
-
-- **One Optimizely SDK bootstrap per pod**
-- **One place to control refresh cadence**
-- **A safe fallback datafile available immediately at startup**
-- **Browser consumers that reuse server-provided data instead of refetching**
-
-That led to a small pattern I like a lot: a symbol-backed global reference for the server SDK, paired with a build step that writes a fallback datafile into the app before the server even boots.
+- **`GlobalRef` + `Symbol.for(...)` on `global`** — one slot per process, same key everywhere, so the client is created once per pod (startup), not per request.
+- **Build-time prefetch** — `next.config.mjs` runs before the build and writes `fallbackDatafile.json` so boot does not depend only on the CDN being up.
+- **Backend owns polling** — `datafileOptions.autoUpdate` + `updateInterval` on the server client; React side gets a passed-in datafile with `autoUpdate: false` so the browser is not running a second polling loop.
 
 ## The challenge
 
@@ -78,7 +71,7 @@ export class GlobalRef<T> {
 }
 ```
 
-That matters because the symbol comes from the global symbol registry. Instead of leaning on a hosting-specific singleton story, I can look up the same symbol key again and resolve the same process-level slot on `global`.
+That matters because the symbol comes from the global symbol registry. Since Next does not give me a true singleton pattern for this SDK, I can look up the same symbol key again and resolve the same process-level slot on `global`.
 
 In practice, that gives me a much sturdier singleton mechanism for this deployment model:
 
@@ -86,7 +79,7 @@ In practice, that gives me a much sturdier singleton mechanism for this deployme
 - **`global[symbol]`** becomes the backing store
 - **`GlobalRef<Optimizely.Client>`** wraps the pattern so the rest of the app does not need to know the storage details
 
-It is a tiny abstraction, but it solves a real deployment problem cleanly. The app no longer depends on whether some example code's runtime assumptions happen to match how our pods actually live.
+It is a tiny abstraction, but it solves the actual problem cleanly: Next does not give us the singleton behavior we wanted, so we created that behavior explicitly for the pod runtime.
 
 ### 2. Initialize the Optimizely SDK only if missing
 
@@ -112,7 +105,7 @@ export const setOptimizelyClient = () => {
 };
 ```
 
-That `if (!optimizelyInstanceGlobal.value)` guard is the whole point: the SDK is created once for the pod, not once per request or page visit.
+That `if (!optimizelyInstanceGlobal.value)` guard is the whole point: the SDK is created once at startup for the pod, not once per request or page visit.
 
 After that, the Node SDK handles background datafile refreshes on the configured interval. So instead of repeatedly rebuilding the client, I let one long-lived instance do the job it was designed to do.
 
@@ -202,6 +195,37 @@ That split is important.
 
 The browser does not need to keep downloading the datafile on its own if the server-side singleton is already managing freshness. The browser just needs a stable client initialized from the data it was given so React hooks and feature checks can work without redundant network churn.
 
+That distinction became even more important after a real production incident.
+
+## Incident pressure: the memory leak / slowness post-mortem
+
+This was not just an abstract design preference. It ended up mattering during a production slowness incident in June 2025, where the site gradually became unhealthy and the investigation traced growing outbound traffic back to Optimizely.
+
+The important part of that post-mortem was not "Optimizely bad." It was that default SDK background behavior becomes dangerous if you do not control where it runs and how often it wakes up.
+
+The investigation split the system into two suspects:
+
+- **Backend singleton** running once per pod
+- **Frontend React provider** running in the browser layer
+
+We instrumented the backend, load tested the singleton path, and verified that our startup hook only initialized the server-side instance once per pod. That held up. Instrumentation helped guarantee a single startup path, but it did not magically turn Next into a framework with true singleton guarantees. The backend singleton was not the thing creating the runaway traffic pattern.
+
+The browser side was more interesting. Even after adding explicit cleanup, load testing still showed growing outbound Optimizely traffic over time. That was the signal that pushed the architecture toward stricter separation of responsibilities:
+
+- **Backend owns polling / refresh**
+- **Frontend consumes provided data**
+- **Frontend does not independently auto-fetch**
+
+That is why the React provider in this setup uses `autoUpdate: false`. It is not just a performance optimization. It is part of the production-safety model that came out of incident response.
+
+The final fix from that incident lined up with the architecture here:
+
+1. **Remove polling intervals from the frontend SDK**
+2. **Pass the backend singleton's datafile into app-router pages**
+3. **Disable automatic client-side datafile fetching**
+
+Once that happened, traffic stabilized and feature flag behavior remained intact. So the pattern in this article is not just "clean code." It is informed by failure: one runtime-owned Optimizely lifecycle on the backend, and a much thinner client role on the frontend.
+
 So the architecture becomes:
 
 ```text
@@ -227,13 +251,12 @@ The build-time fallback is useful, and the refresh interval is operationally imp
 
 It is a small pattern, but it reflects a deeper lesson about integration code:
 
-- **Do not assume vendor examples match your hosting model**
-- **Expect standalone Next.js deployments to surface edge cases the default path hides**
-- **Do not assume singleton behavior appears automatically outside those assumptions**
+- **Do not assume Next gives you a real singleton pattern**
+- **Do not assume long-lived SDKs will behave well if the framework can recreate them**
 - **Do not reinitialize long-lived SDKs if the runtime can keep them alive**
 - **If you need process-wide state, make that decision explicit**
 
-Using `Symbol.for(...)` on `global` makes the singleton visible in the code as an intentional platform choice, not as something implied by example code that was written for a different runtime story.
+Using `Symbol.for(...)` on `global` makes the singleton visible in the code as an intentional runtime choice, instead of pretending the framework already solved it for us.
 
 That is the kind of implementation detail I like documenting because it looks tiny in a diff, but it changes how stable the integration feels in production.
 
@@ -248,6 +271,8 @@ This setup gave the Optimizely integration a much cleaner operating model:
 - **A clear separation of responsibilities** between server evaluation and React consumption
 
 The practical effect was a dramatic reduction in unnecessary API traffic. Before, the system was much closer to "fetch because the page got visited." After, it became "fetch when the pod starts, then refresh every N minutes." That is a much saner performance profile, especially at scale, because growth in page views no longer implies the same growth in config-fetch churn.
+
+It also reduced a real operational risk we had already seen in production. Once the frontend stopped participating in its own polling loop and the backend became the single owner of datafile freshness, the traffic pattern became much easier to reason about and much harder to accidentally blow up.
 
 It is not a massive subsystem, but it is a good example of the kind of infrastructure polish that makes feature-flagging code easier to trust. It is also a good reminder that once you run Next on AWS or Google Cloud as a real standalone app, you start owning runtime behavior that managed-platform examples often gloss over.
 
