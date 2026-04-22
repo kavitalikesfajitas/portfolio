@@ -1,0 +1,5 @@
+{
+  "extends": "@kavita-likes-fajitas/typescript-config/react-library",
+  "include": [".storybook/**/*.ts", ".storybook/**/*.tsx"],
+  "exclude": ["node_modules", "dist"]
+}

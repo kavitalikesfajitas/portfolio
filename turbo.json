@@ -28,6 +28,10 @@
       "cache": false,
       "persistent": true
     },
+    "kavita-storybook#build": {
+      "dependsOn": ["^build"],
+      "env": ["PR_NUMBER"]
+    },
     "@kavita-likes-fajitas/ui-library#dev": {
       "dependsOn": ["@kavita-likes-fajitas/shadcn-ui-lib#build"],
       "cache": false,
