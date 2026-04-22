@@ -1,6 +1,29 @@
 import type { StorybookConfig } from "@storybook/react-vite";
+import type { Plugin } from "vite";
 
 const PR_NUMBER = process.env.PR_NUMBER;
+
+/**
+ * Next/RSC packages ship `"use client"` at the top of ESM files. Rollup warns
+ * loudly when bundling them for Storybook; the directive is meaningless here.
+ */
+function stripReactServerDirectives(): Plugin {
+  const directive = /^\s*["']use (client|server)["'];?\s*\n?/m;
+  return {
+    name: "storybook-strip-react-server-directives",
+    enforce: "pre",
+    transform(code, id) {
+      if (!id.includes("node_modules")) {
+        return null;
+      }
+      const next = code.replace(directive, "");
+      if (next === code) {
+        return null;
+      }
+      return { code: next, map: null };
+    },
+  };
+}
 const BUILD_BASE_PATH = PR_NUMBER ? `/preview/PR-${PR_NUMBER}/` : "/";
 
 // Story file patterns - add new patterns here
@@ -36,6 +59,27 @@ const config: StorybookConfig = {
   },
   async viteFinal(config) {
     config.base = BUILD_BASE_PATH;
+    config.plugins = [stripReactServerDirectives(), ...(config.plugins ?? [])];
+
+    const rollupOptions = { ...config.build?.rollupOptions };
+    const previousOnWarn = rollupOptions.onwarn;
+    rollupOptions.onwarn = (warning, defaultHandler) => {
+      const text = `${warning.message ?? ""}`;
+      if (
+        /"use client"|'use client'|"use server"|'use server'|Module level directive/i.test(
+          text,
+        )
+      ) {
+        return;
+      }
+      if (previousOnWarn) {
+        previousOnWarn(warning, defaultHandler);
+      } else {
+        defaultHandler(warning);
+      }
+    };
+    config.build = { ...config.build, rollupOptions };
+
     config.esbuild = {
       ...config.esbuild,
       jsx: "automatic",
