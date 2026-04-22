@@ -8,18 +8,6 @@ In the future Contentful would key into the frameType and pull the correct frame
 **/
 export type CardFrameOption = "dotswoosh" | "custom";
 
-export enum GotEmVariant {}
-/** 
-   * No Longer supported
-
-  Idle = "idle",
-  Verified = "isVerified",
-  Wanted = "isWanted",
-  
-  */
-
-export type GotEmVariants = keyof typeof GotEmVariant;
-
 export type CardFrameConfig = {
   titlePosition: {
     x: number;
@@ -27,12 +15,15 @@ export type CardFrameConfig = {
     z: number;
   };
   src: string;
-  variant?: GotEmVariants;
+  /** KHR_materials_variants name, when the frame glTF exposes variants */
+  variant?: string;
   portalWidthHeightRatio?: number;
 };
 
 type CardDynamicText = {
   productTitle?: string;
+  /** URL for drei `<Text font=...>` (woff/woff2/ttf). */
+  titleFontUrl?: string;
 };
 
 export type GotEmCardProps = PropsWithChildren<{

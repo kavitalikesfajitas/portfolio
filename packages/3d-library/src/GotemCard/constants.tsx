@@ -4,6 +4,10 @@ import type {
   CardLayerFoilConfig,
 } from "./types";
 
+/** Default font for card title text (woff served from Google Fonts). */
+export const DEFAULT_GOTEM_TITLE_FONT_URL =
+  "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff";
+
 // A.k.a. almost zero 😉
 export const EPSILLON = 0.001;
 

@@ -1,0 +1,199 @@
+{
+  "metadata": {
+    "version": 4.6,
+    "type": "Object",
+    "generator": "Object3D.toJSON"
+  },
+  "geometries": [
+    {
+      "uuid": "6e68b103-9b24-48a7-8e27-ff035480358e",
+      "type": "BufferGeometry",
+      "data": {
+        "attributes": {
+          "normal": {
+            "itemSize": 3,
+            "type": "Float32Array",
+            "array": [],
+            "normalized": false
+          },
+          "position": {
+            "itemSize": 3,
+            "type": "Float32Array",
+            "array": [],
+            "normalized": false
+          },
+          "uv": {
+            "itemSize": 2,
+            "type": "Float32Array",
+            "array": [],
+            "normalized": false
+          }
+        },
+        "index": {
+          "type": "Uint32Array",
+          "array": []
+        },
+        "boundingSphere": {
+          "center": [5.960464477539063e-8, 0, 0],
+          "radius": 1.1896579110323746
+        }
+      }
+    }
+  ],
+  "materials": [
+    {
+      "uuid": "8c2c4d8b-52c0-4d83-a124-a579f4c92700",
+      "type": "MeshStandardMaterial",
+      "name": "phong1SG",
+      "color": 16777215,
+      "roughness": 1,
+      "metalness": 1,
+      "emissive": 0,
+      "map": "03f77f0d-ecd1-40c7-abeb-865fae007ecf",
+      "aoMap": "87556f7f-a798-42a7-8074-b6d82e447468",
+      "aoMapIntensity": 1,
+      "normalMap": "4815b0e8-73c7-4763-81b1-8d0b08aa8d6c",
+      "normalMapType": 0,
+      "normalScale": [1, -1],
+      "roughnessMap": "87556f7f-a798-42a7-8074-b6d82e447468",
+      "metalnessMap": "87556f7f-a798-42a7-8074-b6d82e447468",
+      "envMapIntensity": 1,
+      "blendColor": 0
+    }
+  ],
+  "textures": [
+    {
+      "uuid": "03f77f0d-ecd1-40c7-abeb-865fae007ecf",
+      "name": "diffuseMidnight.jpg",
+      "image": "ca4f7a75-579f-4811-a2e4-bc55a88c0f10",
+      "mapping": 300,
+      "channel": 0,
+      "repeat": [1, 1],
+      "offset": [0, 0],
+      "center": [0, 0],
+      "rotation": 0,
+      "wrap": [1000, 1000],
+      "format": 1023,
+      "internalFormat": null,
+      "type": 1009,
+      "colorSpace": "srgb",
+      "minFilter": 1007,
+      "magFilter": 1006,
+      "anisotropy": 1,
+      "flipY": false,
+      "generateMipmaps": true,
+      "premultiplyAlpha": false,
+      "unpackAlignment": 4,
+      "userData": {
+        "mimeType": "image/webp"
+      }
+    },
+    {
+      "uuid": "87556f7f-a798-42a7-8074-b6d82e447468",
+      "name": "occlusionRougnessMetalness.jpg",
+      "image": "cc375e56-6eda-4c09-82fe-9b7e8998fc32",
+      "mapping": 300,
+      "channel": 0,
+      "repeat": [1, 1],
+      "offset": [0, 0],
+      "center": [0, 0],
+      "rotation": 0,
+      "wrap": [1000, 1000],
+      "format": 1023,
+      "internalFormat": null,
+      "type": 1009,
+      "colorSpace": "",
+      "minFilter": 1007,
+      "magFilter": 1006,
+      "anisotropy": 1,
+      "flipY": false,
+      "generateMipmaps": true,
+      "premultiplyAlpha": false,
+      "unpackAlignment": 4,
+      "userData": {
+        "mimeType": "image/webp"
+      }
+    },
+    {
+      "uuid": "4815b0e8-73c7-4763-81b1-8d0b08aa8d6c",
+      "name": "normal.jpg",
+      "image": "c4f79585-e678-409a-923c-5576ac764dba",
+      "mapping": 300,
+      "channel": 0,
+      "repeat": [1, 1],
+      "offset": [0, 0],
+      "center": [0, 0],
+      "rotation": 0,
+      "wrap": [1000, 1000],
+      "format": 1023,
+      "internalFormat": null,
+      "type": 1009,
+      "colorSpace": "",
+      "minFilter": 1007,
+      "magFilter": 1006,
+      "anisotropy": 1,
+      "flipY": false,
+      "generateMipmaps": true,
+      "premultiplyAlpha": false,
+      "unpackAlignment": 4,
+      "userData": {
+        "mimeType": "image/webp"
+      }
+    }
+  ],
+  "images": [
+    {
+      "uuid": "ca4f7a75-579f-4811-a2e4-bc55a88c0f10",
+      "url": ""
+    },
+    {
+      "uuid": "cc375e56-6eda-4c09-82fe-9b7e8998fc32",
+      "url": ""
+    },
+    {
+      "uuid": "c4f79585-e678-409a-923c-5576ac764dba",
+      "url": ""
+    }
+  ],
+  "object": {
+    "uuid": "5972a026-f16f-4d57-8571-dff27e52349a",
+    "type": "Group",
+    "name": "Scene",
+    "layers": 1,
+    "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+    "up": [0, 1, 0],
+    "children": [
+      {
+        "uuid": "a7926fd0-529e-4b1a-8b6e-eaecafa1d921",
+        "type": "Mesh",
+        "name": "Shoe",
+        "userData": {
+          "gltfExtensions": {
+            "KHR_materials_variants": {
+              "mappings": [
+                {
+                  "material": 0,
+                  "variants": [0]
+                },
+                {
+                  "material": 1,
+                  "variants": [1]
+                },
+                {
+                  "material": 2,
+                  "variants": [2]
+                }
+              ]
+            }
+          },
+          "name": "Shoe"
+        },
+        "layers": 1,
+        "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "up": [0, 1, 0],
+        "geometry": "6e68b103-9b24-48a7-8e27-ff035480358e",
+        "material": "8c2c4d8b-52c0-4d83-a124-a579f4c92700"
+      }
+    ]
+  }
+}
