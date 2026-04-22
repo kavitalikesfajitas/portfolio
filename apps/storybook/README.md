@@ -1,13 +1,13 @@
-# Preorder Web Storybook
+# Portfolio Storybook
 
-Storybook app for developing and documenting UI components across the monorepo.
+Storybook app for developing and documenting UI components across the monorepo (e.g. `ui-library`, future packages under `packages/`).
 
-## Running Locally
+## Running locally
 
 From the monorepo root:
 
 ```bash
-yarn workspace preorder-web-storybook dev
+yarn workspace @kavita-likes-fajitas/storybook dev
 ```
 
 Or from this directory:
@@ -21,42 +21,41 @@ Storybook will start at [http://localhost:6006](http://localhost:6006).
 ## Building
 
 ```bash
-yarn workspace preorder-web-storybook build
+yarn workspace @kavita-likes-fajitas/storybook build
 ```
 
-The static build will be output to `dist/`.
+The static build is written to `dist/`.
 
-To preview the built version:
+To preview the built site:
 
 ```bash
-yarn workspace preorder-web-storybook preview
+yarn workspace @kavita-likes-fajitas/storybook preview
 ```
 
-## Adding Stories
+## Adding stories
 
-Stories are co-located with their components. Create a `*.stories.tsx` file next to the component you are working on:
+Stories are co-located with components. Add a `*.stories.tsx` next to the component (often under `packages/ui-library/src/`):
 
 ```
-packages/nvs-design-system/src/
+packages/ui-library/src/
   Button/
-    index.tsx
-    index.stories.tsx  <-- story file
+    ThemedButton.tsx
+    ThemedButton.stories.tsx
 ```
 
-### Story File Template
+### Story file template
 
 ```tsx
 import type { Meta, StoryObj } from "@storybook/react";
-import { MyComponent } from "./index";
+import { MyComponent } from "./MyComponent";
 
-const meta: Meta<typeof MyComponent> = {
-  title: "Components/MyComponent",
+const meta = {
+  title: "UI / MyComponent",
   component: MyComponent,
-  tags: ["autodocs"],
-};
+} satisfies Meta<typeof MyComponent>;
 
 export default meta;
-type Story = StoryObj<typeof MyComponent>;
+type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
@@ -67,30 +66,27 @@ export const Default: Story = {
 
 ## Configuration
 
-### Adding New Story Locations
+### Story globs
 
-Edit `.storybook/main.ts` and add patterns to the `stories` array:
+Edit `.storybook/main.ts` and adjust the `stories` array. Paths are relative to `.storybook/`:
 
 ```ts
 const stories = [
   "../../../packages/**/src/**/*.stories.@(ts|tsx)",
-  "../../*/src/**/*.stories.@(ts|tsx)",
-  // Add new patterns here, paths are relative to .storybook/
+  "../../*/src/**/*.stories.@(ts|tsx)", // other apps in apps/
 ];
 ```
 
-### Adding Static Directories
+### Static directories
 
-To make static assets (images, fonts, etc.) available to stories, add entries to the `staticDirs` array in `.storybook/main.ts`:
+To expose public assets (images, fonts, etc.) to the preview, add entries to `staticDirs` in `.storybook/main.ts`. Paths are relative to `.storybook/`:
 
 ```ts
 const staticDirs: StorybookConfig["staticDirs"] = [
-  "../../nvs-preorder/public",
-  // Add more directories here, paths are relative to .storybook/
-  // Examples:
+  "../../living-kavita-loca/public",
   // "../../<app-name>/public"
   // "../../../packages/<package-name>/public"
 ];
 ```
 
-Assets are then accessible via their path relative to the public folder root. For example, if `nvs-preorder/public/favicon.ico` exists, it's available at `/favicon.ico` in stories.
+Files from `living-kavita-loca/public` are served from the URL root in Storybook—for example `public/favicon.ico` → `/favicon.ico`.

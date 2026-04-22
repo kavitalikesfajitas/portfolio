@@ -42,7 +42,6 @@ const config: StorybookConfig = {
     };
     config.define = {
       ...config.define,
-      "process.env.NEXT_PUBLIC_UNOPTIMIZED_IMAGES": JSON.stringify("true"),
     };
     return config;
   },
