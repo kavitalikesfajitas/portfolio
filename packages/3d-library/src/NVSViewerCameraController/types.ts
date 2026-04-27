@@ -1,6 +1,19 @@
 import type { CameraControlsProps } from "@react-three/drei";
-import type { MouseButtons, Touches } from "camera-controls/dist/types";
 import type { Vector3 } from "three";
+
+/** Compatible with `camera-controls` ACTION flags consumed by drei's CameraControls */
+export type ViewerCameraTouches = {
+  one: number;
+  two: number;
+  three: number;
+};
+
+export type ViewerCameraMouseButtons = {
+  left: number;
+  right: number;
+  middle: number;
+  wheel: number;
+};
 
 export type ViewerCameraControllerProps = {
   currentTargetIdx: number;
@@ -32,6 +45,6 @@ export type ViewerCameraTransform = {
 export type ViewerCameraTransforms = ViewerCameraTransform[];
 
 export type UseControlsEventsReturn = {
-  touches: Touches;
-  mouseButtons: MouseButtons;
+  touches: ViewerCameraTouches;
+  mouseButtons: ViewerCameraMouseButtons;
 };

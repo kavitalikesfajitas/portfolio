@@ -1,4 +1,5 @@
-import { RefObject, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import type { RefObject } from "react";
 
 // Types
 import { type MeshPhysicalMaterial } from "three";
@@ -14,7 +15,7 @@ export const useHtmlImageAspectRatio = (image: HTMLImageElement | null) => {
 };
 
 export const useLayerFoilEffect = (
-  materialRef: RefObject<MeshPhysicalMaterial>,
+  materialRef: RefObject<MeshPhysicalMaterial | null>,
   foilConfig: CardLayerFoilConfig,
 ) => {
   // Time for material surgery
@@ -37,7 +38,7 @@ export const MaterialMetalness = ({
   materialRef,
 }: {
   textureUrl: string;
-  materialRef: RefObject<MeshPhysicalMaterial>;
+  materialRef: RefObject<MeshPhysicalMaterial | null>;
 }) => {
   const texture = useTexture(textureUrl);
 
@@ -57,7 +58,7 @@ export const MaterialRoughness = ({
   materialRef,
 }: {
   textureUrl: string;
-  materialRef: RefObject<MeshPhysicalMaterial>;
+  materialRef: RefObject<MeshPhysicalMaterial | null>;
 }) => {
   const texture = useTexture(textureUrl);
 

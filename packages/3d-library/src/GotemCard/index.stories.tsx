@@ -1,9 +1,10 @@
-import { Canvas, ThreeEvent, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
+import type { ThreeEvent } from "@react-three/fiber";
 import { Group, Vector3 } from "three";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { animate, useMotionValue } from "framer-motion";
 import { motion } from "framer-motion-3d";
-import { Environment, Gltf } from "@react-three/drei";
+import { Environment } from "@react-three/drei";
 
 // Components
 import { GotEmCard } from "./";
@@ -14,7 +15,7 @@ import { NVSViewerCameraController } from "../NVSViewerCameraController";
 import { PresetCards, PresetFoilEffect } from "./constants";
 
 // Types
-import { GotEmVariant, GotEmVariants, type GotEmCardProps } from "./types";
+import type { GotEmCardProps } from "./types";
 
 type CardSceneProps = GotEmCardProps & {
   bg?: string;
@@ -249,15 +250,15 @@ export const Stack = {
  */
 
 type CardDesignerProps = {
-  bgImage: string | null;
-  productImage: string | null;
+  /** Storybook file control: array of object URLs */
+  bgImage: string[] | null;
+  productImage: string[] | null;
   frame: string;
   productTitle: string;
   titlePosition: { x: number; y: number; z: number };
-  metallicImage: string | null;
-  roughnessImage: string | null;
+  metallicImage: string[] | null;
+  roughnessImage: string[] | null;
   iridescence: number;
-  variant: GotEmVariants;
   bg: string;
 };
 
@@ -265,7 +266,9 @@ const CardDesignerComponent = (props: CardDesignerProps) => {
   const titlePosition =
     PresetCards["aj1-low-og-game-royal"].frame.titlePosition;
   const hasHoloTextures =
-    props.metallicImage?.length ?? props.roughnessImage?.length;
+    Boolean(props.metallicImage?.[0]) || Boolean(props.roughnessImage?.[0]);
+  const bgLayerUrl = props.bgImage?.[0];
+  const productLayerUrl = props.productImage?.[0];
 
   return (
     <Canvas className="!absolute top-0 left-0 w-full h-full z-40 bg-transparent">
@@ -281,20 +284,16 @@ const CardDesignerComponent = (props: CardDesignerProps) => {
       >
         <Environment preset="studio" />
 
-        {props.bgImage?.length && (
+        {bgLayerUrl != null && bgLayerUrl !== "" && (
           <GotEmCardLayer
-            src={props.bgImage[0]}
+            src={bgLayerUrl}
             zOffset={-0.01}
             // If we have the required holo textures, pass them to the foil config
             foilConfig={
               hasHoloTextures
                 ? {
-                    metallicImageUrl: props.metallicImage?.length
-                      ? props.metallicImage[0]
-                      : undefined,
-                    roughnessImageUrl: props.roughnessImage?.length
-                      ? props.roughnessImage[0]
-                      : undefined,
+                    metallicImageUrl: props.metallicImage?.[0],
+                    roughnessImageUrl: props.roughnessImage?.[0],
                     iridescence: props.iridescence,
                   }
                 : undefined
@@ -302,8 +301,8 @@ const CardDesignerComponent = (props: CardDesignerProps) => {
           />
         )}
 
-        {props.productImage?.length && (
-          <GotEmCardLayer src={props.productImage[0]} zOffset={0.01} />
+        {productLayerUrl != null && productLayerUrl !== "" && (
+          <GotEmCardLayer src={productLayerUrl} zOffset={0.01} />
         )}
       </GotEmCard>
 

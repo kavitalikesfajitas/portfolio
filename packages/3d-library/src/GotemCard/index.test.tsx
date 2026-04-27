@@ -1,17 +1,18 @@
-import { PropsWithChildren, Children } from "react";
-import ReactThreeTestRenderer from "@react-three/test-renderer";
+import type { PropsWithChildren } from "react";
 import { Suspense } from "react";
+import ReactThreeTestRenderer from "@react-three/test-renderer";
+import { Children } from "react";
+import { describe, expect, it, vi } from "vitest";
 
 // Components
 import { GotEmCard } from "./";
 
-// Mocks
-jest.mock("three/examples/jsm/utils/SkeletonUtils", () => ({
-  clone: jest.fn((obj) => obj as unknown),
-  retarget: jest.fn(),
+vi.mock("three/examples/jsm/utils/SkeletonUtils", () => ({
+  clone: vi.fn((obj: object) => obj),
+  retarget: vi.fn(),
 }));
 
-jest.mock("@react-three/drei", () => ({
+vi.mock("@react-three/drei", () => ({
   useGLTF: () => ({
     scene: {},
     animations: [],
@@ -26,7 +27,6 @@ jest.mock("@react-three/drei", () => ({
     ref: {},
   }),
   MeshPortalMaterial: ({ children }: PropsWithChildren) => <>{children}</>,
-  // Bit of a hack but since R3F doesn't support HTML arbitrary strings in it's tree - we inject the productTitle prop as the group name so we can assert it
   Text: ({ children }: PropsWithChildren) => {
     const onlyTextChild = Children.toArray(children).find(
       (child) => typeof child === "string",
@@ -70,13 +70,9 @@ describe("Given <GotEmCard /> component", () => {
       </Suspense>,
     );
 
-    // Search group with name YO! yo, yo yo (it's sync but eslint thinks it's async)
     // eslint-disable-next-line testing-library/await-async-query
     const match = renderer.scene.findByProps({ name: "YO" });
-    // It should be a group because of how we set the mock for Text component
     expect(match.type).toBe("Group");
-
-    // And it should be defined
     expect(match).toBeDefined();
   });
 
@@ -92,12 +88,10 @@ describe("Given <GotEmCard /> component", () => {
       </Suspense>,
     );
     try {
-      // Search group with name YO! yo, yo yo (it's sync but eslint thinks it's async)
       // eslint-disable-next-line testing-library/await-async-query
       renderer.scene.findByProps({ name: "LOLWAT" });
     } catch (error) {
-      // @ts-expect-error Testing error message
-      expect(error.message).toBe(
+      expect((error as Error).message).toBe(
         'RTTR: No instances found with props: {"name":"LOLWAT"}',
       );
     }

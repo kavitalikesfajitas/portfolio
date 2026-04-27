@@ -1,5 +1,9 @@
-import type { PropsWithChildren } from "react";
-import type { PortalMaterialType } from "@react-three/drei";
+import type { ComponentRef, PropsWithChildren } from "react";
+
+/** Instance type for drei's `<MeshPortalMaterial ref={...} />` */
+export type GotEmPortalMaterialHandle = ComponentRef<
+  (typeof import("@react-three/drei"))["MeshPortalMaterial"]
+>;
 
 /*
 String union to define all frameType keys
@@ -28,7 +32,7 @@ type CardDynamicText = {
 
 export type GotEmCardProps = PropsWithChildren<{
   frame: CardFrameConfig;
-  portalRef?: React.MutableRefObject<PortalMaterialType>;
+  portalRef?: React.RefObject<GotEmPortalMaterialHandle | null>;
 }> &
   CardDynamicText;
 

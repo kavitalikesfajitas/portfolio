@@ -62,7 +62,12 @@ export const GotEmCard: FC<GotEmCardProps> = (props) => {
 
       <mesh scale={0.97}>
         <planeGeometry args={[frameAspect, 1]} />
-        <MeshPortalMaterial ref={props.portalRef} transparent>
+        <MeshPortalMaterial
+          ref={props.portalRef}
+          transparent
+          blur={0}
+          resolution={512}
+        >
           {props.children}
         </MeshPortalMaterial>
       </mesh>

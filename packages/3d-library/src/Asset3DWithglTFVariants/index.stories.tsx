@@ -1,20 +1,17 @@
 import type { StoryFn } from "@storybook/react";
 import { Environment, Html } from "@react-three/drei";
-import { Suspense, useState } from "react";
+import React, { Suspense, useState } from "react";
+import { Canvas } from "@react-three/fiber";
 
 import Asset3DWithglTFVariants from ".";
 
 import { MathUtils } from "three";
-import type { NvsAuthorableScene } from "../NvsAuthorableScene";
-import type { NvsCameraControls } from "../NvsCameraControls";
+import { CameraControls as NvsCameraControls } from "../NvsCameraControls";
 import {
   NvsControlsTypes,
   type NvsCameraControlsProps,
 } from "../NvsCameraControls/types";
 import { type SceneAssetProps, Asset3DAnimationType } from "../types/Assets3D";
-import { Canvas } from "@react-three/fiber";
-
-const Author;
 
 const VariantsDemo = ({ ...props }: SceneAssetProps) => {
   const [currentVariant, setCurrentVariant] = useState<string>();
@@ -60,6 +57,7 @@ export default {
 
   decorators: [
     (Story: StoryFn) => {
+      const Render = Story as unknown as React.FC;
       // Controls setup
       const controlProps = {
         fov: 75,
@@ -80,15 +78,15 @@ export default {
 
       return (
         <div className="absolute left-0 top-0 h-dvh w-screen">
-            <Canvas {...props} shadows>
-      <Suspense fallback={<CubeLoader />}>{children}</Suspense>
-  
-            <color attach="background" args={["#111111"]} />
-            <Environment files={envMap.url} />
-            <NvsCameraControls {...controlProps}>
-              <Story />
-            </NvsCameraControls>
-          </NvsAuthorableScene>
+          <Canvas shadows>
+            <Suspense fallback={null}>
+              <color attach="background" args={["#111111"]} />
+              <Environment files={envMap.url} />
+              <NvsCameraControls {...controlProps}>
+                <Render />
+              </NvsCameraControls>
+            </Suspense>
+          </Canvas>
         </div>
       );
     },

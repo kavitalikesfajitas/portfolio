@@ -1,5 +1,5 @@
 import { CameraControls } from "@react-three/drei";
-import { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { MathUtils } from "three";
 
@@ -15,26 +15,27 @@ export function NVSViewerCameraController({
   globalControlsProps,
   autoRotate,
 }: ViewerCameraControllerProps) {
-  if (currentTargetIdx >= targets.length) {
+  const activeTarget = targets[currentTargetIdx];
+
+  if (currentTargetIdx >= targets.length || !activeTarget) {
     // eslint-disable-next-line no-console
     console.error(
       "Invalid target index, it is out of bounds for the provided targets array",
     );
+    return null;
   }
 
   const controlsRef = useRef<CameraControls>(null);
-  const { touches, mouseButtons } = useControlsEventsForTarget(
-    targets[currentTargetIdx],
-  );
+  const { touches, mouseButtons } = useControlsEventsForTarget(activeTarget);
 
   const mergedControlsProps = useMemo(
     () =>
       Object.assign(
         {},
         globalControlsProps,
-        targets[currentTargetIdx].controlsConstraints,
+        activeTarget.controlsConstraints,
       ),
-    [globalControlsProps, targets, currentTargetIdx],
+    [globalControlsProps, activeTarget],
   );
 
   async function animateToTarget(target: ViewerCameraTransform) {
@@ -52,8 +53,8 @@ export function NVSViewerCameraController({
     if (!controlsRef.current) return;
 
     // eslint-disable-next-line no-console
-    animateToTarget(targets[currentTargetIdx]).catch(console.error);
-  }, [currentTargetIdx, targets, controlsRef.current]);
+    animateToTarget(activeTarget).catch(console.error);
+  }, [activeTarget]);
 
   useFrame((_, delta) => {
     if (!controlsRef.current || !autoRotate) return;
@@ -63,8 +64,10 @@ export function NVSViewerCameraController({
   return (
     <CameraControls
       {...mergedControlsProps}
-      touches={touches}
-      mouseButtons={mouseButtons}
+      touches={touches as React.ComponentProps<typeof CameraControls>["touches"]}
+      mouseButtons={
+        mouseButtons as React.ComponentProps<typeof CameraControls>["mouseButtons"]
+      }
       ref={controlsRef}
       makeDefault
     />
