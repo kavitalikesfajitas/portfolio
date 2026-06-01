@@ -36,7 +36,7 @@ yarn workspace @kavita-likes-fajitas/storybook preview
 
 Stories are co-located with components. Add a `*.stories.tsx` next to the component (often under `packages/ui-library/src/`):
 
-```
+```text
 packages/ui-library/src/
   Button/
     ThemedButton.tsx
