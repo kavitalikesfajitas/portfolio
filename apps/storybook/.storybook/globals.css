@@ -1,0 +1,14 @@
+/* Tailwind v4 and shared design tokens (match living-kavita-loca) */
+@import "tailwindcss";
+@import "@kavita-likes-fajitas/shadcn-ui-lib/styles/global.css";
+@import "@kavita-likes-fajitas/tailwind-config/shared-styles";
+
+@config "../tailwind.config.ts";
+
+@layer base {
+  body {
+    font-family: system-ui, sans-serif;
+    background: var(--color-gray-1000);
+    color: #ffffff;
+  }
+}

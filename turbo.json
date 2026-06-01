@@ -28,6 +28,9 @@
       "cache": false,
       "persistent": true
     },
+    "@kavita-likes-fajitas/storybook#build": {
+      "dependsOn": ["^build"]
+    },
     "@kavita-likes-fajitas/ui-library#dev": {
       "dependsOn": ["@kavita-likes-fajitas/shadcn-ui-lib#build"],
       "cache": false,
