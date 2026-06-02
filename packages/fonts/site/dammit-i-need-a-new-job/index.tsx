@@ -1,4 +1,5 @@
 import localFont from "next/font/local";
+import { Inter } from "next/font/google";
 import clsx from "clsx";
 
 const fontHelveticaNeue = localFont({
@@ -92,12 +93,12 @@ const fontHelveticaNeue = localFont({
 const fontMidnightGelactic = localFont({
   src: [
     {
-      path: "../../fonts/midnight_gelactic/Midnight Gelactic DEMO VERSION.otf",
+      path: "../../fonts/midnight_gelactic/Midnight Gelactic.otf",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../../fonts/midnight_gelactic/Midnight Gelactic Italic DEMO VERSION.otf",
+      path: "../../fonts/midnight_gelactic/Midnight Gelactic Italic.otf",
       weight: "400",
       style: "italic",
     },
