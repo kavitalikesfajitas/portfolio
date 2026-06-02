@@ -1,0 +1,61 @@
+{
+  "folders": [
+    { "path": "." },
+    { "path": "apps/dammit-i-need-a-new-job" },
+    { "path": "apps/living-kavita-loca" },
+    { "path": "packages/eslint-config" },
+    { "path": "packages/fonts" },
+    { "path": "packages/shadcn-ui-lib" },
+    { "path": "packages/tailwind-config" },
+    { "path": "packages/typescript-config" },
+    { "path": "packages/ui-library" },
+    { "path": "infra" },
+    { "path": "scripts" },
+  ],
+  "settings": {
+    "editor.formatOnSave": true,
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/.turbo": true,
+    },
+    "eslint.validate": ["javascript", "typescript", "typescriptreact"],
+  },
+  "extensions": {
+    "recommendations": [
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "bradlc.vscode-tailwindcss",
+    ],
+  },
+  "oso.polarLanguageServer.validations": "cloud",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never",
+  },
+  "editor.formatOnSave": true,
+  "eslint.format.enable": true,
+  "eslint.run": "onSave",
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+  "editor.formatOnSaveMode": "file",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "search.exclude": {
+    "**/.yarn": true,
+    "**/.pnp.*": true,
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "jest.runMode": "on-demand",
+  "files.associations": {
+    "**/*.json.hbs": "json",
+    "*.json.hbs": "json",
+  },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "handlebars",
+  ],
+  "[handlebars]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  },
+}

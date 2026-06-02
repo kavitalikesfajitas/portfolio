@@ -1,0 +1,46 @@
+{
+  "name": "dammit-i-need-a-new-job",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --experimental-https --port 3002 --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "lodash": "^4.18.1",
+    "next": "16.2.7",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@kavita-likes-fajitas/eslint-config": "*",
+    "@kavita-likes-fajitas/fonts": "*",
+    "@kavita-likes-fajitas/kavita-fajita-icons": "*",
+    "@kavita-likes-fajitas/shadcn-ui-lib": "*",
+    "@kavita-likes-fajitas/tailwind-config": "*",
+    "@kavita-likes-fajitas/typescript-config": "*",
+    "@kavita-likes-fajitas/ui-library": "*",
+    "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@types/lodash": "^4.17.21",
+    "@types/mdx": "^2.0.13",
+    "@types/node": "^20",
+    "@types/react": "^19.2.10",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/coverage-v8": "4.1.4",
+    "clsx": "^2.1.1",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.7",
+    "jsdom": "^26.1.0",
+    "tailwindcss": "^4",
+    "typescript": "^5.5.4",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.4"
+  }
+}

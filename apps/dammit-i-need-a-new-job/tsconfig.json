@@ -1,0 +1,23 @@
+{
+  "extends": "@kavita-likes-fajitas/typescript-config/nextjs",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@kavita-likes-fajitas/ui-library/*": ["../../packages/ui-library/src/*"]
+    },
+    "isolatedModules": true,
+    "lib": ["dom", "dom.iterable", "esnext"]
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.mdx",
+    "next.config.ts",
+    "mdx-components.tsx",
+    ".next/types/**/*.ts",
+    "eslint.config.mjs"
+  ],
+  "exclude": ["node_modules"]
+}

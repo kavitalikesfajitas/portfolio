@@ -1,0 +1,65 @@
+@import "tailwindcss";
+@import "@kavita-likes-fajitas/shadcn-ui-lib/styles/global.css";
+@import "@kavita-likes-fajitas/tailwind-config/shared-styles";
+@config "../tailwind.config.ts";
+
+@-ms-viewport {
+  width: device-width;
+  height: device-height;
+}
+:root {
+  --background: var(--color-black);
+  --foreground: var(--color-white);
+}
+.font-inter {
+  font-family: var(--font-inter);
+}
+.font-midnight-gelactic {
+  font-family: var(--font-midnight-gelactic);
+}
+.font-lobster {
+  font-family: var(--font-lobster);
+}
+.font-overpass-mono {
+  font-family: var(--font-overpass-mono);
+}
+.font-rampart-one {
+  font-family: var(--font-rampart-one);
+}
+
+.font-londrina-shadow {
+  font-family: var(--font-londrina-shadow);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Smaller than text-xs (0.75rem) — for fine print like stat sub-text */
+  --text-xxs: 0.625rem;
+  --text-xxs--line-height: 0.875rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--color-black);
+    --foreground: var(--color-white);
+  }
+}
+
+@layer base {
+  body {
+    font-family: var(--font-inter), sans-serif;
+    background: var(--color-white)
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+}
+
+
