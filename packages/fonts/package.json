@@ -1,11 +1,12 @@
 {
   "name": "@kavita-likes-fajitas/fonts",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
-  "main": "./index.tsx",
+  "main": "./index.ts",
   "files": [
     "index.tsx",
+    "site/**/*",
     "fonts/**/*",
     "fonts/*.otf",
     "fonts/*.ttf",
