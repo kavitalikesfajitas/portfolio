@@ -1,0 +1,88 @@
+{
+  "name": "@kavita-likes-fajitas/kavita-fajita-icons",
+  "version": "0.1.0",
+  "description": "icons for my site",
+  "sideEffects": false,
+  "type": "module",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./*": {
+      "import": "./dist/*/index.js",
+      "types": "./dist/*/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "generate": "svgr --out-dir src/components -- src/svgs",
+    "build": "yarn generate && tsdown --config ./tsdown.config.ts",
+    "dev": "yarn generate && tsdown --watch",
+    "test": "yarn generate && vitest",
+    "typecheck": "yarn generate && tsc --noEmit",
+    "test-ci": "yarn generate && vitest run --coverage --reporter=dot",
+    "lint": "yarn generate && eslint"
+  },
+  "svgr": {
+    "typescript": true,
+    "prettier": false,
+    "jsxRuntime": "automatic",
+    "ref": true,
+    "icon": true,
+    "titleProp": true,
+    "svgProps": {
+      "aria-hidden": "true",
+      "focusable": "false"
+    },
+    "svgoConfig": {
+      "plugins": [
+        {
+          "name": "preset-default",
+          "params": {
+            "overrides": {
+              "removeViewBox": false
+            }
+          }
+        },
+        "removeDimensions"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^4"
+  },
+  "devDependencies": {
+    "@kavita-likes-fajitas/eslint-config": "workspace:*",
+    "@kavita-likes-fajitas/tailwind-config": "workspace:*",
+    "@kavita-likes-fajitas/typescript-config": "workspace:*",
+    "@svgr/cli": "^8.1.0",
+    "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@types/node": "^20",
+    "@types/react": "^19.2.10",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/coverage-v8": "4.1.4",
+    "eslint": "^9",
+    "jsdom": "^26.1.0",
+    "postcss": "^8.5.6",
+    "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.7.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^4",
+    "tsdown": "^0.21.9",
+    "typescript": "^5.5.4",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.4"
+  }
+}
