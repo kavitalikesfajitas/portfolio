@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getAppFontVariables } from "@kavita-likes-fajitas/fonts";
+import { getAppFontVariablesForLivingKavitaLoca } from "@kavita-likes-fajitas/fonts";
 import "./globals.css";
 import clsx from "clsx";
 import { Footer } from "@kavita-likes-fajitas/ui-library/Navigation/Footer";
@@ -15,7 +15,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const fontVariables = getAppFontVariables();
+  const fontVariables = getAppFontVariablesForLivingKavitaLoca();
   return (
     <html lang="en">
       <body className={clsx(fontVariables, "antialiased")}>

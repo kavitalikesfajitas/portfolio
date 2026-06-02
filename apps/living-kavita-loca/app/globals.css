@@ -10,8 +10,8 @@
 .font-midnight-gelactic {
   font-family: var(--font-midnight-gelactic);
 }
-.font-helvetica-neue {
-  font-family: var(--font-helvetica-neue);
+.font-inter {
+  font-family: var(--font-inter);
 }
 
 .font-lobster {
@@ -19,7 +19,7 @@
 }
 @layer base {
   body {
-    font-family: var(--font-helvetica-neue), sans-serif;
+    font-family: var(--font-inter), sans-serif;
     background: var(--color-gray-1000);
   }
 }
