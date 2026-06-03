@@ -16,7 +16,7 @@ export function DaysCounterCardContent() {
   return (
     <CardContent className="relative z-30 flex flex-col items-center gap-6 px-8 pt-12">
       <div className="font-overpass-mono tracking-tighter text-sm text-center text-cream-800">
-        DAYS SINCE LAID OFF
+        DAYS SINCE I MY LAST SPIRAL
       </div>
       <div className="text-orange-1000 font-extrabold tracking-tighter text-8xl leading-none w-full flex justify-center">
         {isDaysSinceLaidOffReady ? (
