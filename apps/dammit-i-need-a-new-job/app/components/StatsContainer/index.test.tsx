@@ -4,7 +4,7 @@ import { StatsContainer } from ".";
 
 describe("given a <StatsContainer>", () => {
   test("it renders the component successfully", () => {
-    render(<StatsContainer/>);
-    expect(screen.getByText("Start working here")).toBeInTheDocument();
+    render(<StatsContainer>Stats content</StatsContainer>);
+    expect(screen.getByText("Stats content")).toBeInTheDocument();
   });
 });

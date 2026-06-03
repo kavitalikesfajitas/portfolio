@@ -11,5 +11,23 @@
 
     /* Custom gray palette */
     --color-gray-1000: #111111;
+
+    /* Dammit theme */
+    --color-cream-1000: #f2ede3;
+    --color-cream-900: #f8f4ed;
+    --color-cream-800: #e8e1d4;
+
+    --color-neutral-910: #1a1a1a;
+
+    --color-black-1000: #0a0a0a;
+    --color-black-900: #151515;
+
+    --color-border-1000: #2a2a2a;
+
+    --color-orange-1000: #ff6a2a;
+    --color-orange-900: #ff8a3d;
+
+    --color-text-1000: #f8f4ed;
+    --color-text-900: #b5aea3;
   }
 }

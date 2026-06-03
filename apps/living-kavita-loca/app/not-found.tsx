@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import clsx from "clsx";
 import { NonMainNav } from "@/app/components/Nav/NonMainNav";
-import { ThemedButton } from "@kavita-likes-fajitas/ui-library/Button";
+import { RoseThemedButton } from "@kavita-likes-fajitas/ui-library/Button";
 import Samosa404Rock from "@/public/images/personal/samosa-rock-404.jpg";
 
 export const metadata: Metadata = {
@@ -68,9 +68,9 @@ export default function NotFound() {
             <br /> Let&apos;s get you back on track.
           </p>
         </div>
-        <ThemedButton asChild>
+        <RoseThemedButton asChild>
           <Link href="/">Back to Home</Link>
-        </ThemedButton>
+        </RoseThemedButton>
       </div>
     </main>
   );

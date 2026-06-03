@@ -1,1 +1,1 @@
-export * from "./ThemedButton";
+export * from "./RoseThemedButton";

@@ -9,9 +9,7 @@ export function StatusBlock({ className, children }: StatusBlockProps) {
   return (
     <div
       className={clsx(
-        // Inherit the parent grid's rows so header / value / sub-text align
-        // across every column regardless of how long a label wraps.
-        "grid row-span-3 grid-rows-subgrid text-center",
+        "flex min-w-0 flex-col items-center text-center lg:grid lg:row-span-3 lg:grid-rows-subgrid",
         className,
       )}
     >

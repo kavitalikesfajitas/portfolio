@@ -7,6 +7,11 @@ import clsx from "clsx";
 export const metadata: Metadata = {
   title: "Dammit I Need A New Job",
   description: "Dark Layoff Humor",
+  icons: {
+    icon: "/images/dammit-flame.png",
+    shortcut: "/images/dammit-flame.png",
+    apple: "/images/dammit-flame.png",
+  },
 };
 
 export default function RootLayout({

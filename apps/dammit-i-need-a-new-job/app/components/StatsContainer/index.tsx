@@ -11,8 +11,13 @@ type StatsContainerProps = React.PropsWithChildren<{
 
 export function StatsContainer({ className, children }: StatsContainerProps) {
   return (
-    <Card className={clsx("w-full flex", className)}>
-      <CardContent className="grid grid-cols-4 grid-rows-[auto_auto_auto] divide-x divide-gray-200 *:px-6">
+    <Card
+      className={clsx(
+        "w-full flex bg-neutral-910 text-cream-1000 border-border-1000",
+        className,
+      )}
+    >
+      <CardContent className="grid grid-cols-2 lg:grid-cols-4 lg:grid-rows-[auto_auto_auto] p-0">
         {children}
       </CardContent>
     </Card>

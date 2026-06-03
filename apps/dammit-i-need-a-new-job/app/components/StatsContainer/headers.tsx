@@ -4,7 +4,7 @@ import {
   PaperPlane,
   ChatBubble,
   Ghost,
-  Flame,
+  Infinity as InfinityIcon,
 } from "@kavita-likes-fajitas/kavita-fajita-icons";
 
 export type IconProps = SVGProps<SVGSVGElement> & {
@@ -17,6 +17,7 @@ export type StatHeader = {
   label: string;
   subText?: string;
   tone?: IconContainerTone;
+  value?: number | string;
 };
 
 export enum StatHeaderKey {
@@ -31,21 +32,25 @@ export const StatHeaders: Record<StatHeaderKey, StatHeader> = {
     Icon: PaperPlane,
     label: "Jobs Applied To",
     subText: "keep going, sweetie...",
+    value: 10,
   },
   INTERVIEWS: {
     Icon: ChatBubble,
     label: "Interviews",
     subText: "we love progress...",
+    value: 2,
   },
   GHOSTED: {
     Icon: Ghost,
     label: "Ghosted",
     subText: "it me, not you...",
+    value: 2,
   },
   EXISTENTIAL_CRISIS: {
-    Icon: Flame,
+    Icon: InfinityIcon,
     label: "Existential Crisis",
     tone: "accent",
     subText: "who even am I...",
+    value: "∞",
   },
 };

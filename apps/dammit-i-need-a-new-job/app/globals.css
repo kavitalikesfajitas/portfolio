@@ -8,7 +8,7 @@
   height: device-height;
 }
 :root {
-  --background: var(--color-black);
+  --background: var(--color-neutral-950);
   --foreground: var(--color-white);
 }
 .font-inter {
@@ -44,7 +44,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: var(--color-black);
+    --background: var(--color-neutral-950);
     --foreground: var(--color-white);
   }
 }
@@ -52,7 +52,7 @@
 @layer base {
   body {
     font-family: var(--font-inter), sans-serif;
-    background: var(--color-white)
+    background: var(--color-white);
   }
 }
 
@@ -61,5 +61,3 @@ body {
   color: var(--foreground);
   min-height: 100vh;
 }
-
-
