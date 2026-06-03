@@ -31,7 +31,7 @@ export function NavigationMenu({ className }: NavigationMenuProps) {
         </div>
         <a
           href="https://livingkavitaloca.com"
-          className="font-overpass-mono text-xs font-semibold uppercase tracking-tighter text-cream-800 transition-colors duration-200 hover:text-orange-1000"
+          className="font-overpass-mono text-xs font-semibold uppercase tracking-tighter underline text-cream-800 transition-colors duration-200 hover:text-orange-1000"
         >
           created by kavita chaudhry
         </a>
