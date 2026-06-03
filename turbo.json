@@ -41,6 +41,14 @@
       "dependsOn": ["@kavita-likes-fajitas/shadcn-ui-lib#build"],
       "cache": false,
       "persistent": true
+    },
+    "dammit-i-need-a-new-job#build": {
+      "dependsOn": [
+        "@kavita-likes-fajitas/kavita-fajita-icons#build",
+        "@kavita-likes-fajitas/shadcn-ui-lib#build",
+        "@kavita-likes-fajitas/ui-library#build",
+        "^build"
+      ]
     }
   }
 }
