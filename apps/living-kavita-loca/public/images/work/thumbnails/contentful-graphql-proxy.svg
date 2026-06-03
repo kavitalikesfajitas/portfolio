@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Abstract GraphQL proxy architecture illustration">
+  <defs>
+    <linearGradient id="background" x1="96" y1="54" x2="1054" y2="602" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#080b12"/>
+      <stop offset="0.5" stop-color="#10151e"/>
+      <stop offset="1" stop-color="#15111a"/>
+    </linearGradient>
+    <linearGradient id="proxyFace" x1="460" y1="148" x2="739" y2="449" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2b3240"/>
+      <stop offset="1" stop-color="#111620"/>
+    </linearGradient>
+    <linearGradient id="graphStroke" x1="430" y1="198" x2="760" y2="434" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff8a65"/>
+      <stop offset="0.47" stop-color="#67e8d5"/>
+      <stop offset="1" stop-color="#9d8cff"/>
+    </linearGradient>
+    <linearGradient id="clientAccent" x1="150" y1="0" x2="380" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff8a65"/>
+      <stop offset="1" stop-color="#ffd166"/>
+    </linearGradient>
+    <linearGradient id="contentAccent" x1="826" y1="0" x2="1040" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#67e8d5"/>
+      <stop offset="1" stop-color="#9d8cff"/>
+    </linearGradient>
+    <linearGradient id="cacheAccent" x1="464" y1="0" x2="736" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff8a65"/>
+      <stop offset="1" stop-color="#67e8d5"/>
+    </linearGradient>
+    <radialGradient id="centerGlow" cx="50%" cy="46%" r="45%">
+      <stop offset="0" stop-color="#67e8d5" stop-opacity="0.22"/>
+      <stop offset="0.58" stop-color="#67e8d5" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#67e8d5" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000000" flood-opacity="0.48"/>
+    </filter>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0v48" fill="none" stroke="#ffffff" stroke-opacity="0.035" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#background)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <ellipse cx="600" cy="306" rx="430" ry="250" fill="url(#centerGlow)"/>
+  <rect x="115" y="68" width="970" height="494" rx="8" fill="#05070c" fill-opacity="0.26" stroke="#ffffff" stroke-opacity="0.06"/>
+
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M303 218C378 178 444 181 501 224" stroke="#ff8a65" stroke-opacity="0.35" stroke-width="2"/>
+    <path d="M303 401C379 444 451 438 509 385" stroke="#ffd166" stroke-opacity="0.22" stroke-width="2"/>
+    <path d="M702 224C774 176 848 179 923 226" stroke="#67e8d5" stroke-opacity="0.32" stroke-width="2"/>
+    <path d="M696 386C770 442 850 443 933 396" stroke="#9d8cff" stroke-opacity="0.26" stroke-width="2"/>
+    <path d="M348 315H480" stroke="url(#clientAccent)" stroke-width="3"/>
+    <path d="M720 315H854" stroke="url(#contentAccent)" stroke-width="3"/>
+    <path d="M600 421V500" stroke="url(#cacheAccent)" stroke-width="3"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="160" y="178" width="190" height="112" rx="8" fill="#151a24" stroke="#ffffff" stroke-opacity="0.09"/>
+    <rect x="160" y="341" width="190" height="112" rx="8" fill="#151a24" stroke="#ffffff" stroke-opacity="0.09"/>
+    <rect x="850" y="177" width="190" height="112" rx="8" fill="#151a24" stroke="#ffffff" stroke-opacity="0.09"/>
+    <rect x="850" y="341" width="190" height="112" rx="8" fill="#151a24" stroke="#ffffff" stroke-opacity="0.09"/>
+  </g>
+
+  <g opacity="0.92">
+    <rect x="186" y="209" width="118" height="12" rx="6" fill="#ff8a65" fill-opacity="0.6"/>
+    <rect x="186" y="238" width="88" height="9" rx="4.5" fill="#ffffff" fill-opacity="0.13"/>
+    <rect x="186" y="261" width="128" height="9" rx="4.5" fill="#ffffff" fill-opacity="0.09"/>
+    <rect x="186" y="372" width="92" height="12" rx="6" fill="#ffd166" fill-opacity="0.54"/>
+    <rect x="186" y="401" width="124" height="9" rx="4.5" fill="#ffffff" fill-opacity="0.12"/>
+    <rect x="186" y="424" width="82" height="9" rx="4.5" fill="#ffffff" fill-opacity="0.09"/>
+
+    <rect x="876" y="208" width="118" height="12" rx="6" fill="#67e8d5" fill-opacity="0.58"/>
+    <rect x="876" y="237" width="82" height="9" rx="4.5" fill="#ffffff" fill-opacity="0.13"/>
+    <rect x="876" y="260" width="125" height="9" rx="4.5" fill="#ffffff" fill-opacity="0.09"/>
+    <rect x="876" y="372" width="105" height="12" rx="6" fill="#9d8cff" fill-opacity="0.56"/>
+    <rect x="876" y="401" width="124" height="9" rx="4.5" fill="#ffffff" fill-opacity="0.12"/>
+    <rect x="876" y="424" width="78" height="9" rx="4.5" fill="#ffffff" fill-opacity="0.09"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="476" y="146" width="248" height="270" rx="8" fill="url(#proxyFace)" stroke="#67e8d5" stroke-opacity="0.28"/>
+    <rect x="505" y="176" width="190" height="210" rx="8" fill="#0b1018" stroke="#ffffff" stroke-opacity="0.13"/>
+    <path d="M575 224l50-28 50 28v58l-50 28-50-28z" fill="#111824" stroke="url(#graphStroke)" stroke-width="4"/>
+    <circle cx="575" cy="224" r="9" fill="#ff8a65"/>
+    <circle cx="675" cy="224" r="9" fill="#9d8cff"/>
+    <circle cx="625" cy="310" r="9" fill="#67e8d5"/>
+    <path d="M575 224l50 86 50-86M575 224h100" fill="none" stroke="#ffffff" stroke-opacity="0.34" stroke-width="3"/>
+    <rect x="540" y="340" width="120" height="16" rx="8" fill="#67e8d5" fill-opacity="0.18"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <path d="M482 500c0-22 236-22 236 0v48c0 22-236 22-236 0z" fill="#121821" stroke="#67e8d5" stroke-opacity="0.3"/>
+    <ellipse cx="600" cy="500" rx="118" ry="25" fill="#17202b" stroke="url(#cacheAccent)" stroke-width="3"/>
+    <path d="M482 524c0 22 236 22 236 0" fill="none" stroke="#ffffff" stroke-opacity="0.1"/>
+  </g>
+
+  <g filter="url(#glow)">
+    <circle cx="348" cy="315" r="7" fill="#ff8a65"/>
+    <circle cx="480" cy="315" r="7" fill="#ffd166"/>
+    <circle cx="720" cy="315" r="7" fill="#67e8d5"/>
+    <circle cx="854" cy="315" r="7" fill="#9d8cff"/>
+    <circle cx="600" cy="421" r="7" fill="#67e8d5"/>
+  </g>
+
+  <g opacity="0.55" fill="none" stroke="#ffffff" stroke-width="2">
+    <path d="M151 518c130-36 251-39 363-8 112 31 219 32 322 2 74-22 144-25 212-8" stroke-opacity="0.08"/>
+    <path d="M205 115c87 25 164 27 231 5 86-28 173-22 260 20 69 34 148 35 236 4" stroke-opacity="0.06"/>
+  </g>
+</svg>

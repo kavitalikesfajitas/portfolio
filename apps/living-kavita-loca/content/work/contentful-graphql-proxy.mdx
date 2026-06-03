@@ -1,4 +1,4 @@
-import HeroImage from "@/public/images/work/thumbnails/graphql-proxy.png";
+import HeroImage from "@/public/images/work/thumbnails/contentful-graphql-proxy.svg";
 
 export const metadata = {
   title: "Contentful GraphQL Proxy",
@@ -22,36 +22,39 @@ export const metadata = {
 
 ---
 
-**TL;DR:** I replaced a growing set of Contentful wrapper Lambdas in `api/content` with a single GraphQL proxy. I started with a Next.js proof of concept, realized the cache and traffic model would not hold up for `swoosh.nike`, wrote the RFC, created the Jira epic and implementation tickets, and led the work over a little more than two sprints to ship the production version: an Express server with Redis, health checks, CORS, and telemetry.
+## About
 
-## Overview
+At Nike, a lot of Contentful reads were hiding behind `api/content`.
 
-The story here is pretty simple: I proved the pattern quickly, hit the scaling limits of the first version, wrote the RFC, and then led the work to ship the production version.
+On paper, that looked like a nice REST API. In reality, every route was still hand-written GraphQL to Contentful. Need a new content shape? Add another handler. Need a new field? Backend change. Need a slightly different query? Another little deployment for something that should have been a schema problem.
 
-**1 — Proof of concept.** I started with a quick Next.js route and an in-process cache to prove the pattern, validate the GraphQL wrapper approach, and learn what the real operational requirements would be before committing to a bigger server shape.
+It worked, but it kept growing in the wrong direction.
 
+I replaced that sprawl with a single GraphQL proxy: one endpoint, one cache story, one place to observe and tune Contentful traffic.
 
-**2 — The scaling limit.** It became clear pretty quickly that **in-process caching on a Next route** was not the right long-term shape for the traffic profile we expected on `swoosh.nike`. Once you care about replicas, cold paths, and shared cache hit rate, a simple in-memory cache stops being good enough.
+The first version was a quick Next.js proof of concept. That was useful because it proved the shape fast. But it also made the limit obvious: in-process cache inside a web route was not going to hold up for `swoosh.nike` traffic. Once you care about replicas, cold starts, and shared cache hits, "just put an LRU in the route" stops being cute.
 
-**3 — RFC.** From there I wrote and circulated the internal RFC, _Replace Content-APIs with a single GraphQL Apollo proxy for Contentful_. It laid out the current pain points, the `api/content` REST-over-GraphQL pattern we wanted to get away from, the staged approach from POC to dedicated service, and the caching implications of Contentful rate limits.
+So I wrote the RFC, created the Jira epic and tickets, and led the work over a little more than two sprints. The production version became a dedicated Express + Apollo service with Redis, health checks, CORS, local HTTPS support, and telemetry.
 
-**4 — Execution.** I created the Jira epic, wrote the implementation tickets, and drove the work over a little more than two sprints to get from the original pattern to the standalone Express service: **`POST /contentful/graphql`**, **Redis-backed** Apollo caching for cross-instance hits, **`GET /contentful/health`**, CORS, optional **HTTPS** for local development, and packaging that worked cleanly with CI and Docker.
+---
 
-The core problem was always the same: **`api/content`** looked like a clean **REST/OpenAPI** surface, but each route still boiled down to hand-maintained GraphQL and `makeItemsRequest`. I pushed for the proxy because it gave us one place to manage content reads instead of continuing to spread that work across more Lambdas.
+## The Problem
 
-## The challenge (why the old shape had to go)
+The old setup had a few problems that all fed each other:
 
-- **It looked like REST, but it was really GraphQL** — Teams integrated through `api/content` like they were calling a normal REST API, but under the hood we were still building and maintaining GraphQL requests to Contentful. That made the surface area misleading and added unnecessary translation work in the backend.
-- **Backend owned every new content shape** — If a team needed a new field or a slightly different query, they could not just update a schema contract and move on. The backend had to approve it, add or change a handler, maintain the GraphQL for it, and review the request shape.
-- **Small content changes turned into API deployments** — Instead of treating this like a schema-driven integration, we were often redeploying `api/content` and its related infrastructure just to support another content query. That was too much operational work for changes that were often pretty small.
-- **The API surface kept growing** — `api/content` meant one handler per concern (`get-page`, `get-collections`, `get-product-by-slug`, and so on), which kept expanding the Lambda and SAM surface area whenever the CMS introduced another shape we wanted to expose.
-- **Caching needed to work across instances** — In-process LRU is fine for a single Node process, but not for traffic that fans out across replicas. We needed shared cache behavior, which is why Redis ended up being part of the production shape.
+- It looked like REST, but it was really GraphQL wearing a jacket.
+- Backend owned too much of the content query shape.
+- Small CMS changes could turn into API deployments.
+- The Lambda surface area kept expanding.
+- Caching was scattered, local, and hard to reason about under real traffic.
 
 ## Before and after
 
-**Before (`api/content`):** a widening set of **REST-shaped** Lambdas (`get-page`, `get-collections`, `get-product-by-slug`, …), each with **OpenAPI** surface area and its own **`makeItemsRequest`** + **hand-maintained GraphQL**. Clients integrated against **many URLs**; the backend still owned **many queries**—just **fragmented** across deployables.
+Before, storefronts called a growing list of REST-shaped endpoints like `get-page`, `get-collections`, and `get-product-by-slug`. Each endpoint had its own handler, its own OpenAPI surface, and its own hand-maintained GraphQL call to Contentful.
 
-**After (proxy BFF):** clients speak **GraphQL** to **`POST /contentful/graphql`**. The service **loads Contentful’s schema from the repo**, **wraps** it, and **forwards** operations with **server-only** credentials. **Cache policy, timeouts, and observability** are centralized instead of re-learned per Lambda.
+After, clients called one endpoint: `POST /contentful/graphql`.
+
+The proxy loaded the Contentful schema from the repo, wrapped it, and forwarded requests with server-only credentials. Cache policy, timeouts, and telemetry lived in one place instead of being re-learned per Lambda.
 
 ```text
                     ┌─────────────────────────────────────────┐
@@ -69,13 +72,29 @@ The core problem was always the same: **`api/content`** looked like a clean **RE
                                Contentful GraphQL (CDA)
 ```
 
-Same vendor endpoint—**different** cost to change a query, **different** cache story under **replicas and launch traffic**.
+Same upstream. Much better ownership model.
 
 ## What I built
 
-### Next.js POC → dedicated server
+### The first version
 
-The **POC lived in the web app**; **production load on swoosh.nike** is what forced the move to a **long-lived server** and **Redis**. The **architecture is the same bet**—schema in repo, **wrap**, **delegate** to Contentful with a bearer token—just hosted where **cache, replicas, and ops** make sense.
+I started with a Next.js route because I wanted to prove the idea before asking everyone to care about it.
+
+That POC used Apollo inside a Pages API route and a small in-memory cache. It was enough to answer the important question: can we expose a clean GraphQL surface while keeping Contentful credentials and vendor details server-side?
+
+Yes.
+
+But it was not the final architecture. The POC was still tied to the web app, and the cache lived inside one process. For the traffic profile we cared about, especially PDP traffic on `swoosh.nike`, we needed a dedicated service with shared cache behavior.
+
+### The production shape
+
+The production version became a standalone Express server running Apollo:
+
+- `POST /contentful/graphql` for content queries
+- `GET /contentful/health` for liveness
+- Redis-backed cache behavior across instances
+- CORS and optional local HTTPS for realistic browser testing
+- Docker/CI packaging so it could run like the rest of the platform
 
 ```typescript
 const executor = buildHTTPExecutor({
@@ -92,48 +111,23 @@ const schema = wrapSchema({
 });
 ```
 
-### What that code is actually doing
+That code is doing three jobs:
 
-- **`loadSchemaSync` + `GraphQLFileLoader`** pull a **checked-in** `contentful.schema.graphql` into a `GraphQLSchema` object. That file is the **public contract** reviewers and clients codegen against; Contentful stays an **implementation detail** behind the executor.
-- **`buildHTTPExecutor`** (from `@graphql-tools/executor-http`) is the **remote transport**: every resolved field ultimately becomes a **`POST`** to `https://graphql.contentful.com/content/v1/spaces/{space}/environments/{env}` with the **CDA bearer token** in `Authorization`. **`timeout: 5000`** and **`retry: 1`** cap tail latency and give **one** bounded retry on transient failures—enough to smooth blips, not enough to **stampede** Contentful.
-- **`wrapSchema`** stitches the **local SDL** to that **remote executor**: Apollo validates and plans against **your** schema file, but **execution** fans out through the HTTP executor. That is **schema delegation**, not a second graph you hand-maintain in resolvers.
+- Load a checked-in Contentful schema so reviewers and clients have a real contract.
+- Use an HTTP executor to forward operations to Contentful with a bounded timeout and retry.
+- Let Apollo validate and execute against the local schema while Contentful stays behind the proxy.
 
-### Request lifecycle (standalone server)
+### The cache work
 
-1. **Express** accepts **`POST /contentful/graphql`** with **`express.json({ limit: "50mb" })`** in the implementation shown here, but that is **not** a safe public default on its own. If you allow bodies that large, pair them with **rate limiting**, **persisted-operation allowlists** (or authenticated-only large bodies), **memory-safe batching rules**, and smaller fallback limits wherever clients do not truly need huge payloads.
-2. **`cors`** runs on that path; preflight uses **`OPTIONS`** with **`optionsSuccessStatus: 200`** for older clients that choke on **204**. That helps browser compatibility, but it does **not** protect the route from oversized or expensive GraphQL requests.
-3. **`@as-integrations/express` `expressMiddleware`** hands the HTTP request to **Apollo Server 4**.
-4. Apollo **parses, validates, and executes** against the **wrapped** schema; this is also where you enforce **depth / cost limits**, operation rules, and execution guards before a request turns into an expensive fan-out to Contentful. Cache plugins participate on the way out (see below).
-5. The executor issues **`POST`** to Contentful’s GraphQL HTTP API and returns data **or** partial errors per GraphQL rules.
+The cache was the part that mattered most.
 
-If I were documenting this as a production playbook instead of a case study, I would link the body-limit decision at **`express.json({ limit: "50mb" })`** to the **Express** middleware that rate-limits or authenticates the route, and link the **Apollo parse / validate / execute** step to whichever **depth / cost** plugin or custom validation rules the server uses. In practice, **persisted queries**, **smaller body limits**, and **pagination** are usually safer defaults than a blanket public **50MB** allowance.
+Contentful is fast when you stay on the cached path. It is much less forgiving when launch traffic starts turning into uncached upstream reads. So the proxy needed to make caching boring and predictable.
 
-Health checks are a separate **`GET /contentful/health`** JSON response (status, message, listen URL, timestamp)—cheap **liveness** without hitting Contentful.
+I used Apollo cache control with a default max age, response caching for successful queries, and a layered cache with memory first and Redis second. Hot keys could stay close to the process, while shared entries survived across replicas.
 
-### Next.js POC vs Express server (same graph, different host constraints)
-
-**POC (`pages/api/contentful/graphql`):** **`startServerAndCreateNextHandler`** from `@as-integrations/next` embeds Apollo inside a **Pages API** route. **`export const config = { maxDuration: 5 }`** caps **serverless** execution time; that alone is a hint you are not building a **long-lived** cache host. In that first version, Apollo **`cache`** was a plain **`InMemoryLRUCache`** (in the POC: **~100MB** cap, **5-minute** store TTL) for features like **APQ**, **response caching**, and other Apollo cache consumers. Parsed-and-validated operation reuse is a **separate** concern under **`documentStore`**, which is what Apollo uses to skip repeated **parse + validate** work.
-
-**Production-shaped service:** **Express** + **`http` / `https.createServer`**, **`ApolloServerPluginDrainHttpServer`** for graceful shutdown, and the same **Apollo plugin stack**. The important production detail is that **`cache`** and **`documentStore`** are **two different knobs**: use **`cache`** for **APQ / response caching** and Apollo cache consumers such as **RESTDataSource**, and wire **`documentStore`** separately if you want parsed-and-validated operations to survive beyond one warm process.
-
-### Apollo plugins (why each one exists)
-
-- **`ApolloServerPluginCacheControl`** with **`defaultMaxAge: 180`** (seconds) and **`calculateHttpHeaders: true`**. Contentful’s exported schema **does not** declare `@cacheControl` on types/fields, so without a **default**, Apollo would not emit sensible **`Cache-Control`** hints and **`@apollo/server-plugin-response-cache`** would have little to hang onto. Apollo documents this pattern for [default `maxAge` when the schema is silent](https://www.apollographql.com/docs/apollo-server/performance/caching#default-maxage).
-- **`responseCachePlugin()`** stores **full successful query results** keyed by operation + cache policy. By default it **does not** cache responses that contain errors, and it aligns with the cache-control plugin so you do not cache “accidentally forever.”
-- **`ApolloServerPluginLandingPageDisabled()`** in non-dev: the endpoint is **not** gated like an internal admin tool, so **Sandbox / landing** stays off.
-- **`ApolloServerPluginDrainHttpServer`** on Express: clean shutdown with the Node HTTP server.
-- **Telemetry:** a small **`requestDidStart` / `willSendResponse`** plugin records **`performance.now()`** duration and exports metrics (e.g. **`graphqlRequestDuration`**) with **operation name**, **route**, and **HTTP status**—the kind of dimensions you need when PDP latency regresses.
-
-### The cache implementation (in-memory → layered → Redis)
-
-Apollo’s **`cache`** option is not “only HTTP responses.” It matters for **APQ**, **response caching**, and other Apollo cache consumers such as **RESTDataSource**. But **parsed / validated operation reuse** belongs to **`documentStore`**, which is a **separate** setting. If you move from the POC to a production **Express / `http.createServer`** deployment, configure **both** independently.
-
-**Redis on:** the code builds a **layered** cache via **`cacheable`**: **primary** in-memory **`Keyv` + `InMemoryLRUCache`**, **secondary** **`KeyvRedis`** (TLS + `servername` in non-dev, **`disableOfflineQueue: true`** to avoid unbounded buffering when Redis is unhappy). One **`KeyvAdapter`** can back Apollo **`cache`** for **APQ / response caching**; a second store can back **`documentStore`** for parsed queries. Everything sits under explicit namespaces so keys do not collide with unrelated Redis users. Optional **`DEBUG_PROXY`** hooks log **get/set** paths when you are proving behavior locally.
-
-**Redis off:** the same separation still matters. A small in-memory **`cache`** may be enough for a POC, while **`documentStore`** can remain default / in-memory until parse + validate reuse becomes a real bottleneck.
+One small but important detail: Apollo `cache` and `documentStore` are not the same thing. Response caching, APQ, and other Apollo cache consumers use `cache`; parsed-and-validated operation reuse belongs to `documentStore`. I treated those as separate knobs instead of pretending one cache solved every problem.
 
 ```typescript
-// Production shape: configure Apollo `cache` and `documentStore` separately.
 const responseLayer = new Cacheable({
   primary: responseMemoryStore,
   secondary: responseRedisStore,
@@ -161,16 +155,15 @@ const server = new ApolloServer({
 });
 ```
 
-### `cacheable` in practice: debugging without SSH
+### Proving it without direct Redis access
 
-This part was a lot of the real engineering work.
+This was the least glamorous part and probably the most real.
 
-At Nike, I could not just SSH into managed Redis infrastructure and poke around directly. So I had to prove cache behavior from the **application edge**, not from host access:
+I could not just SSH into managed Redis and poke around. I had to prove cache behavior from the application edge.
 
-- **App-level hooks** — I instrumented `cacheable` hook points (`AFTER_SET`, `AFTER_GET`, `AFTER_GET_MANY`, `BEFORE_SECONDARY_SETS_PRIMARY`) behind a **`DEBUG_PROXY`** switch to confirm read/write flow and TTL behavior in each layer.
-- **Local parity loop** — I ran local Redis via Docker and used `redis-cli monitor` while firing real GraphQL queries, then compared that output with proxy debug logs to verify key writes, read paths, and fallback behavior.
-- **Synthetic request patterns** — I used repeated query runs (warm/cold mixes) to prove when responses came from L1 memory, L2 Redis, or Contentful.
-- **Telemetry cross-check** — I correlated cache debug logs with request duration metrics so “it seems faster” turned into measurable p50/p95 movement.
+So I added debug hooks behind `DEBUG_PROXY`, ran local Redis with Docker, watched `redis-cli monitor`, and compared that with the proxy logs while sending real GraphQL queries. Then I used repeated warm/cold request patterns to prove when reads were coming from memory, Redis, or Contentful.
+
+It was not fancy. It was the kind of debugging that makes you trust the system after you ship it.
 
 Representative debug pattern:
 
@@ -185,44 +178,33 @@ if (debugProxy) {
 }
 ```
 
-### Redis architecture decision (`001_redis_config.md`)
+### The Redis decision
 
-I also documented and drove the Redis decision in RFC **`001_redis_config.md`**:
+I also wrote the Redis decision doc. The choice came down to provisioned ElastiCache versus ElastiCache Serverless.
 
-- **Evaluated options** — provisioned ElastiCache replication group vs **ElastiCache Serverless**.
-- **Chose serverless** — for **operational simplicity**, **automatic scaling**, **built-in failover/Multi-AZ**, and **pay-per-use** economics.
-- **Explicit tradeoffs** — serverless is **not** “I own a single Redis box” and not full cluster-mode tuning either; you gain managed scaling and HA, but lose some low-level configuration knobs (for example, node shape and certain advanced controls).
-- **Cost stance** — a fixed 3-node setup is predictable but can overpay during low usage; serverless aligns cost to actual usage, which matched the proxy’s variable traffic profile.
+We chose serverless because it matched the shape of the service: variable traffic, managed failover, less capacity planning, and pay-per-use economics. The tradeoff is that you do not get every low-level knob you would with a provisioned setup. That was acceptable here because the important work was making cache behavior observable and safe, not hand-tuning a cluster.
 
-This is the key nuance: serverless cache is its own operating model. It is neither “just one instance” nor “self-managed cluster controls everywhere.” Designing around that model (and instrumenting it correctly) is what made it production-usable.
+### Hardening
 
-### Caching, correctness, and ops (summary)
+The proxy also cleaned up a few things that had been spread around before:
 
-- **Default cache age + response cache** so Contentful sees **steady, cache-friendly** traffic and clients see **stable** PDP latency.
-- **Layered LRU + Redis** so **hot keys** hit memory and **shared** entries survive **process** boundaries.
-- **`GET /contentful/health`**, **CORS**, optional **local HTTPS** (`mkcert` + env key paths) when the browser requires a **trusted origin** that matches **realistic** hostnames.
+- Contentful tokens stayed server-side.
+- The schema lived in the repo, so reviews could see the contract.
+- Introspection and landing pages stayed off in production.
+- Timeouts and retries were bounded so a bad upstream day did not pile up forever.
+- Health checks were cheap and did not need to hit Contentful.
 
-### Security, schema, and delivery hygiene
+## How I ran the work
 
-- **Secrets stay server-side** — The **Content Delivery API token** and **space / environment** targeting live in the **proxy process**, not in the browser bundle.
-- **Schema in repo** — The Contentful schema is **materialized as GraphQL SDL in the repository** (and regenerated when space or environment changes), so **reviews** show **exactly** what clients can ask for and **codegen** can track it.
-- **Production hardening** — **Introspection** and **GraphQL playground** stay **off** where the endpoint is public; **landing plugins** disabled in non-dev paths so you do not accidentally **advertise** an unauthenticated graph.
-- **HTTP executor discipline** — **POST** to Contentful with a **bounded timeout** and **limited retries** so a bad release does not **pile up** hung requests against the vendor.
+This was not just a code change. I had to make the work legible enough for people to fund it.
 
-### Vendor reality (why caching was never optional)
+The POC gave me something concrete to show. The RFC turned the recurring gripe into a staged plan. The Jira epic split the work into server extraction, Redis, cache behavior, telemetry, and delivery pieces. Then I drove the implementation across a little more than two sprints.
 
-Contentful’s delivery path is **rate-limited** on **uncached** hits to the **Content Delivery API**; **CDN cache hits** are the cheap path. That is why the RFC called out **vendor limits** explicitly: a proxy that **does not** define **TTLs** and **response caching** is a **foot-gun**—you either **thrash** upstream or **surprise** yourself at launch. The Apollo stack here is **intentionally opinionated** (default **max-age**, **response cache** for successful **query** operations) so behavior is **predictable** under **PDP** traffic.
-
-### How I ran the program (not just the repo)
-
-- **POC first** — Next.js route to **de-risk the idea** in days, not quarters.
-- **RFC after the demo** — Once **cache + swoosh.nike scale** made the limit obvious, the RFC turned “we should” into **reviewable stages** and **vendor-grounded** caching strategy.
-- **Planning** — **Epic + tickets** broke out **server extraction**, **Redis**, and **operational** work so execution was **trackable**.
-- **Execution** — **A little over two sprints** to **today’s dedicated server**: same GraphQL story, **production** topology.
+That order mattered. It kept the project from becoming "let's rebuild content infra because GraphQL feels nicer." The point was simpler: fewer handlers, safer cache behavior, better latency, and less backend work for every new content query.
 
 ## Results
 
-Representative production impact where this pattern ran (**Nike PDP** context):
+Representative production impact from the PDP context:
 
 | Metric         | Before | After | Improvement       |
 | -------------- | ------ | ----- | ----------------- |
@@ -231,20 +213,16 @@ Representative production impact where this pattern ran (**Nike PDP** context):
 | Cache Hit Rate | N/A    | 94%   | -                 |
 | Error Rate     | 0.8%   | 0.1%  | **87% reduction** |
 
-**How to read that table:** this is not “micro-optimization for charts.” It is **shoppers waiting less on PDPs**, **fewer fragile reads** under launch traffic, and **fewer incidents** where “content” becomes the blame magnet.
+The numbers are nice, but the bigger win was operational.
 
-**Outcomes beyond the percent rows:**
+New Contentful-backed experiences did not need another `api/content` Lambda. TTLs and telemetry lived together. Frontend and platform teams could standardize on GraphQL operations and generated types instead of pretending the system was REST all the way down.
 
-- **Faster product iteration** — New Contentful-backed experiences did not need **another** **`api/content`** Lambda and **another** REST contract to argue about.
-- **One place to tune** — **TTLs**, **cache headers**, and **telemetry** for content reads **lived together** instead of spreading across handlers.
-- **Honest integration** — Frontend and platform teams could **standardize on GraphQL** operations and **generated types** instead of pretending the system was **REST all the way down**.
+## What I’d do again
 
-## What I’d repeat on the next platform bet
-
-- **Write the short, blunt RFC** — It turned a recurring gripe into **funded work** with **exit criteria** stakeholders could recognize.
-- **POC before the committee** — A **Next route** bought **truth** cheaply; **swoosh.nike-scale cache** forced the **honest** next step before we over-invested.
-- **Name the wire protocol in the API** — When integration is GraphQL, **own it in the surface**; hiding it behind REST **taxes every future query change**.
-- **Default the cache story** — Upstream schemas without hints are normal; **your server must still enforce** sane **TTLs** and **response caching** so you stay inside **delivery limits** and keep **tail latency** under control.
+- Prove the shape cheaply before writing the big plan.
+- Make the RFC short and blunt.
+- Name the real protocol. If the system is GraphQL, let it be GraphQL.
+- Treat caching as part of the API design, not a performance sprinkle at the end.
 
 ## Future enhancements
 
@@ -254,4 +232,4 @@ Representative production impact where this pattern ran (**Nike PDP** context):
 
 ---
 
-_Origin: legacy **`api/content`** sprawl; **first Next.js POC pre-2024** (`pages/api/contentful/graphql`) on the Nike Digital Platform team; load targets included **swoosh.nike**. **RFC → Jira → sprints →** standalone **`contentful-proxy`** server (solo-maintained monorepo, Docker/CI, Redis)._
+_Origin: legacy `api/content` sprawl; first Next.js POC pre-2024 (`pages/api/contentful/graphql`) on the Nike Digital Platform team; load targets included `swoosh.nike`. RFC -> Jira -> sprints -> standalone `contentful-proxy` server._
