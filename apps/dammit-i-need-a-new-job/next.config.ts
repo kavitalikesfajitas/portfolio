@@ -8,6 +8,8 @@ const workspaceRoot = path.resolve(
   "..",
 );
 
+const appRoot = path.dirname(url.fileURLToPath(import.meta.url));
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   turbopack: {
@@ -27,7 +29,7 @@ const nextConfig: NextConfig = {
   webpack: (config) => {
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
-      "@": path.resolve(__dirname, "."),
+      "@": appRoot,
     };
     return config;
   },

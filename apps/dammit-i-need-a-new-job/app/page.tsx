@@ -33,6 +33,7 @@ export default function Home() {
           </div>
           <Image
             src={ConstructionBarrier}
+            priority
             alt="construction barrier"
             className="w-full max-w-sm self-center object-contain md:w-80 md:self-end lg:w-96"
           />

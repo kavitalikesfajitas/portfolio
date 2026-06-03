@@ -17,7 +17,7 @@ export function NavigationMenu({ className }: NavigationMenuProps) {
     >
       <hr className=" w-full self-center border-orange-1000 border-t-2 mt-8" />
       <div className=" flex-1 flex flex-row gap-2 items-center">
-        <div className="font-overpass-mono uppercase tracking-tighter text-2xl text-cream-1000 font-bold">
+        <div className="font-overpass-mono uppercase tracking-tighter pl-6 text-2xl text-cream-1000 font-bold">
           DAMMIT.
         </div>
         <Image

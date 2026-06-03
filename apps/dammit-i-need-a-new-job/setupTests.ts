@@ -10,11 +10,11 @@ afterEach(() => {
 vi.mock("next/image", () => ({
   default: (
     imageProps: React.ComponentProps<"img"> & {
-    placeholder?: string;
-    priority?: boolean;
-    quality?: number;
-    src: string | { src: string };
-  },
+      placeholder?: string;
+      priority?: boolean;
+      quality?: number;
+      src: string | { src: string };
+    },
   ) => {
     const { alt, src } = imageProps;
     const props = { ...imageProps };
@@ -30,6 +30,37 @@ vi.mock("next/image", () => ({
     });
   },
 }));
+
+const localStorageMock = (() => {
+  let store: Record<string, string> = {};
+
+  return {
+    clear: () => {
+      store = {};
+    },
+    getItem: (key: string) => store[key] ?? null,
+    key: (index: number) => Object.keys(store)[index] ?? null,
+    get length() {
+      return Object.keys(store).length;
+    },
+    removeItem: (key: string) => {
+      delete store[key];
+    },
+    setItem: (key: string, value: string) => {
+      store[key] = value;
+    },
+  };
+})();
+
+Object.defineProperty(globalThis, "localStorage", {
+  configurable: true,
+  value: localStorageMock,
+});
+
+Object.defineProperty(window, "localStorage", {
+  configurable: true,
+  value: localStorageMock,
+});
 
 // Mock window.matchMedia for jsdom
 Object.defineProperty(window, "matchMedia", {

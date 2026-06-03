@@ -23,7 +23,7 @@ jobs:
     environment: default
     name: "Living Kavita Loca App Tests, Build, Lint and Check Size"
     runs-on: [ubuntu-latest]
-    timeout-minutes: 45
+    timeout-minutes: 30
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}

@@ -27,42 +27,8 @@ permissions:
 jobs:
   test-build-dammit-app:
     if: github.ref != 'refs/heads/main' && github.event.pull_request.draft == false
+    uses: ./.github/workflows/ci-dammit-i-need-a-new-job.yml
     name: "Dammit App Tests, Build, Lint and Typecheck"
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    env:
-      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
-    steps:
-      - name: Checkout main
-        uses: actions/checkout@v4
-
-      - name: 📥 Monorepo install
-        uses: ./.github/actions/yarn-monorepo-install
-        with:
-          node-version-file: ".nvmrc"
-
-      - name: ♻️ Restore dammit app related caches
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ github.workspace }}/apps/dammit-i-need-a-new-job/.next/cache
-            ${{ github.workspace }}/.cache
-            ${{ github.workspace }}/**/tsconfig.tsbuildinfo
-          key: dammit-i-need-a-new-job-cache-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
-
-      - name: 🕵️ Typecheck
-        run: yarn turbo typecheck --filter="dammit-i-need-a-new-job..."
-
-      - name: 🔬 Linter
-        run: yarn turbo lint --filter="dammit-i-need-a-new-job..."
-        env:
-          TIMING: 1
-
-      - name: 🧪 Unit tests
-        run: yarn turbo test-ci --filter="dammit-i-need-a-new-job..."
-
-      - name: 🏗 Build
-        run: yarn turbo build --filter="dammit-i-need-a-new-job..."
-        env:
-          NEXT_TELEMETRY_DISABLED: true
+    with:
+      environment: default
+    secrets: inherit

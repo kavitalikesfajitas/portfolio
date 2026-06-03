@@ -13,12 +13,41 @@
     { "path": "scripts" },
   ],
   "settings": {
+    "oso.polarLanguageServer.validations": "cloud",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit",
+      "source.organizeImports": "never",
+    },
     "editor.formatOnSave": true,
+    "eslint.format.enable": true,
+    "eslint.run": "onSave",
+    "eslint.workingDirectories": [{ "mode": "auto" }],
+    "editor.formatOnSaveMode": "file",
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "search.exclude": {
+      "**/.yarn": true,
+      "**/.pnp.*": true,
+    },
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "jest.runMode": "on-demand",
+    "files.associations": {
+      "**/*.json.hbs": "json",
+      "*.json.hbs": "json",
+    },
+    "eslint.validate": [
+      "javascript",
+      "javascriptreact",
+      "typescript",
+      "typescriptreact",
+      "handlebars",
+    ],
+    "[handlebars]": {
+      "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    },
     "files.exclude": {
       "**/node_modules": true,
       "**/.turbo": true,
     },
-    "eslint.validate": ["javascript", "typescript", "typescriptreact"],
   },
   "extensions": {
     "recommendations": [
@@ -26,36 +55,5 @@
       "esbenp.prettier-vscode",
       "bradlc.vscode-tailwindcss",
     ],
-  },
-  "oso.polarLanguageServer.validations": "cloud",
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit",
-    "source.organizeImports": "never",
-  },
-  "editor.formatOnSave": true,
-  "eslint.format.enable": true,
-  "eslint.run": "onSave",
-  "eslint.workingDirectories": [{ "mode": "auto" }],
-  "editor.formatOnSaveMode": "file",
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "search.exclude": {
-    "**/.yarn": true,
-    "**/.pnp.*": true,
-  },
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "jest.runMode": "on-demand",
-  "files.associations": {
-    "**/*.json.hbs": "json",
-    "*.json.hbs": "json",
-  },
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact",
-    "handlebars",
-  ],
-  "[handlebars]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
   },
 }
