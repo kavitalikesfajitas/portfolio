@@ -139,7 +139,7 @@ const apolloCache = new KeyvAdapter(
     store: responseLayer,
     namespace: "contentful-cache",
   }),
-  { disableBatchReads }
+  { disableBatchReads },
 );
 
 const documentStore = createParsedQueryDocumentStore({
@@ -206,12 +206,78 @@ That order mattered. It kept the project from becoming "let's rebuild content in
 
 Representative production impact from the PDP context:
 
-| Metric         | Before | After | Improvement   |
-| -------------- | ------ | ----- | ------------- |
-| P50 Latency    | 180ms  | 45ms  | 75% faster    |
-| P95 Latency    | 420ms  | 168ms | 60% faster    |
-| Cache Hit Rate | N/A    | 94%   | -             |
-| Error Rate     | 0.8%   | 0.1%  | 87% reduction |
+<div className="my-4 overflow-x-auto rounded-lg border border-gray-800 md:my-6">
+  <table className="w-full border-collapse text-left text-xs md:text-sm">
+    <thead className="bg-gray-800/50">
+      <tr>
+        <th className="border-b border-gray-700 px-3 py-2 font-semibold text-white md:px-4 md:py-3">
+          Metric
+        </th>
+        <th className="border-b border-gray-700 px-3 py-2 font-semibold text-white md:px-4 md:py-3">
+          Before
+        </th>
+        <th className="border-b border-gray-700 px-3 py-2 font-semibold text-white md:px-4 md:py-3">
+          After
+        </th>
+        <th className="border-b border-gray-700 px-3 py-2 font-semibold text-white md:px-4 md:py-3">
+          Improvement
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          P50 Latency
+        </td>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          180ms
+        </td>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          45ms
+        </td>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          75% faster
+        </td>
+      </tr>
+      <tr>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          P95 Latency
+        </td>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          420ms
+        </td>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          168ms
+        </td>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          60% faster
+        </td>
+      </tr>
+      <tr>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          Cache Hit Rate
+        </td>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          N/A
+        </td>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          94%
+        </td>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          -
+        </td>
+      </tr>
+      <tr>
+        <td className="px-3 py-2 text-gray-300 md:px-4 md:py-3">Error Rate</td>
+        <td className="px-3 py-2 text-gray-300 md:px-4 md:py-3">0.8%</td>
+        <td className="px-3 py-2 text-gray-300 md:px-4 md:py-3">0.1%</td>
+        <td className="px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          87% reduction
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 The numbers are nice, but the bigger win was operational.
 
