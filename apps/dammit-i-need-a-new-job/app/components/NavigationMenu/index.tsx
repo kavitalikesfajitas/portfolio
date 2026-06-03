@@ -15,18 +15,26 @@ export function NavigationMenu({ className }: NavigationMenuProps) {
         className,
       )}
     >
-      <hr className=" w-full self-center border-orange-1000 border-t-2 mt-8" />
-      <div className=" flex-1 flex flex-row gap-2 items-center">
-        <div className="font-overpass-mono uppercase tracking-tighter pl-6 text-2xl text-cream-1000 font-bold">
-          DAMMIT.
+      <hr className="mt-8 w-full self-center border-t border-orange-1000/80" />
+      <div className="flex w-full flex-wrap items-center justify-between gap-x-6 gap-y-3 px-6 pb-2">
+        <div className="flex items-center gap-2">
+          <div className="font-overpass-mono text-2xl font-bold uppercase tracking-tighter text-cream-1000">
+            DAMMIT.
+          </div>
+          <Image
+            src={FireLogo}
+            alt="fire logo"
+            placeholder="blur"
+            quality={75}
+            className="h-8 w-8 animate-pulse"
+          />
         </div>
-        <Image
-          src={FireLogo}
-          alt="fire logo"
-          placeholder="blur"
-          quality={75}
-          className="w-8 h-8 animate-pulse"
-        />
+        <a
+          href="https://livingkavitaloca.com"
+          className="font-overpass-mono text-xs font-semibold uppercase tracking-tighter text-cream-800 transition-colors duration-200 hover:text-orange-1000"
+        >
+          created by kavita chaudhry
+        </a>
       </div>
     </nav>
   );
