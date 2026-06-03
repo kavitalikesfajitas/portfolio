@@ -1,0 +1,57 @@
+name: "Dammit I Need A New Job App Tests, Build, Lint and Check Size - Reusable Workflow"
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "Environment to run on"
+        required: false
+        type: string
+        default: "default"
+
+jobs:
+  build-app-and-run-tests:
+    environment: ${{ inputs.environment }}
+    name: "Dammit I Need A New Job App Tests, Build, Lint and Check Size"
+    runs-on: [ubuntu-latest]
+    timeout-minutes: 30
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+
+      - name: 📥 Monorepo install
+        uses: ./.github/actions/yarn-monorepo-install
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: ♻️ Restore dammit-i-need-a-new-job related caches
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ github.workspace }}/apps/dammit-i-need-a-new-job/.next/cache
+            ${{ github.workspace }}/.cache
+            ${{ github.workspace }}/**/tsconfig.tsbuildinfo
+          key: dammit-i-need-a-new-job-cache-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+
+      - name: 🕵️ Typecheck
+        run: yarn turbo typecheck --filter="dammit-i-need-a-new-job..."
+
+      - name: 🔬 Linter
+        run: yarn turbo lint --filter="dammit-i-need-a-new-job..."
+        env:
+          TIMING: 1
+
+      - name: 🧪 Unit tests
+        run: yarn turbo test-ci --filter="dammit-i-need-a-new-job..."
+
+      - name: 🏗 Build dammit-i-need-a-new-job
+        run: yarn turbo build --filter="dammit-i-need-a-new-job..."
+        env:
+          NEXT_TELEMETRY_DISABLED: true
+          ENABLE_CACHE: true

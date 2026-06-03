@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Container } from "@/app/main/components/Container";
+import { Container } from "@kavita-likes-fajitas/ui-library/Container";
 import { NonMainNav } from "@/app/components/Nav/NonMainNav";
 import { TechBadge } from "@kavita-likes-fajitas/ui-library/TechBadge";
 import { Hero } from "./components/Hero";

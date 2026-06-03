@@ -1,0 +1,34 @@
+name: "Dammit I Need A New Job - CI Pull Request"
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - "apps/dammit-i-need-a-new-job/**"
+      - "packages/**"
+      - "package.json"
+      - "*.lock"
+      - ".yarnrc.yml"
+      - "turbo.json"
+      - "tsconfig.base.json"
+      - ".prettier*"
+      - ".github/**"
+      - "!.github/workflows/ci-pr-audit.yml"
+      - "!.github/workflows/ci-pr-body-audit-reusable.yml"
+      - "!.github/workflows/ci-pr-reusable-commit-lint.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test-build-dammit-app:
+    if: github.ref != 'refs/heads/main' && github.event.pull_request.draft == false
+    uses: ./.github/workflows/ci-dammit-i-need-a-new-job.yml
+    name: "Dammit App Tests, Build, Lint and Typecheck"
+    with:
+      environment: default
+    secrets: inherit

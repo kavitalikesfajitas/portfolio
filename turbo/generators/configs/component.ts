@@ -23,6 +23,10 @@ export default function generator(plop: NodePlopAPI) {
                         name: "Living Kavita Loca App (app-specific)",
                         value: "app",
                     },
+                    {
+                        name: "Dammit I Need A New Job App (app-specific)",
+                        value: "dammit",
+                    },
                 ],
             },
             {
@@ -34,11 +38,17 @@ export default function generator(plop: NodePlopAPI) {
             },
         ],
         actions: (data) => {
+            const appDirs: Record<string, string> = {
+                app: "living-kavita-loca",
+                dammit: "dammit-i-need-a-new-job",
+            };
+
             let componentPath: string;
             let testPath: string;
-            if (data?.location === "app") {
-                componentPath = "apps/living-kavita-loca/app/components/{{pascalCase name}}/index.tsx";
-                testPath = "apps/living-kavita-loca/app/components/{{pascalCase name}}/index.test.tsx";
+            const appDir = data?.location ? appDirs[data.location] : undefined;
+            if (appDir) {
+                componentPath = `apps/${appDir}/app/components/{{pascalCase name}}/index.tsx`;
+                testPath = `apps/${appDir}/app/components/{{pascalCase name}}/index.test.tsx`;
             } else {
                 componentPath = `packages/${data?.packageName}/src/{{pascalCase name}}/index.tsx`;
                 testPath = `packages/${data?.packageName}/src/{{pascalCase name}}/index.test.tsx`;
@@ -48,12 +58,12 @@ export default function generator(plop: NodePlopAPI) {
                 {
                     type: "add",
                     path: componentPath,
-                    templateFile: path.join(__dirname, "../templates/react-component/Component.tsx.hbs"),
+                    templateFile: path.join(__dirname, "./templates/react-component/Component.tsx.hbs"),
                 },
                 {
                     type: "add",
                     path: testPath,
-                    templateFile: path.join(__dirname, "../templates/react-component/Component.test.tsx.hbs"),
+                    templateFile: path.join(__dirname, "./templates/react-component/Component.test.tsx.hbs"),
                 },
             ];
         },

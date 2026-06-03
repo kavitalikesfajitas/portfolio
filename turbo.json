@@ -23,6 +23,12 @@
     "@kavita-likes-fajitas/ui-library#test-ci": {
       "dependsOn": ["@kavita-likes-fajitas/shadcn-ui-lib#build"]
     },
+    "@kavita-likes-fajitas/kavita-fajita-icons#typecheck": {
+      "dependsOn": ["@kavita-likes-fajitas/kavita-fajita-icons#build"]
+    },
+    "dammit-i-need-a-new-job#typecheck": {
+      "dependsOn": ["@kavita-likes-fajitas/kavita-fajita-icons#build"]
+    },
     "dev": {
       "inputs": ["$TURBO_DEFAULT$", ".env.local", ".env.development", ".env"],
       "cache": false,

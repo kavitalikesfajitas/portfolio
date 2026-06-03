@@ -4,8 +4,10 @@ import type { ActionType } from "plop";
 
 type PackageType = "react" | "esm";
 
-const TURBO_ROOT = path.resolve(__dirname, "..");
-const PROJECT_ROOT = path.resolve(__dirname, "../../..");
+// Turbo gen bundles every config into the entry at turbo/generators, so
+// __dirname resolves to turbo/generators (NOT turbo/generators/configs).
+const TURBO_ROOT = __dirname;
+const PROJECT_ROOT = path.resolve(__dirname, "../..");
 
 const getActions = (packageType: PackageType, name: string) => {
   const templatePath = path.resolve(
@@ -13,8 +15,6 @@ const getActions = (packageType: PackageType, name: string) => {
     "templates/package",
     packageType,
   );
-  console.log(`${templatePath}/**`);
-  console.log(templatePath);
   return [
     {
       type: "addMany",

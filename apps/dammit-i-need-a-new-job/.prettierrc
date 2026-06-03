@@ -1,0 +1,18 @@
+{
+  "semi": true,
+  "trailingComma": "all",
+  "overrides": [
+    {
+      "files": ["**/package.json.hbs"],
+      "options": {
+        "parser": "json"
+      }
+    },
+    {
+      "files": ["**/*.tsx.hbs"],
+      "options": {
+        "parser": "typescript"
+      }
+    }
+  ]
+}

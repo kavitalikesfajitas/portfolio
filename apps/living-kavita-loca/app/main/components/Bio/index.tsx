@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import BioImage from "@/public/images/personal/bio-photo.jpg";
 import Image from "next/image";
-import { Container } from "../Container";
+import { Container } from "@kavita-likes-fajitas/ui-library/Container";
 import { forwardRef } from "react";
 
 type SnazzyDividerProps = {

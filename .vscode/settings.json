@@ -7,6 +7,7 @@
   "editor.formatOnSave": true,
   "eslint.format.enable": true,
   "eslint.run": "onSave",
+  "eslint.workingDirectories": [{ "pattern": "apps/*" }, { "pattern": "packages/*" }],
   "editor.formatOnSaveMode": "file",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "search.exclude": {
@@ -23,10 +24,6 @@
     "javascript",
     "javascriptreact",
     "typescript",
-    "typescriptreact",
-    "handlebars"
-  ],
-  "[handlebars]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  }
+    "typescriptreact"
+  ]
 }
