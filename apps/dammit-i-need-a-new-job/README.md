@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dammit. I Need A New Job.
 
-## Getting Started
+A tiny Next.js app for tracking the chaos of job hunting while experimenting with a better way to discover roles.
 
-First, run the development server:
+## What This Is
+
+This is the first pass at a standalone job-search side project inside the portfolio monorepo. Right now it includes:
+
+- A responsive landing page
+- A persisted days-since-laid-off counter
+- Job-search themed status stats
+- Local image assets and custom icons
+- App-level tests, typecheck, lint, and build scripts
+
+## Local Development
+
+Run from the repo root:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+yarn install
+yarn workspace dammit-i-need-a-new-job dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The dev server runs at:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```txt
+https://localhost:3002
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Commands
 
-## Learn More
+```bash
+# Typecheck this app and its dependencies
+yarn turbo typecheck --filter="dammit-i-need-a-new-job..."
 
-To learn more about Next.js, take a look at the following resources:
+# Lint this app and its dependencies
+yarn turbo lint --filter="dammit-i-need-a-new-job..."
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Run tests with coverage
+yarn turbo test-ci --filter="dammit-i-need-a-new-job..."
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Build for production
+yarn turbo build --filter="dammit-i-need-a-new-job..."
+```
 
-## Deploy on Vercel
+## Implementation Notes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- The counter uses `@react-hookz/web` and persists to local storage.
+- The counter is configured to avoid SSR hydration issues.
+- PNG imports are typed with the app-level image declaration file.
+- The existential crisis stat is intentionally infinite.
+- Typecheck depends on the local icon package build because this app imports generated icon output.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Vercel
+
+This app is intended to deploy as a standalone Vercel project from:
+
+```txt
+apps/dammit-i-need-a-new-job
+```
+
+Suggested Vercel settings:
+
+```txt
+Framework Preset: Next.js
+Root Directory: apps/dammit-i-need-a-new-job
+Install Command: yarn install --immutable
+Build Command: yarn build
+Output Directory: .next
+```
