@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "cd ../.. && corepack yarn@4.11.0 install --immutable",
+  "buildCommand": "cd ../.. && corepack yarn@4.11.0 turbo run build --filter=\"dammit-i-need-a-new-job\"",
+  "outputDirectory": ".next"
+}
