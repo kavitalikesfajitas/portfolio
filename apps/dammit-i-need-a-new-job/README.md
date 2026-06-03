@@ -115,6 +115,6 @@ Whether that becomes a real product or just an excuse to keep drawing increasing
 
 This project is purely for fun. It's a creative and technical playground built to explore frontend tooling, deployment workflows, and ideas around job discovery — nothing more.
 
-It is **not** a commentary on, or an insult to, my current employer. I'm genuinely happy where I am; the "new job" framing is just the satirical premise that makes the cartoon cats funnier. Any resemblance to real job-search frustrations is purely coincidental.
+The "new job" framing is purely for laughs — mostly an excuse to draw cats having a worse week than you. Any resemblance to a real existential crisis is purely coincidental.
 
 Probably.

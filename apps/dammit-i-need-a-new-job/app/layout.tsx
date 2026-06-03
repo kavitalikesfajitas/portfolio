@@ -4,7 +4,7 @@ import { getAppFontVariablesForDammit } from "@kavita-likes-fajitas/fonts";
 import clsx from "clsx";
 import { Footer } from "@kavita-likes-fajitas/ui-library/Navigation/Footer";
 export const metadata: Metadata = {
-  title: "Dammit I Need A New Job",
+  title: "Dammit I Gotta Get A New job",
   description: "Dark Layoff Humor",
   icons: {
     icon: "/images/dammit-flame.png",
