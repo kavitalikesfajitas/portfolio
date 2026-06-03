@@ -1,0 +1,154 @@
+import HeroImage from "@/public/images/work/thumbnails/optimizely-singleton.svg";
+
+export const metadata = {
+  title: "Optimizely Singleton Provider",
+  heroImage: HeroImage,
+  role: "Frontend / Platform Engineer",
+  tech: ["Next.js", "TypeScript", "Optimizely", "React"],
+};
+
+# Optimizely Singleton Provider
+
+**Role:** Frontend / Platform Engineer  
+**Tech Stack:** Next.js · TypeScript · Optimizely · React
+
+---
+
+## What the Optimizely Node SDK expects
+
+Optimizely Feature Experimentation (and similar products) ship a **datafile**: a JSON document that describes experiments, feature flags, audiences, and rollouts for a given environment. The Node SDK loads that document into memory, optionally refreshes it on a timer (`autoUpdate` + `updateInterval`), and exposes APIs like `isFeatureEnabled` and event APIs for impressions.
+
+For that model to behave well in production, you generally want **one client object per OS process** (or per worker, if you use worker threads). Creating a new `createInstance` on every request is wasteful: you pay initialization cost, you may duplicate background refresh and outbound fetches to Optimizely’s CDN, and you lose a single place to reason about freshness and logging.
+
+In a small Express or Fastify service, the pattern is obvious: call `createInstance` once when the HTTP server boots, attach the client to application context, and reuse it for the lifetime of the process.
+
+## Where Next.js makes that awkward
+
+This project used **Next.js with `output: "standalone"`**, deployed as a long-lived Node process in a container—the kind of setup you see when teams run Next on **AWS** or **Google Cloud** instead of a proprietary edge runtime.
+
+Next.js does not give you a first-class **singleton** primitive for server-only SDKs. You do not get a built-in “register this once at process start” hook that the framework guarantees will run exactly once per deployment in all execution modes. Module scope can look like a singleton in some cases, but it is not a contract across every code path: cold starts, multiple bundles, instrumentation boundaries, and the way server components and route handlers are split can all change how often your init code runs relative to your mental model.
+
+If the Optimizely client is created inline with code that runs “whenever someone hits a page,” **Optimizely traffic starts to correlate with user traffic** even when the datafile has not meaningfully changed. That is the wrong coupling: freshness should follow a **policy** (interval, build artifact, explicit invalidation), not **request volume**.
+
+So the engineering problem was explicit: **persist one Optimizely client in process memory**, **seed it deterministically at boot**, **refresh it on a controlled schedule**, and **stop the browser SDK from running a parallel polling loop**.
+
+## Anchoring the client on `global` with `Symbol.for`
+
+The workaround we used was a tiny `GlobalRef<T>` helper that stores a value on the Node **`global` object** under a key produced by **`Symbol.for("optimizelyClient")`** (the actual string comes from the constructor argument).
+
+```typescript
+export class GlobalRef<T> {
+  private readonly sym: symbol;
+
+  constructor(uniqueName: string) {
+    this.sym = Symbol.for(uniqueName);
+  }
+
+  get value() {
+    return (global as any)[this.sym] as T | undefined;
+  }
+
+  set value(value: T) {
+    (global as any)[this.sym] = value;
+  }
+}
+```
+
+**Why `Symbol.for` instead of `Symbol()`:** `Symbol.for` registers the symbol in the **global symbol registry** for the whole runtime. Two different modules that both call `Symbol.for("optimizelyClient")` get the **same symbol value**, so they read and write the **same property** on `global`. A fresh `Symbol()` per module would not match across files.
+
+**Why `global` at all:** We needed something that outlives any single module evaluation or request handler object graph. The Node `global` object is the practical “bag of process-wide state” for this kind of SDK when the framework does not offer its own container.
+
+That is still not a “Next singleton” in the sense of a framework guarantee. It is **process-local state** you opt into. If you scale horizontally, each pod still has its own client, which is what you want for CPU and memory isolation.
+
+## Server bootstrap: create once, then refresh
+
+The server-side client is created only when `optimizelyInstanceGlobal.value` is still empty: a guard that makes repeated import of the module idempotent for the lifetime of the process.
+
+```typescript
+export const optimizelyInstanceGlobal = new GlobalRef<Optimizely.Client>(
+  "optimizelyClient",
+);
+
+export const setOptimizelyClient = () => {
+  if (!optimizelyInstanceGlobal.value) {
+    optimizelyInstanceGlobal.value = Optimizely.createInstance({
+      sdkKey,
+      datafile: fallbackOptimizelyDatafile,
+      odpOptions: { disabled: true },
+      datafileOptions: {
+        autoUpdate: true,
+        updateInterval: OPTIMIZELY_REFRESH_INTERVAL,
+      },
+    }) as Optimizely.Client;
+  }
+};
+```
+
+Important details:
+
+- **`datafile: fallbackOptimizelyDatafile`** imports the JSON that was written at **build time** (see below). That gives the SDK a coherent starting point before the first network refresh succeeds.
+- **`datafileOptions.autoUpdate: true`** plus **`updateInterval`** (in this codebase, `180000` ms—three minutes) moves refresh cadence under explicit configuration instead of tying it to traffic.
+- **`odpOptions.disabled: true`** turns off Optimizely Data Platform features we were not using in this integration.
+
+The module also calls `setOptimizelyClient()` at load time so the server has a client as soon as that code path is exercised.
+
+**Instrumentation:** Logging or metrics when this block runs helps confirm you are not double-initializing. That only proves your **startup hook** fired once per process; it does not change how Next is structured. It is evidence, not a framework feature.
+
+## Build-time datafile: `next.config.mjs` and `fallbackDatafile.json`
+
+Before Next returns its config, the app runs **`preFetchOptimizelyDatafile()`** (a small Node script). It uses the same SDK key the runtime uses, **HTTP-fetches** `https://cdn.optimizely.com/datafiles/${sdkKey}.json`, and **`fs.writeFileSync`** the body into `src/app/providers/optimizely/fallbackDatafile.json`.
+
+Embedded in `next.config.mjs`:
+
+```javascript
+try {
+  await preFetchOptimizelyDatafile();
+} catch (error) {
+  console.error(
+    "Error pre-fetching Optimizely Datafile Fallback File:",
+    error,
+  );
+}
+```
+
+The build must have **`NEXT_PUBLIC_OPTIMIZELY_SDK_KEY`** (or whatever your pipeline exports) available so the prefetch matches production’s environment. If prefetch fails, the catch block logs the error; teams often still ship the previous committed fallback or fail the build depending on policy.
+
+**Runtime sequence:** the build writes the freshest datafile snapshot the CI environment could fetch → the running pod starts and `createInstance` reads that snapshot immediately → the SDK’s background updater replaces in-memory state as CDN fetches succeed. **Staleness** is bounded by your **`updateInterval`** and how often you rebuild and redeploy, not by how many users opened the product page.
+
+## Server vs browser: two clients, one owner of freshness
+
+**On the server**, route handlers or server components can use the shared client—for example waiting for `onReady()` and calling `isFeatureEnabled` for an API that answers “is this flag on for this user?” That path uses the same long-lived instance stored in `GlobalRef`.
+
+**On the client**, the React SDK still needs a client object for hooks and context, but you do **not** want it to **independently download and poll** the datafile if the server already owns freshness. So the React wrapper builds its client from **`dataFromOptimizely`** passed in from the server (serialized datafile or equivalent) and sets **`datafileOptions: { autoUpdate: false }`**. Explicit `close()` on unmount remains a good safety net; it does not replace turning off client-side auto-update when the server is authoritative.
+
+End-to-end flow:
+
+```text
+Build     → CDN fetch → write fallbackDatafile.json
+Pod boot  → createInstance(datafile + sdkKey + server autoUpdate)
+Requests  → reuse server singleton; serialize datafile to client; React SDK without auto-fetch
+```
+
+## June 2025 production slowness and the post-mortem
+
+An internal **June 2025** post-mortem documented production **slowness** on `swoosh.nike` that developed over time after the last deploy. Investigation tied **rising outbound volume** to **Optimizely** endpoints (traffic to Cloudflare-hosted IPs). The pattern **reset on deploy or pod restart**, which often points to cumulative behavior rather than a single bad request.
+
+The team split the problem into **backend singleton** behavior versus **frontend React SDK** behavior. Instrumentation and load testing showed the **backend** initialization happening **once per pod** and **not** explaining the runaway growth. The **frontend** path, including default background behaviors and polling assumptions, was the harder part to align with production reality even after cleanup hooks.
+
+The resolution described in that document matches the architecture here: **remove redundant frontend polling**, **feed the app router from the backend’s datafile**, and **disable automatic client-side datafile fetching**. After that, outbound traffic **stabilized**, and feature flags **continued to work** as expected.
+
+That incident is why “backend owns polling, client consumes a snapshot” is not an optional stylistic choice. It is the difference between **one controlled refresh loop** and **duplicate timers and fetches** fighting each other across layers.
+
+## What this buys you in production
+
+Decoupling Optimizely request volume from raw page visits reduces load on Optimizely’s CDN, your **egress / gateway**, and your own **Node heap** if duplicate clients were retaining duplicate trees. Build-time `fallbackDatafile.json` improves **cold start** behavior when the CDN is flaky. A single server client keeps **logs and metrics** about refresh in one place.
+
+## Reusing the pattern elsewhere
+
+The same structure applies to other vendors that ship a **remote document** and a **polling SDK**: persist **one** client per process, **seed** from build or disk, **refresh** on a policy you control, and make any **UI-layer SDK** a **thin consumer** unless you have a clear reason to duplicate background work.
+
+Newer Next.js capabilities around **`fetch` caching** and **`revalidateTag`** might eventually offer another dimension for **when** to refresh derived configuration. This implementation predates leaning on that; the core fix was always **ownership of lifecycle**, not a clever cache tag.
+
+---
+
+_Written from work on a Next.js preorder application using `@optimizely/optimizely-sdk` (Node) and `@optimizely/react-sdk` (React), with `GlobalRef` + `Symbol.for` on `global` and build-time prefetch wired through `next.config.mjs`._
