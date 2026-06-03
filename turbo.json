@@ -5,8 +5,7 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*", "!README.md"],
-      "outputs": [".next/**", "!.next/cache/**", "out/**", "dist/**"],
-      "env": ["PR_NUMBER"]
+      "outputs": ["dist/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -48,7 +47,19 @@
         "@kavita-likes-fajitas/shadcn-ui-lib#build",
         "@kavita-likes-fajitas/ui-library#build",
         "^build"
-      ]
+      ],
+      "inputs": ["$TURBO_DEFAULT$", ".env*", "!README.md"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "living-kavita-loca#build": {
+      "dependsOn": [
+        "@kavita-likes-fajitas/shadcn-ui-lib#build",
+        "@kavita-likes-fajitas/ui-library#build",
+        "^build"
+      ],
+      "inputs": ["$TURBO_DEFAULT$", ".env*", "!README.md"],
+      "outputs": [".next/**", "!.next/cache/**", "out/**"],
+      "env": ["PR_NUMBER"]
     }
   }
 }
