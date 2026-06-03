@@ -35,6 +35,12 @@ export function NavDropdownMenu() {
             </DropdownMenuLink>
           ))}
           <DropdownMenuSeparator />
+          <DropdownMenuExternalLink
+            href="https://dammitigottagetanewjob.com/"
+            className="text-sm md:text-base"
+          >
+            Dammit I Gotta Get A New Job - A Side Quest
+          </DropdownMenuExternalLink>
           <DropdownMenuLink href="/old-site" className="text-sm md:text-base">
             Old Living Kavita Loca Site
           </DropdownMenuLink>
@@ -62,6 +68,24 @@ const DropdownMenuLink = ({
   return (
     <DropdownMenuItem className={clsx("p-2", className)} asChild>
       <Link href={href}>{children}</Link>
+    </DropdownMenuItem>
+  );
+};
+
+const DropdownMenuExternalLink = ({
+  href,
+  children,
+  className,
+}: {
+  href: string;
+  children: React.ReactNode;
+  className?: string;
+}): React.ReactNode => {
+  return (
+    <DropdownMenuItem className={clsx("p-2", className)} asChild>
+      <a href={href} target="_blank" rel="noopener noreferrer">
+        {children}
+      </a>
     </DropdownMenuItem>
   );
 };
