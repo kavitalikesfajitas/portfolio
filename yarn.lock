@@ -1618,7 +1618,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kavita-likes-fajitas/next-utils@workspace:packages/next-utils":
+"@kavita-likes-fajitas/next-utils@workspace:*, @kavita-likes-fajitas/next-utils@workspace:packages/next-utils":
   version: 0.0.0-use.local
   resolution: "@kavita-likes-fajitas/next-utils@workspace:packages/next-utils"
   dependencies:
@@ -7022,6 +7022,7 @@ __metadata:
     "@kavita-likes-fajitas/eslint-config": "npm:*"
     "@kavita-likes-fajitas/fonts": "npm:*"
     "@kavita-likes-fajitas/kavita-fajita-icons": "npm:*"
+    "@kavita-likes-fajitas/next-utils": "workspace:*"
     "@kavita-likes-fajitas/shadcn-ui-lib": "npm:*"
     "@kavita-likes-fajitas/tailwind-config": "npm:*"
     "@kavita-likes-fajitas/typescript-config": "npm:*"

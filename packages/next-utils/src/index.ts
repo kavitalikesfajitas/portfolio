@@ -1,3 +1,1 @@
-export default function HelloWorld() {
-  return "Hello World";
-}
+export * from "./templateFetch";
