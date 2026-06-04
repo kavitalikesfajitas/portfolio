@@ -1,0 +1,41 @@
+{
+  "name": "@kavita-likes-fajitas/next-utils",
+  "version": "0.1.0",
+  "description": "reusable next utils for the apps",
+  "sideEffects": false,
+  "type": "module",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./*": {
+      "import": "./dist/*/index.js",
+      "types": "./dist/*/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsdown --config ./tsdown.config.ts",
+    "dev": "tsdown --watch",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit",
+    "test-ci": "vitest run --coverage --reporter=dot",
+    "lint": "eslint"
+  },
+  "devDependencies": {
+    "@kavita-likes-fajitas/eslint-config": "workspace:*",
+    "@kavita-likes-fajitas/typescript-config": "workspace:*",
+    "@types/node": "^24",
+    "eslint": "^9",
+    "prettier": "^3.6.2",
+    "tsdown": "^0.21.9",
+    "typescript": "^5.5.4",
+    "vitest": "^4.1.4"
+  }
+}

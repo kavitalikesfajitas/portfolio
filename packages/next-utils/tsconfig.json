@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@kavita-likes-fajitas/typescript-config/esm-library",
+  "compilerOptions": {
+    "lib": ["esnext"],
+    "types": ["node"],
+    "emitDeclarationOnly": true,
+    "declaration": true
+  },
+  "include": [
+    "eslint.config.mjs",
+    "src/**/*.ts",
+    "src/**/*.mts",
+    "src/**/*.mjs",
+    "src/**/*.js",
+    "src/**/*.json",
+    "tests"
+  ]
+}
