@@ -1594,7 +1594,7 @@ __metadata:
     "@tailwindcss/postcss": "npm:^4"
     "@testing-library/jest-dom": "npm:^6.9.1"
     "@testing-library/react": "npm:^16.3.0"
-    "@types/node": "npm:^20"
+    "@types/node": "npm:^24"
     "@types/react": "npm:^19.2.10"
     "@types/react-dom": "npm:^19.2.3"
     "@vitejs/plugin-react": "npm:^6.0.1"
@@ -1618,6 +1618,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@kavita-likes-fajitas/next-utils@workspace:*, @kavita-likes-fajitas/next-utils@workspace:packages/next-utils":
+  version: 0.0.0-use.local
+  resolution: "@kavita-likes-fajitas/next-utils@workspace:packages/next-utils"
+  dependencies:
+    "@kavita-likes-fajitas/eslint-config": "workspace:*"
+    "@kavita-likes-fajitas/typescript-config": "workspace:*"
+    "@types/node": "npm:^24"
+    eslint: "npm:^9"
+    prettier: "npm:^3.6.2"
+    tsdown: "npm:^0.21.9"
+    typescript: "npm:^5.5.4"
+    vitest: "npm:^4.1.4"
+  languageName: unknown
+  linkType: soft
+
 "@kavita-likes-fajitas/shadcn-ui-lib@npm:*, @kavita-likes-fajitas/shadcn-ui-lib@workspace:*, @kavita-likes-fajitas/shadcn-ui-lib@workspace:packages/shadcn-ui-lib":
   version: 0.0.0-use.local
   resolution: "@kavita-likes-fajitas/shadcn-ui-lib@workspace:packages/shadcn-ui-lib"
@@ -1632,7 +1647,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/jest-dom": "npm:^6.9.1"
     "@testing-library/react": "npm:^16.3.0"
-    "@types/node": "npm:^20"
+    "@types/node": "npm:^24"
     "@types/react": "npm:^19.2.10"
     "@types/react-dom": "npm:^19.2.3"
     "@vitejs/plugin-react": "npm:^6.0.1"
@@ -1682,7 +1697,7 @@ __metadata:
     "@storybook/react-vite": "npm:^8.6.18"
     "@storybook/test": "npm:^8.6.18"
     "@tailwindcss/postcss": "npm:^4.1.18"
-    "@types/node": "npm:^20"
+    "@types/node": "npm:^24"
     "@types/react": "npm:^19.2.10"
     "@types/react-dom": "npm:^19.2.3"
     clsx: "npm:^2.1.1"
@@ -1740,7 +1755,7 @@ __metadata:
     "@testing-library/react": "npm:^16.3.0"
     "@tsdown/css": "npm:^0.21.9"
     "@types/lodash": "npm:^4.17.21"
-    "@types/node": "npm:^20"
+    "@types/node": "npm:^24"
     "@types/react": "npm:^19.2.10"
     "@types/react-dom": "npm:^19.2.3"
     "@vitejs/plugin-react": "npm:^6.0.1"
@@ -5108,12 +5123,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20":
-  version: 20.19.24
-  resolution: "@types/node@npm:20.19.24"
+"@types/node@npm:^24":
+  version: 24.13.0
+  resolution: "@types/node@npm:24.13.0"
   dependencies:
-    undici-types: "npm:~6.21.0"
-  checksum: 10c0/c872ce80a1e832fe035a3c94a27acb2d6e45ffa1209c0241ac6e2d405db8d6f47eea7a2509b5c2dbedae6231dafb9dbed873dd5daaebbad1f11fdaa58726ce5e
+    undici-types: "npm:~7.18.0"
+  checksum: 10c0/93a3f834f61cf3eae90703982c03cef16698acf0f265780b90ecd2afc0f6d83bcecf892745c4f7e5451c296f5bd58c9884e34a89df98d64985772961494ce633
   languageName: node
   linkType: hard
 
@@ -7007,6 +7022,7 @@ __metadata:
     "@kavita-likes-fajitas/eslint-config": "npm:*"
     "@kavita-likes-fajitas/fonts": "npm:*"
     "@kavita-likes-fajitas/kavita-fajita-icons": "npm:*"
+    "@kavita-likes-fajitas/next-utils": "workspace:*"
     "@kavita-likes-fajitas/shadcn-ui-lib": "npm:*"
     "@kavita-likes-fajitas/tailwind-config": "npm:*"
     "@kavita-likes-fajitas/typescript-config": "npm:*"
@@ -7018,7 +7034,7 @@ __metadata:
     "@testing-library/react": "npm:^16.3.0"
     "@types/lodash": "npm:^4.17.21"
     "@types/mdx": "npm:^2.0.13"
-    "@types/node": "npm:^20"
+    "@types/node": "npm:^24"
     "@types/react": "npm:^19.2.10"
     "@types/react-dom": "npm:^19.2.3"
     "@vitejs/plugin-react": "npm:^6.0.1"
@@ -10297,7 +10313,7 @@ __metadata:
     "@testing-library/react": "npm:^16.3.0"
     "@types/lodash": "npm:^4.17.21"
     "@types/mdx": "npm:^2.0.13"
-    "@types/node": "npm:^20"
+    "@types/node": "npm:^24"
     "@types/react": "npm:^19.2.10"
     "@types/react-dom": "npm:^19.2.3"
     "@vitejs/plugin-react": "npm:^6.0.1"
@@ -15010,17 +15026,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici-types@npm:~6.21.0":
-  version: 6.21.0
-  resolution: "undici-types@npm:6.21.0"
-  checksum: 10c0/c01ed51829b10aa72fc3ce64b747f8e74ae9b60eafa19a7b46ef624403508a54c526ffab06a14a26b3120d055e1104d7abe7c9017e83ced038ea5cf52f8d5e04
-  languageName: node
-  linkType: hard
-
 "undici-types@npm:~7.16.0":
   version: 7.16.0
   resolution: "undici-types@npm:7.16.0"
   checksum: 10c0/3033e2f2b5c9f1504bdc5934646cb54e37ecaca0f9249c983f7b1fc2e87c6d18399ebb05dc7fd5419e02b2e915f734d872a65da2e3eeed1813951c427d33cc9a
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~7.18.0":
+  version: 7.18.2
+  resolution: "undici-types@npm:7.18.2"
+  checksum: 10c0/85a79189113a238959d7a647368e4f7c5559c3a404ebdb8fc4488145ce9426fcd82252a844a302798dfc0e37e6fb178ff481ed03bc4caf634c5757d9ef43521d
   languageName: node
   linkType: hard
 

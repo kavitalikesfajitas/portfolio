@@ -1,10 +1,14 @@
 {
-  "name": "@kavita-likes-fajitas/{{name}}",
+  "name": "@kavita-likes-fajitas/next-utils",
   "version": "0.1.0",
-  "description": "{{description}}",
+  "description": "reusable next utils for the apps",
   "sideEffects": false,
   "type": "module",
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -25,13 +29,13 @@
     "lint": "eslint"
   },
   "devDependencies": {
+    "@kavita-likes-fajitas/eslint-config": "workspace:*",
+    "@kavita-likes-fajitas/typescript-config": "workspace:*",
     "@types/node": "^24",
-    "tsdown": "^0.21.9",
-    "typescript": "^5.5.4",
-    "vitest": "^4.1.4",
     "eslint": "^9",
     "prettier": "^3.6.2",
-    "@kavita-likes-fajitas/eslint-config": "workspace:*",
-    "@kavita-likes-fajitas/typescript-config": "workspace:*"
+    "tsdown": "^0.21.9",
+    "typescript": "^5.5.4",
+    "vitest": "^4.1.4"
   }
 }
