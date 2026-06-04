@@ -1,4 +1,4 @@
-import sharedLintStagedConfig from "../../../../../.lintstagedrc.mjs";
+import sharedLintStagedConfig from "../../.lintstagedrc.mjs";
 
 /** @type {import('lint-staged').Configuration} */
 export default {
