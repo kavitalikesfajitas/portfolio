@@ -37,6 +37,9 @@ describe("departments route", () => {
       meta: { cache: { revalidate: 86_400 } },
     });
     expect(response.status).toBe(200);
+    expect(response.headers.get("Cache-Control")).toBe(
+      "public, s-maxage=86400, stale-while-revalidate=3600",
+    );
     expect(mockedFetchGreenhouseDepartments).toHaveBeenCalledWith("vercel");
   });
 });

@@ -11,6 +11,8 @@ type RouteContext = {
 };
 
 export const revalidate = 86_400;
+const DEPARTMENTS_CACHE_CONTROL =
+  "public, s-maxage=86400, stale-while-revalidate=3600";
 
 export async function GET(_request: Request, { params }: RouteContext) {
   const parsedParams = departmentsRouteParamsSchema.safeParse(await params);
@@ -49,7 +51,10 @@ export async function GET(_request: Request, { params }: RouteContext) {
           cache: { revalidate: GREENHOUSE_DEPARTMENTS_REVALIDATE_SECONDS },
         },
       },
-      { status: 200 },
+      {
+        status: 200,
+        headers: { "Cache-Control": DEPARTMENTS_CACHE_CONTROL },
+      },
     );
   } catch (error) {
     const message =

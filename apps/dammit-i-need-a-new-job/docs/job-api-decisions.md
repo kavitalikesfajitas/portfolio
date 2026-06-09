@@ -118,7 +118,13 @@ Current cache policy:
 - Departments: long-lived cache, currently `86400` seconds.
 - Jobs: shorter cache, currently `900` seconds.
 
-The departments route also exports route-level `revalidate = 86400` because its response is public and only depends on the provider identifier. The jobs route does not export route-level revalidation because it depends on request-time headers and query params.
+The departments route also exports route-level `revalidate = 86400` because its response is public and only depends on the provider identifier. It also sends an explicit CDN cache header:
+
+```txt
+Cache-Control: public, s-maxage=86400, stale-while-revalidate=3600
+```
+
+The jobs route does not export route-level revalidation because it depends on request-time headers and query params.
 
 Departments change less often than jobs and are useful as the first narrowing step, so they can be cached more aggressively.
 
