@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { verifyApiKey } from "@/lib/auth/api-key";
 import { matchJobsByTitleTerm } from "@/lib/jobs/matching";
 import {
   fetchGreenhouseJobs,
@@ -12,6 +13,12 @@ type RouteContext = {
 };
 
 export async function GET(request: NextRequest, { params }: RouteContext) {
+  const apiKey = verifyApiKey(request);
+
+  if (!apiKey.ok) {
+    return apiKey.response;
+  }
+
   const parsedParams = jobsRouteParamsSchema.safeParse(await params);
 
   if (!parsedParams.success) {

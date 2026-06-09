@@ -1,0 +1,207 @@
+# Job API Decisions
+
+This note captures the current MVP decisions for the job aggregation/proxy API.
+
+## Product Goal
+
+Build a small engineering-focused job discovery experiment, starting with Greenhouse public job boards.
+
+The first hypothesis is that company-provided departments can reduce the search space before inspecting every job. Departments are useful as a signal, not as a canonical taxonomy across companies.
+
+## Scope
+
+In scope for the MVP:
+
+- Greenhouse only.
+- API proxy routes inside the Next.js app.
+- Zod validation for route params, query params, and Greenhouse payloads.
+- Normalization into a small internal shape.
+- Native `fetch`.
+- Next fetch caching.
+- Server-side filtering heuristics.
+
+Out of scope for now:
+
+- Database.
+- Prisma.
+- Sync jobs.
+- Background cron.
+- Redis.
+- Algolia or a dedicated search engine.
+- User auth for the public app experience.
+
+## Route Shape
+
+Use provider-specific proxy routes:
+
+```txt
+app/api/v1/departments/[provider]/[identifier]
+app/api/v1/jobs/[provider]/[identifier]
+```
+
+For Greenhouse, `identifier` is the Greenhouse board token.
+
+Examples:
+
+```txt
+/api/v1/departments/greenhouse/vercel
+/api/v1/jobs/greenhouse/vercel
+```
+
+The route structure intentionally leaves room for future providers such as Lever and Ashby without pretending their identifiers or payloads will match Greenhouse.
+
+## Endpoint Split
+
+Keep departments and jobs as separate proxy endpoints.
+
+The departments endpoint is the first-class discovery endpoint for this experiment. It fetches Greenhouse `/departments`, validates the response, normalizes departments, and preserves nested jobs returned by Greenhouse.
+
+The jobs endpoint fetches Greenhouse `/jobs` or `/jobs?content=true`, validates the response, normalizes jobs, and can apply server-side query filtering.
+
+Do not combine departments and jobs into one route yet. They have different cache profiles and different product jobs.
+
+## Greenhouse Findings
+
+Greenhouse exposes these public Job Board API endpoints:
+
+```txt
+/v1/boards/{boardToken}/jobs
+/v1/boards/{boardToken}/jobs?content=true
+/v1/boards/{boardToken}/departments
+/v1/boards/{boardToken}/offices
+/v1/boards/{boardToken}/jobs/{jobId}
+```
+
+For the department-first MVP, `/departments` is the cleanest starting point because it returns department groupings and nested jobs. That lets us ask, "which departments look engineering-related?" before fetching or rendering a larger flat job list.
+
+`/jobs?content=true` is useful when we need full job descriptions or a richer job detail/filter view, but it should not be the first request for the department-first exploration.
+
+## Normalization
+
+Greenhouse payloads are external contracts, so validate them with Zod before using them.
+
+Normalize Greenhouse data into internal shapes before returning from the API. The normalized response should preserve enough Greenhouse identifiers to debug and link back to the source, while giving the app stable field names.
+
+Department engineering detection is heuristic-only:
+
+- Match department names against engineering-ish terms.
+- Store matched terms as signals.
+- Do not treat department names as canonical across companies.
+- Do not assume "Engineering" means the same thing everywhere.
+
+The heuristic is allowed to be imperfect because the product question is whether it reduces the search space enough to be useful.
+
+## Filtering
+
+Filtering belongs server-side in our API for now.
+
+For example:
+
+```txt
+/api/v1/jobs/greenhouse/vercel?term=engineer
+```
+
+The API can inspect normalized job titles and return matching jobs. This keeps the browser UI simple and gives us one place to evolve the matching logic.
+
+This is not a full search engine. It is a small filtering layer for the MVP.
+
+## Caching
+
+Use Next fetch caching at the Greenhouse client layer:
+
+```ts
+fetch(url, { next: { revalidate: seconds } });
+```
+
+Current cache policy:
+
+- Departments: long-lived cache, currently `86400` seconds.
+- Jobs: shorter cache, currently `900` seconds.
+
+The departments route also exports route-level `revalidate = 86400` because its response is public and only depends on the provider identifier. The jobs route does not export route-level revalidation because it depends on request-time headers and query params.
+
+Departments change less often than jobs and are useful as the first narrowing step, so they can be cached more aggressively.
+
+Jobs should refresh more often because listings open, close, and update more frequently.
+
+## `force-static`
+
+Do not use `force-static` on both endpoints by default.
+
+`force-static` is only a reasonable fit for a route that does not depend on request-time data such as headers or search params.
+
+Departments may be a candidate for `force-static` if the endpoint stays public and only depends on route params. Jobs should not use `force-static` while it supports query params such as `content` and `term`.
+
+If an endpoint requires `x-api-key` or reads headers, do not make that route `force-static`. Header-based checks are request-time behavior.
+
+For now, fetch-level revalidation is the safer default because it caches upstream Greenhouse requests without changing route semantics.
+
+## API Keys
+
+An `x-api-key` is not a replacement for caching.
+
+Use an API key only where the endpoint is meant to behave like a protected proxy.
+
+Current policy:
+
+- Departments endpoint: public.
+- Jobs endpoint: requires `x-api-key` outside development.
+
+The departments endpoint stays public because it is the cheap discovery request and it can be cached for longer. The jobs endpoint is more expensive and can support richer query options, so it is reasonable to protect it when it is called from server-side code.
+
+Local development bypasses the key check when `NODE_ENV=development` so the app remains easy to run on `https://localhost:3002`.
+
+Do not send this key from browser/client components:
+
+- Greenhouse job board data is public.
+- The browser would expose any key sent from client-side requests.
+- Caching solves the immediate performance concern more directly.
+
+Keep the key server-only through `JOBS_API_KEY`. If the browser needs jobs later, use a public page/server component path or another server-owned boundary rather than exposing the key.
+
+## Current MVP Response Shape
+
+Use a department-first response for the department endpoint:
+
+```txt
+provider
+identifier
+resource
+endpoint
+departments
+meta
+```
+
+Use a flat job response for the jobs endpoint:
+
+```txt
+provider
+identifier
+resource
+endpoint
+jobs
+meta
+```
+
+The `meta` object should stay lightweight and operational:
+
+- result counts
+- applied filter description
+- upstream total
+- cache revalidation value
+
+Avoid putting product logic into `meta`.
+
+## Decision Summary
+
+- Start with Greenhouse only.
+- Treat departments as the first discovery request.
+- Keep departments and jobs as separate proxy endpoints.
+- Validate external payloads with Zod.
+- Normalize before returning data to the app.
+- Keep engineering detection heuristic-only.
+- Cache departments longer than jobs.
+- Use fetch-level caching as the default.
+- Do not force-static the jobs endpoint.
+- Keep departments public.
+- Require `x-api-key` for the jobs proxy outside development.
