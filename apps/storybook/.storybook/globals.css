@@ -5,9 +5,93 @@
 
 @config "../tailwind.config.ts";
 
+@font-face {
+  font-family: "Midnight Gelactic";
+  src: url("/fonts/midnight_gelactic/Midnight Gelactic.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Midnight Gelactic";
+  src: url("/fonts/midnight_gelactic/Midnight Gelactic Italic.otf")
+    format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lobster";
+  src: url("/fonts/Lobster-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Overpass Mono";
+  src: url("/fonts/overpass_mono/OverpassMono-VariableFont_wght.ttf")
+    format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Rampart One";
+  src: url("/fonts/rampart_one/RampartOne-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Londrina Shadow";
+  src: url("/fonts/londrina-shadow/LondrinaShadow-Regular.ttf")
+    format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-inter: system-ui, sans-serif;
+  --font-midnight-gelactic: "Midnight Gelactic", serif;
+  --font-lobster: "Lobster", cursive, serif;
+  --font-overpass-mono: "Overpass Mono", monospace;
+  --font-rampart-one: "Rampart One", serif;
+  --font-londrina-shadow: "Londrina Shadow", cursive;
+}
+
+.font-inter {
+  font-family: var(--font-inter);
+}
+
+.font-midnight-gelactic {
+  font-family: var(--font-midnight-gelactic);
+}
+
+.font-lobster {
+  font-family: var(--font-lobster);
+}
+
+.font-overpass-mono {
+  font-family: var(--font-overpass-mono);
+}
+
+.font-rampart-one {
+  font-family: var(--font-rampart-one);
+}
+
+.font-londrina-shadow {
+  font-family: var(--font-londrina-shadow);
+}
+
 @layer base {
   body {
-    font-family: system-ui, sans-serif;
+    font-family: var(--font-inter);
     background: var(--color-gray-1000);
     color: #ffffff;
   }

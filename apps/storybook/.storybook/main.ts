@@ -31,12 +31,14 @@ const BUILD_BASE_PATH = PR_NUMBER ? `/preview/PR-${PR_NUMBER}/` : "/";
 const stories = [
   "../../../packages/**/src/**/*.stories.@(ts|tsx)",
   "../../*/src/**/*.stories.@(ts|tsx)", // other apps in apps/
+  "../../*/app/**/*.stories.@(ts|tsx)", // app router components
 ];
 
 // Static directories - map public folders to URL paths so storybook components have access static files in public directories.
 // Paths are relative to this file (.storybook/main.ts), so ../.. goes to apps/
 const staticDirs: StorybookConfig["staticDirs"] = [
   "../../living-kavita-loca/public",
+  { from: "../../../packages/fonts/fonts", to: "/fonts" },
   // "../../../packages/3d-library/public",
   // Add more public directories as needed in the future, please be specific to the app/package that needs it.
   // Example: "../../<app-name>/public" or "../../../packages/<package-name>/public"

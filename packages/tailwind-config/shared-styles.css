@@ -29,5 +29,8 @@
 
     --color-text-1000: #f8f4ed;
     --color-text-900: #b5aea3;
+    /* Smaller than text-xs (0.75rem) — for fine print like stat sub-text */
+    --text-xxs: 0.625rem;
+    --text-xxs--line-height: 0.875rem;
   }
 }
