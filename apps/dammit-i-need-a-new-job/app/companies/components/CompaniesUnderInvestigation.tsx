@@ -91,7 +91,7 @@ export async function CompaniesUnderInvestigation() {
         <h1 className="mb-3 text-2xl font-bold uppercase tracking-tighter text-cream-1000">
           Companies Under Investigation
         </h1>
-        <p className="max-w-4xl text-base leading-relaxed text-text-900">
+        <p className="max-w-4xl text-base leading-relaxed text-foreground-900">
           Finding companies with active engineering hiring.
         </p>
       </div>
@@ -99,7 +99,7 @@ export async function CompaniesUnderInvestigation() {
       {company ? (
         <CompanyJobListingRow {...company} />
       ) : (
-        <div className="rounded-lg border border-border-1000 bg-neutral-910/80 px-5 py-4 text-sm text-text-900">
+        <div className="rounded-lg border border-divider-1000 bg-neutral-910/80 px-5 py-4 text-sm text-foreground-900">
           Greenhouse is being dramatic. Try again in a bit.
         </div>
       )}

@@ -12,7 +12,7 @@ export function RightContentHero() {
         "flex flex-col flex-1 items-center lg:items-end gap-0 relative",
       )}
     >
-      <Card className="flex h-[430px] w-80 flex-col overflow-visible bg-neutral-910 text-cream-1000 border-border-1000 relative py-0">
+      <Card className="flex h-[430px] w-80 flex-col overflow-visible bg-neutral-910 text-cream-1000 border-divider-1000 relative py-0">
         <DaysCounterCardContent />
         <Image
           src={Cat6}

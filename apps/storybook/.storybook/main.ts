@@ -38,6 +38,7 @@ const stories = [
 // Paths are relative to this file (.storybook/main.ts), so ../.. goes to apps/
 const staticDirs: StorybookConfig["staticDirs"] = [
   "../../living-kavita-loca/public",
+  { from: "../../../packages/fonts/fonts", to: "/fonts" },
   // "../../../packages/3d-library/public",
   // Add more public directories as needed in the future, please be specific to the app/package that needs it.
   // Example: "../../<app-name>/public" or "../../../packages/<package-name>/public"

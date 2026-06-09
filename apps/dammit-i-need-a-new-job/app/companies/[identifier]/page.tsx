@@ -69,7 +69,7 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
           &lt;- All companies
         </Link>
 
-        <section className="rounded-lg border border-border-1000 bg-neutral-910/80 p-6">
+        <section className="rounded-lg border border-divider-1000 bg-neutral-910/80 p-6">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div>
               <div className="flex items-center gap-3">
@@ -78,7 +78,7 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
                 </h1>
                 <span className="size-2 rounded-full bg-green-500" />
               </div>
-              <p className="mt-2 text-sm text-text-900">
+              <p className="mt-2 text-sm text-foreground-900">
                 {totalEngineeringJobs} engineering jobs across{" "}
                 {engineeringDepartments.length} departments.
               </p>

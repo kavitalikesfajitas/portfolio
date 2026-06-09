@@ -150,7 +150,7 @@ export function CompanyJobsTable({
   return (
     <div className="grid gap-6 lg:grid-cols-[18rem_1fr]">
       <aside className="flex flex-col gap-4">
-        <Card className="rounded-lg border border-border-1000 bg-neutral-910/80 px-5 py-5">
+        <Card className="rounded-lg border border-divider-1000 bg-neutral-910/80 px-5 py-5">
           <h2 className="text-lg font-bold uppercase tracking-tighter text-orange-1000">
             Filters
           </h2>
@@ -161,7 +161,7 @@ export function CompanyJobsTable({
               value={globalFilter}
               onChange={(event) => setGlobalFilter(event.target.value)}
               placeholder="Search by title, keyword..."
-              className="h-10 rounded-md border border-border-1000 bg-neutral-950 px-3 text-sm text-cream-1000 outline-none transition-colors placeholder:text-text-900 focus:border-orange-1000"
+              className="h-10 rounded-md border border-divider-1000 bg-neutral-950 px-3 text-sm text-cream-1000 outline-none transition-colors placeholder:text-foreground-900 focus:border-orange-1000"
             />
           </label>
 
@@ -191,7 +191,7 @@ export function CompanyJobsTable({
 
           <Button
             onClick={clearFilters}
-            className="mt-6 h-10 rounded-md border border-border-1000 bg-transparent font-overpass-mono text-sm text-cream-800 hover:bg-orange-1000 hover:text-neutral-950"
+            className="mt-6 h-10 rounded-md border border-divider-1000 bg-transparent font-overpass-mono text-sm text-cream-800 hover:bg-orange-1000 hover:text-neutral-950"
           >
             Clear all filters
           </Button>
@@ -201,7 +201,7 @@ export function CompanyJobsTable({
           <h2 className="text-lg font-bold uppercase tracking-tighter text-orange-1000">
             Cat Tip
           </h2>
-          <p className="mt-3 text-sm leading-relaxed text-text-900">
+          <p className="mt-3 text-sm leading-relaxed text-foreground-900">
             Start with department filters before searching job text. Less hay,
             fewer needles.
           </p>
@@ -213,7 +213,7 @@ export function CompanyJobsTable({
           <div className="text-sm text-cream-800">
             {filteredRows.length} jobs found
           </div>
-          <div className="rounded-md border border-border-1000 bg-neutral-950 px-4 py-3 text-sm text-cream-800">
+          <div className="rounded-md border border-divider-1000 bg-neutral-950 px-4 py-3 text-sm text-cream-800">
             Sort: Most relevant
           </div>
         </div>
@@ -225,7 +225,7 @@ export function CompanyJobsTable({
             return (
               <Card
                 key={job.id}
-                className="rounded-lg border border-border-1000 bg-neutral-910/80 px-5 py-5"
+                className="rounded-lg border border-divider-1000 bg-neutral-910/80 px-5 py-5"
               >
                 <div className="grid gap-4 md:grid-cols-[1fr_auto]">
                   <div>

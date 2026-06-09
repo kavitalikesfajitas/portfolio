@@ -35,7 +35,7 @@ function DepartmentBadge({ name, count, isPrimary }: DepartmentSummary) {
         "h-7 rounded-md border bg-neutral-950/35 px-3 font-overpass-mono text-xs font-semibold tracking-normal shadow-[inset_0_0_14px_rgba(255,255,255,0.025)]",
         isPrimary
           ? "border-orange-1000 text-orange-1000"
-          : "border-border-1000 text-cream-800",
+          : "border-divider-1000 text-cream-800",
       ].join(" ")}
     >
       <span>{name}</span>
@@ -54,7 +54,7 @@ export function CompanyJobListingRow({
   href,
 }: CompanyJobListingRowProps) {
   return (
-    <Card className="w-full rounded-lg border border-border-1000 bg-neutral-910/80 px-5 py-4 text-cream-1000 shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_18px_60px_rgba(0,0,0,0.35)]">
+    <Card className="w-full rounded-lg border border-divider-1000 bg-neutral-910/80 px-5 py-4 text-cream-1000 shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_18px_60px_rgba(0,0,0,0.35)]">
       <div className="grid grid-cols-[auto_1fr] gap-4 sm:grid-cols-[auto_1fr_auto] sm:items-center">
         <CompanyMark />
 
@@ -80,7 +80,7 @@ export function CompanyJobListingRow({
             ))}
             <Badge
               variant="outline"
-              className="h-7 rounded-md border border-border-1000 bg-neutral-950/35 px-3 font-overpass-mono text-xs font-semibold text-cream-800"
+              className="h-7 rounded-md border border-divider-1000 bg-neutral-950/35 px-3 font-overpass-mono text-xs font-semibold text-cream-800"
             >
               +{extraDepartmentCount} more
             </Badge>

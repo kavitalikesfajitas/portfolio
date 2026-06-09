@@ -1,5 +1,8 @@
 import { Button } from "@kavita-likes-fajitas/shadcn-ui-lib/components/ui/button";
-import { Card } from "@kavita-likes-fajitas/shadcn-ui-lib/components/ui/card";
+import {
+  DividedPanel,
+  DividedPanelItem,
+} from "@kavita-likes-fajitas/ui-library";
 import Image from "next/image";
 import Link from "next/link";
 import ConstructionBarrier from "@/public/images/construction-barrier.png";
@@ -52,7 +55,7 @@ function CompanyMark({ mark }: { mark: Investigation["mark"] }) {
 
 function InvestigationCard({ name, jobs, href, mark }: Investigation) {
   return (
-    <Card className="rounded-none border-0 border-r border-border-1000 bg-transparent px-5 py-4 last:border-r-0">
+    <DividedPanelItem className="items-stretch gap-4 border-divider-1000 px-5 py-4 text-left sm:odd:border-r sm:nth-[n+3]:border-t lg:border-r lg:border-t-0 lg:last:border-r-0">
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-3">
           <CompanyMark mark={mark} />
@@ -70,7 +73,9 @@ function InvestigationCard({ name, jobs, href, mark }: Investigation) {
           <div className="text-3xl font-extrabold leading-none text-orange-1000">
             {jobs}
           </div>
-          <div className="mt-2 text-sm text-text-900">engineering jobs</div>
+          <div className="mt-2 text-sm text-foreground-900">
+            engineering jobs
+          </div>
         </div>
 
         <Button
@@ -80,7 +85,7 @@ function InvestigationCard({ name, jobs, href, mark }: Investigation) {
           <Link href={href}>Investigate -&gt;</Link>
         </Button>
       </div>
-    </Card>
+    </DividedPanelItem>
   );
 }
 
@@ -99,18 +104,18 @@ export function CurrentInvestigations() {
         </Link>
       </div>
 
-      <div className="grid overflow-hidden rounded-lg border border-border-1000 bg-neutral-910/80 text-cream-1000 sm:grid-cols-2 lg:grid-cols-4">
+      <DividedPanel contentClassName="sm:grid-cols-2 lg:grid-cols-4">
         {investigations.map((investigation) => (
           <InvestigationCard key={investigation.name} {...investigation} />
         ))}
-      </div>
+      </DividedPanel>
 
-      <div className="flex flex-col gap-6 border-t border-border-1000 pt-6 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-6 border-t border-divider-1000 pt-6 md:flex-row md:items-center md:justify-between">
         <div>
           <h2 className="mb-4 text-xl font-bold uppercase tracking-tighter text-orange-1000">
             The back story
           </h2>
-          <div className="max-w-4xl text-sm leading-relaxed text-text-900 space-y-6">
+          <div className="max-w-4xl text-sm leading-relaxed text-foreground-900 space-y-6">
             <p>I kept thinking there has to be a better way.</p>
 
             <p>
