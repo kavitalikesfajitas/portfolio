@@ -1,6 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 import Image from "next/image";
+import Link from "next/link";
 import FireLogo from "@/public/images/dammit-flame.png";
 
 type NavigationMenuProps = {
@@ -29,12 +30,20 @@ export function NavigationMenu({ className }: NavigationMenuProps) {
             className="h-8 w-8 animate-pulse"
           />
         </div>
-        <a
-          href="https://livingkavitaloca.com"
-          className="font-overpass-mono text-xs font-semibold uppercase tracking-tighter underline text-cream-800 transition-colors duration-200 hover:text-orange-1000"
-        >
-          created by kavita chaudhry
-        </a>
+        <div className="flex items-center gap-6 font-overpass-mono text-xs font-semibold uppercase tracking-tighter">
+          <Link
+            href="/"
+            className="text-cream-800 transition-colors duration-200 hover:text-orange-1000"
+          >
+            about
+          </Link>
+          <Link
+            href="/companies"
+            className="text-orange-1000 transition-colors duration-200 hover:text-cream-1000"
+          >
+            companies
+          </Link>
+        </div>
       </div>
     </nav>
   );

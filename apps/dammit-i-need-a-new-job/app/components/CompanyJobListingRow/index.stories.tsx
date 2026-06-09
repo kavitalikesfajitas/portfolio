@@ -31,6 +31,7 @@ const meta = {
       { name: "Solution Engineering", count: 4 },
     ],
     extraDepartmentCount: 4,
+    href: "/companies/vercel",
   },
 } satisfies Meta<typeof CompanyJobListingRow>;
 

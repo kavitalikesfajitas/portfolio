@@ -1,6 +1,7 @@
 import { Badge } from "@kavita-likes-fajitas/shadcn-ui-lib/components/ui/badge";
 import { Button } from "@kavita-likes-fajitas/shadcn-ui-lib/components/ui/button";
 import { Card } from "@kavita-likes-fajitas/shadcn-ui-lib/components/ui/card";
+import Link from "next/link";
 
 export type DepartmentSummary = {
   name: string;
@@ -15,6 +16,7 @@ export type CompanyJobListingRowProps = {
   engineeringJobCount: number;
   departments: DepartmentSummary[];
   extraDepartmentCount: number;
+  href?: string;
 };
 
 function CompanyMark() {
@@ -49,6 +51,7 @@ export function CompanyJobListingRow({
   engineeringJobCount,
   departments,
   extraDepartmentCount,
+  href,
 }: CompanyJobListingRowProps) {
   return (
     <Card className="w-full rounded-lg border border-border-1000 bg-neutral-910/80 px-5 py-4 text-cream-1000 shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_18px_60px_rgba(0,0,0,0.35)]">
@@ -84,9 +87,21 @@ export function CompanyJobListingRow({
           </div>
         </div>
 
-        <Button className="col-span-2 h-12 rounded-md border border-orange-1000 bg-transparent px-7 font-overpass-mono text-sm font-bold text-orange-1000 hover:bg-orange-1000 hover:text-neutral-950 sm:col-span-1">
-          Explore
-          <span aria-hidden="true">-&gt;</span>
+        <Button
+          asChild={Boolean(href)}
+          className="col-span-2 h-12 rounded-md border border-orange-1000 bg-transparent px-7 font-overpass-mono text-sm font-bold text-orange-1000 hover:bg-orange-1000 hover:text-neutral-950 sm:col-span-1"
+        >
+          {href ? (
+            <Link href={href}>
+              Explore
+              <span aria-hidden="true">-&gt;</span>
+            </Link>
+          ) : (
+            <>
+              Explore
+              <span aria-hidden="true">-&gt;</span>
+            </>
+          )}
         </Button>
       </div>
     </Card>
