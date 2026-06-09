@@ -17,6 +17,7 @@ const booleanQuerySchema = z
 
 export const jobsRouteQuerySchema = z.object({
   content: booleanQuerySchema,
+  term: z.string().trim().min(1).max(120).optional(),
 });
 
 export type JobsRouteParams = z.infer<typeof jobsRouteParamsSchema>;

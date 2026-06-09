@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
+import { matchJobsByTitleTerm } from "@/lib/jobs/matching";
 import {
   fetchGreenhouseJobs,
   GREENHOUSE_JOBS_REVALIDATE_SECONDS,
@@ -10,7 +11,7 @@ type RouteContext = {
   params: Promise<{ provider: string; identifier: string }>;
 };
 
-export async function GET(request: Request, { params }: RouteContext) {
+export async function GET(request: NextRequest, { params }: RouteContext) {
   const parsedParams = jobsRouteParamsSchema.safeParse(await params);
 
   if (!parsedParams.success) {
@@ -20,23 +21,25 @@ export async function GET(request: Request, { params }: RouteContext) {
     );
   }
 
-  const url = new URL(request.url);
-  const parsedQuery = jobsRouteQuerySchema.safeParse({
-    content: url.searchParams.get("content") ?? undefined,
-  });
+  const parsedQuery = jobsRouteQuerySchema.safeParse(
+    Object.fromEntries(request.nextUrl.searchParams),
+  );
 
   if (!parsedQuery.success) {
     return NextResponse.json({ error: "Invalid query" }, { status: 400 });
   }
 
   const { provider, identifier } = parsedParams.data;
-  const { content } = parsedQuery.data;
+  const { content, term } = parsedQuery.data;
 
   try {
     const jobsResponse = await fetchGreenhouseJobs(identifier, {
       includeContent: content,
     });
-    const jobs = normalizeGreenhouseJobs(jobsResponse.jobs);
+    const normalizedJobs = normalizeGreenhouseJobs(jobsResponse.jobs);
+    const jobs = term
+      ? matchJobsByTitleTerm(normalizedJobs, term).map((match) => match.job)
+      : normalizedJobs;
 
     return NextResponse.json(
       {
@@ -46,9 +49,16 @@ export async function GET(request: Request, { params }: RouteContext) {
         endpoint: content ? "jobs?content=true" : "jobs",
         jobs,
         meta: {
-          totalJobs: jobs.length,
-          upstreamTotalJobs: jobsResponse.meta.total,
-          content,
+          total: jobs.length,
+          upstreamTotal: jobsResponse.meta.total,
+          filter: term
+            ? {
+                field: "title",
+                operator: "contains",
+                value: term,
+                totalBeforeFilter: normalizedJobs.length,
+              }
+            : null,
           cache: { revalidate: GREENHOUSE_JOBS_REVALIDATE_SECONDS },
         },
       },

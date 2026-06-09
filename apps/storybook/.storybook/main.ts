@@ -31,6 +31,7 @@ const BUILD_BASE_PATH = PR_NUMBER ? `/preview/PR-${PR_NUMBER}/` : "/";
 const stories = [
   "../../../packages/**/src/**/*.stories.@(ts|tsx)",
   "../../*/src/**/*.stories.@(ts|tsx)", // other apps in apps/
+  "../../*/app/**/*.stories.@(ts|tsx)", // app router components
 ];
 
 // Static directories - map public folders to URL paths so storybook components have access static files in public directories.

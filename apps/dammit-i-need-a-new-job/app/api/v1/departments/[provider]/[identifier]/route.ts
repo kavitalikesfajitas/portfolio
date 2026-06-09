@@ -10,6 +10,8 @@ type RouteContext = {
   params: Promise<{ provider: string; identifier: string }>;
 };
 
+export const dynamic = "force-static";
+
 export async function GET(_request: Request, { params }: RouteContext) {
   const parsedParams = departmentsRouteParamsSchema.safeParse(await params);
 
