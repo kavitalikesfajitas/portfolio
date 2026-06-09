@@ -61,3 +61,5 @@ certificates
 .scratchwork
 .terraform
 infra/terraform.tfvars
+
+**/.env.local
