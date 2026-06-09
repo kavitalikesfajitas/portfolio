@@ -65,8 +65,11 @@ describe("Greenhouse client", () => {
     );
 
     const request = fetchGreenhouseJobs("vercel");
+    const assertion = expect(request).rejects.toThrow(
+      "Greenhouse request timed out",
+    );
     await vi.advanceTimersByTimeAsync(10_000);
 
-    await expect(request).rejects.toThrow("Greenhouse request timed out");
+    await assertion;
   });
 });

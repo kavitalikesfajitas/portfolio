@@ -82,6 +82,8 @@ Greenhouse payloads are external contracts, so validate them with Zod before usi
 
 Normalize Greenhouse data into internal shapes before returning from the API. The normalized response should preserve enough Greenhouse identifiers to debug and link back to the source, while giving the app stable field names.
 
+When normalizing nested jobs from `/departments`, inject the containing department only when it is not already present on the job. Dedupe department references by Greenhouse department id so the same department does not appear twice.
+
 Department engineering detection is heuristic-only:
 
 - Match department names against engineering-ish terms.
@@ -129,6 +131,21 @@ The jobs route does not export route-level revalidation because it depends on re
 Departments change less often than jobs and are useful as the first narrowing step, so they can be cached more aggressively.
 
 Jobs should refresh more often because listings open, close, and update more frequently.
+
+The protected jobs proxy returns:
+
+```txt
+Cache-Control: private, no-store
+Vary: x-api-key
+```
+
+This avoids browser/CDN caching keyed job responses while still allowing the server-side Greenhouse fetch underneath to revalidate for `900` seconds.
+
+## Upstream Requests
+
+Greenhouse board tokens are percent-encoded before they are placed in request paths. This prevents reserved URL characters in provider identifiers from breaking the upstream request path.
+
+Greenhouse fetches use an abort timeout. If the upstream API does not respond in time, the client throws a timeout error instead of letting the proxy hang indefinitely.
 
 ## Page Rendering
 
@@ -220,6 +237,9 @@ Avoid putting product logic into `meta`.
 - Keep engineering detection heuristic-only.
 - Cache departments longer than jobs.
 - Use fetch-level caching as the default.
+- Percent-encode Greenhouse board tokens before upstream requests.
+- Time out slow upstream Greenhouse requests.
+- Dedupe nested job department references by department id.
 - Use ISR for company pages.
 - Do not force-static the jobs endpoint.
 - Keep departments public.

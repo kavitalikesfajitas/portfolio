@@ -37,7 +37,12 @@ async function fetchGreenhouseJson<T>(
 
     return parse(await response.json());
   } catch (error) {
-    if (error instanceof Error && error.name === "AbortError") {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "name" in error &&
+      error.name === "AbortError"
+    ) {
       throw new Error("Greenhouse request timed out");
     }
 

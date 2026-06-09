@@ -10,9 +10,14 @@ type RouteContext = {
   params: Promise<{ provider: string; identifier: string }>;
 };
 
+// Lean into Next's ISR: prerender each board's response and regenerate it at
+// most once per day. Unknown identifiers are generated on-demand and cached
+// (dynamicParams defaults to true), so no generateStaticParams is needed for
+// what is an open, user-supplied board token. On Vercel, Next emits the
+// s-maxage/stale-while-revalidate headers and propagates on-demand purges to
+// the edge, so we no longer hand-roll Cache-Control here.
+export const dynamic = "force-static";
 export const revalidate = 86_400;
-const DEPARTMENTS_CACHE_CONTROL =
-  "public, s-maxage=86400, stale-while-revalidate=3600";
 
 export async function GET(_request: Request, { params }: RouteContext) {
   const parsedParams = departmentsRouteParamsSchema.safeParse(await params);
@@ -51,10 +56,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
           cache: { revalidate: GREENHOUSE_DEPARTMENTS_REVALIDATE_SECONDS },
         },
       },
-      {
-        status: 200,
-        headers: { "Cache-Control": DEPARTMENTS_CACHE_CONTROL },
-      },
+      { status: 200 },
     );
   } catch (error) {
     const message =
