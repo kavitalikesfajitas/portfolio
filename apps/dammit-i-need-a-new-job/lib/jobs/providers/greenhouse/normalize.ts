@@ -64,6 +64,30 @@ function findEngineeringTerms(name: string) {
   );
 }
 
+function withDepartmentReference(
+  job: GreenhouseJob,
+  department: GreenhouseDepartment,
+) {
+  const departmentsById = new Map(
+    (job.departments ?? []).map((jobDepartment) => [
+      jobDepartment.id,
+      jobDepartment,
+    ]),
+  );
+
+  departmentsById.set(department.id, {
+    id: department.id,
+    name: department.name,
+    parent_id: department.parent_id ?? null,
+    child_ids: department.child_ids ?? [],
+  });
+
+  return {
+    ...job,
+    departments: [...departmentsById.values()],
+  };
+}
+
 export function normalizeGreenhouseJobs(
   jobs: GreenhouseJob[],
 ): NormalizedJob[] {
@@ -122,18 +146,7 @@ export function normalizeGreenhouseDepartments(
         matchedTerms,
       },
       jobs: normalizeGreenhouseJobs(
-        department.jobs.map((job) => ({
-          ...job,
-          departments: [
-            ...(job.departments ?? []),
-            {
-              id: department.id,
-              name: department.name,
-              parent_id: department.parent_id ?? null,
-              child_ids: department.child_ids ?? [],
-            },
-          ],
-        })),
+        department.jobs.map((job) => withDepartmentReference(job, department)),
       ),
     };
   });

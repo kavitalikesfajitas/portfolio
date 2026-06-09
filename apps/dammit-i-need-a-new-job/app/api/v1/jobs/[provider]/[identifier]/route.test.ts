@@ -62,6 +62,8 @@ describe("jobs route", () => {
       meta: { cache: { revalidate: 900 } },
     });
     expect(response.status).toBe(200);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(response.headers.get("Vary")).toBe("x-api-key");
     expect(mockedFetchGreenhouseJobs).toHaveBeenCalledWith("vercel", {
       includeContent: false,
     });

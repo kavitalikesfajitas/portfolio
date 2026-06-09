@@ -69,7 +69,13 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
           cache: { revalidate: GREENHOUSE_JOBS_REVALIDATE_SECONDS },
         },
       },
-      { status: 200 },
+      {
+        status: 200,
+        headers: {
+          "Cache-Control": "private, no-store",
+          Vary: "x-api-key",
+        },
+      },
     );
   } catch (error) {
     const message =

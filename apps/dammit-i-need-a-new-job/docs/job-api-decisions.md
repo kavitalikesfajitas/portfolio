@@ -130,6 +130,18 @@ Departments change less often than jobs and are useful as the first narrowing st
 
 Jobs should refresh more often because listings open, close, and update more frequently.
 
+## Page Rendering
+
+Use ISR for company-facing pages instead of making React Query the primary data source.
+
+Current page policy:
+
+- `/companies`: server-rendered and revalidated every `86400` seconds.
+- `/companies/[identifier]`: statically generated for known companies with `generateStaticParams`, currently `vercel`, and revalidated every `900` seconds.
+- Unknown company identifiers return 404 for now.
+
+React Query can still be used for browser-owned interactive API islands, but page generation should use server data and ISR. This keeps the page shell cacheable while leaving room for richer client-side filters later.
+
 ## `force-static`
 
 Do not use `force-static` on both endpoints by default.
@@ -208,6 +220,7 @@ Avoid putting product logic into `meta`.
 - Keep engineering detection heuristic-only.
 - Cache departments longer than jobs.
 - Use fetch-level caching as the default.
+- Use ISR for company pages.
 - Do not force-static the jobs endpoint.
 - Keep departments public.
 - Require `x-api-key` for the jobs proxy outside development.
