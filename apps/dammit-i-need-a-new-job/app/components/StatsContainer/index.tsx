@@ -13,7 +13,7 @@ export function StatsContainer({ className, children }: StatsContainerProps) {
   return (
     <Card
       className={clsx(
-        "w-full flex bg-neutral-910 text-cream-1000 border-border-1000",
+        "w-full flex bg-neutral-910 text-cream-1000 border-divider-1000",
         className,
       )}
     >
