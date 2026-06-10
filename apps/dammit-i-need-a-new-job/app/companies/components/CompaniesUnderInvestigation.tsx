@@ -20,6 +20,14 @@ export async function CompaniesUnderInvestigation() {
         <p className="max-w-4xl text-base leading-relaxed text-foreground-900">
           Finding companies with active engineering hiring.
         </p>
+        <a
+          href="https://github.com/kavitalikesfajitas/portfolio/blob/main/apps/dammit-i-need-a-new-job/docs/001-job-api-decisions.md"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 inline-block text-sm font-bold text-orange-1000 underline-offset-4 hover:underline"
+        >
+          Why these companies? Read the decisions -&gt;
+        </a>
       </div>
 
       {companies.length > 0 ? (
