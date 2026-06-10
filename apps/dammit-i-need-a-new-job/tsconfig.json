@@ -4,6 +4,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
+      "@kavita-likes-fajitas/ui-library": [
+        "../../packages/ui-library/src/index.ts"
+      ],
       "@kavita-likes-fajitas/ui-library/*": ["../../packages/ui-library/src/*"]
     },
     "isolatedModules": true,

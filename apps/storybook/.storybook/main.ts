@@ -59,7 +59,7 @@ const config: StorybookConfig = {
     }
     return head;
   },
-  async viteFinal(config) {
+  async viteFinal(config, { configType }) {
     config.base = BUILD_BASE_PATH;
     config.plugins = [stripReactServerDirectives(), ...(config.plugins ?? [])];
 
@@ -86,8 +86,18 @@ const config: StorybookConfig = {
       ...config.esbuild,
       jsx: "automatic",
     };
+    // Components that import Next client code (e.g. `next/link`) reference
+    // `process.env.*` at module scope. Storybook runs on @storybook/react-vite,
+    // so there's no Node `process` global in the browser bundle and those refs
+    // throw "process is not defined". Provide a process.env shim: the specific
+    // NODE_ENV gets a real value, and any other `process.env.X` (Next's internal
+    // feature flags) resolves to undefined instead of crashing.
     config.define = {
       ...config.define,
+      "process.env.NODE_ENV": JSON.stringify(
+        configType === "PRODUCTION" ? "production" : "development",
+      ),
+      "process.env": "{}",
     };
     return config;
   },

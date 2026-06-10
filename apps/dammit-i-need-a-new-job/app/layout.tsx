@@ -3,6 +3,9 @@ import "./globals.css";
 import { getAppFontVariablesForDammit } from "@kavita-likes-fajitas/fonts";
 import clsx from "clsx";
 import { Footer } from "@kavita-likes-fajitas/ui-library/Navigation/Footer";
+import { Providers } from "./providers";
+import { NavigationMenu } from "./components/NavigationMenu";
+
 export const metadata: Metadata = {
   title: "Dammit I Gotta Get A New job",
   description: "Dark Layoff Humor",
@@ -22,8 +25,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${fontVariables} h-full antialiased`}>
       <body className={clsx("min-h-full flex flex-col")}>
-        {children}
-        <Footer className="bg-cream-1000! text-gray-950!" />
+        <Providers>
+          <NavigationMenu />
+          {children}
+          <Footer className="bg-cream-1000! text-gray-950!" />
+        </Providers>
       </body>
     </html>
   );
