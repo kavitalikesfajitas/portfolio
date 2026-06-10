@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 import { CompanyJobsTable } from "./CompanyJobsTable";
-import type { DepartmentFilterOption } from "../types";
+import type { CompanyJob, DepartmentFilterOption } from "../types";
 
 const departmentOptions = Array.from({ length: 12 }, (_, index) => ({
   name: `Team ${index + 1}`,
@@ -28,6 +28,17 @@ function renderCompanyJobsTable() {
   return render(
     <CompanyJobsTable jobs={[]} departmentOptions={departmentOptions} />,
   );
+}
+
+function makeJobs(count: number): CompanyJob[] {
+  return Array.from({ length: count }, (_, index) => ({
+    id: `job-${index + 1}`,
+    title: `Job ${index + 1}`,
+    absoluteUrl: `https://example.com/jobs/${index + 1}`,
+    location: "Remote",
+    departments: ["Team 1"],
+    updatedAt: "2026-06-01T00:00:00.000Z",
+  }));
 }
 
 function getFilterContent(buttonName: string) {
@@ -91,5 +102,46 @@ describe("given a <CompanyJobsTable>", () => {
       expect(content).toHaveAttribute("data-state", "open");
       expect(content).toHaveClass("block");
     });
+  });
+
+  test("it renders the first 25 jobs before showing more on request", () => {
+    mockMatchMedia(true);
+
+    render(
+      <CompanyJobsTable
+        jobs={makeJobs(28)}
+        departmentOptions={departmentOptions}
+      />,
+    );
+
+    expect(screen.getByRole("heading", { name: "Job 1" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Job 25" })).toBeVisible();
+    expect(
+      screen.queryByRole("heading", { name: "Job 26" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText("Showing 25 of 28 jobs.")).toBeVisible();
+
+    fireEvent.click(screen.getByRole("button", { name: "Load 3 more" }));
+
+    expect(screen.getByRole("heading", { name: "Job 28" })).toBeVisible();
+    expect(
+      screen.queryByRole("button", { name: "Load 3 more" }),
+    ).not.toBeInTheDocument();
+  });
+
+  test("it skips the load more control when there are 25 or fewer jobs", () => {
+    mockMatchMedia(true);
+
+    render(
+      <CompanyJobsTable
+        jobs={makeJobs(25)}
+        departmentOptions={departmentOptions}
+      />,
+    );
+
+    expect(screen.getByRole("heading", { name: "Job 25" })).toBeVisible();
+    expect(
+      screen.queryByRole("button", { name: /Load/ }),
+    ).not.toBeInTheDocument();
   });
 });
