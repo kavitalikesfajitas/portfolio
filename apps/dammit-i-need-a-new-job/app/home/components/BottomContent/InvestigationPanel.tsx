@@ -21,7 +21,7 @@ export async function InvestigationPanel() {
   ).filter((inv) => inv !== null);
 
   return (
-    <DividedPanel contentClassName="sm:grid-cols-2 lg:grid-cols-4">
+    <DividedPanel contentClassName="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
       {investigations.map((investigation) => (
         <InvestigationCard key={investigation.name} {...investigation} />
       ))}

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 import { CompanyJobsTable } from "./CompanyJobsTable";
 import type { CompanyJob, DepartmentFilterOption } from "../types";
@@ -7,22 +7,6 @@ const departmentOptions = Array.from({ length: 12 }, (_, index) => ({
   name: `Team ${index + 1}`,
   count: index + 1,
 })) satisfies DepartmentFilterOption[];
-
-function mockMatchMedia(matches: boolean) {
-  Object.defineProperty(window, "matchMedia", {
-    writable: true,
-    value: (query: string) => ({
-      matches,
-      media: query,
-      onchange: null,
-      addListener: () => {},
-      removeListener: () => {},
-      addEventListener: () => {},
-      removeEventListener: () => {},
-      dispatchEvent: () => false,
-    }),
-  });
-}
 
 function renderCompanyJobsTable() {
   return render(
@@ -56,8 +40,6 @@ function getFilterContent(buttonName: string) {
 
 describe("given a <CompanyJobsTable>", () => {
   test("it collapses filters below the two-column layout and reveals the first 10 team filters", () => {
-    mockMatchMedia(false);
-
     renderCompanyJobsTable();
 
     const { button, content } = getFilterContent("Show");
@@ -79,8 +61,6 @@ describe("given a <CompanyJobsTable>", () => {
   });
 
   test("it reveals additional team filters on request", () => {
-    mockMatchMedia(false);
-
     renderCompanyJobsTable();
 
     fireEvent.click(screen.getByRole("button", { name: "Show" }));
@@ -90,23 +70,17 @@ describe("given a <CompanyJobsTable>", () => {
     expect(screen.getByRole("button", { name: "Show fewer" })).toBeVisible();
   });
 
-  test("it keeps filters open in the two-column layout", async () => {
-    mockMatchMedia(true);
-
+  test("it reveals closed filters with CSS in the two-column layout", () => {
     renderCompanyJobsTable();
 
     const { button, content } = getFilterContent("Show");
 
-    await waitFor(() => {
-      expect(button).toHaveAttribute("aria-expanded", "true");
-      expect(content).toHaveAttribute("data-state", "open");
-      expect(content).toHaveClass("block");
-    });
+    expect(button).toHaveClass("lg:hidden");
+    expect(content).toHaveAttribute("data-state", "closed");
+    expect(content).toHaveClass("hidden", "lg:block");
   });
 
   test("it renders the first 25 jobs before showing more on request", () => {
-    mockMatchMedia(true);
-
     render(
       <CompanyJobsTable
         jobs={makeJobs(28)}
@@ -130,8 +104,6 @@ describe("given a <CompanyJobsTable>", () => {
   });
 
   test("it skips the load more control when there are 25 or fewer jobs", () => {
-    mockMatchMedia(true);
-
     render(
       <CompanyJobsTable
         jobs={makeJobs(25)}

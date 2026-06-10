@@ -12,7 +12,7 @@ export function FilterSectionHeader({
 }: FilterSectionHeaderProps) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <h2 className="text-lg font-bold uppercase tracking-tighter text-orange-1000">
+      <h2 className="text-base font-bold uppercase tracking-tighter text-orange-1000 md:text-lg">
         Filters
       </h2>
 

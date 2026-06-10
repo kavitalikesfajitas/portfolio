@@ -17,7 +17,7 @@ export function JobsStatsBlock() {
       {map(StatHeaders, ({ Icon, label, value, tone, subText }: StatHeader) => (
         <DividedPanelItem
           key={label}
-          className="gap-2 border-divider-1000 px-4 py-6 even:border-l nth-[n+3]:border-t lg:grid lg:row-span-3 lg:grid-rows-subgrid lg:border-l lg:px-6 lg:py-0 lg:first:border-l-0 lg:nth-[n+3]:border-t-0"
+          className="gap-2 border-divider-1000 px-3 py-4 even:border-l nth-[n+3]:border-t sm:px-4 sm:py-6 lg:grid lg:row-span-3 lg:grid-rows-subgrid lg:border-l lg:px-6 lg:py-0 lg:first:border-l-0 lg:nth-[n+3]:border-t-0"
         >
           <DividedPanelItemHeader
             className={clsx(
@@ -36,7 +36,7 @@ export function JobsStatsBlock() {
             </IconContainer>
             {label}
           </DividedPanelItemHeader>
-          <div className="text-4xl font-bold text-center text-cream-1000">
+          <div className="text-center text-3xl font-bold text-cream-1000 sm:text-4xl">
             {value}
           </div>
           <div className="font-overpass-mono text-[10px] leading-tight tracking-tighter text-center text-foreground-900">

@@ -14,17 +14,17 @@ export async function CompaniesUnderInvestigation() {
   return (
     <section className="flex w-full flex-col gap-6 font-overpass-mono">
       <div>
-        <h1 className="mb-3 text-2xl font-bold uppercase tracking-tighter text-cream-1000">
+        <h1 className="mb-2 text-xl font-bold uppercase tracking-tighter text-cream-1000 sm:mb-3 sm:text-2xl">
           Companies Under Investigation
         </h1>
-        <p className="max-w-4xl text-base leading-relaxed text-foreground-900">
+        <p className="max-w-4xl text-sm leading-relaxed text-foreground-900 sm:text-base">
           Finding companies with active engineering hiring.
         </p>
         <a
           href="https://github.com/kavitalikesfajitas/portfolio/blob/main/apps/dammit-i-need-a-new-job/docs/001-job-api-decisions.md"
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-2 inline-block text-sm font-bold text-orange-1000 underline-offset-4 hover:underline"
+          className="mt-2 inline-block text-xs font-bold text-orange-1000 underline-offset-4 hover:underline sm:text-sm"
         >
           Why these companies? Read the decisions -&gt;
         </a>
