@@ -3,14 +3,14 @@ import { clsx } from "clsx";
 export function LeftContentHero() {
   return (
     <div className={clsx("flex flex-col gap-5")}>
-      <div className="flex-1 grow-0 uppercase text-7xl font-bold text-cream-1000 bg-neutral-950 font-londrina-shadow">
+      <div className="flex-1 grow-0 bg-neutral-950 font-londrina-shadow text-5xl font-bold uppercase text-cream-1000 sm:text-7xl">
         Dammit.
         <br /> I gotta get a new job.
       </div>
-      <div className="font-overpass-mono text-2xl font-bold uppercase tracking-tighter text-orange-1000">
+      <div className="font-overpass-mono text-xl font-bold uppercase tracking-tighter text-orange-1000 sm:text-2xl">
         Why This Exists
       </div>
-      <div className="max-w-full lg:max-w-xl space-y-6 font-overpass-mono text-sm lg:text-md leading-relaxed text-cream-800">
+      <div className="max-w-full space-y-5 font-overpass-mono text-xs leading-relaxed text-cream-800 sm:space-y-6 sm:text-sm lg:max-w-xl lg:text-md">
         <p>
           I started looking at job listings and found myself wondering how much
           of the market I was actually seeing.

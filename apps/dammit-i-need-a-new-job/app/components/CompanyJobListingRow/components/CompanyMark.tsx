@@ -9,17 +9,17 @@ type CompanyMarkProps = {
 
 export function CompanyMark({ companyName, logoSrc }: CompanyMarkProps) {
   return (
-    <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-md bg-black shadow-[0_0_18px_rgba(0,0,0,0.45)] sm:size-20">
+    <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-md bg-black shadow-[0_0_18px_rgba(0,0,0,0.45)] sm:size-20">
       {logoSrc ? (
         <Image
           src={logoSrc}
           alt={`${companyName} logo`}
           width={80}
           height={80}
-          className="size-10 object-contain sm:size-12"
+          className="size-9 object-contain sm:size-12"
         />
       ) : (
-        <div className="h-0 w-0 border-x-[17px] border-b-[30px] border-x-transparent border-b-white sm:border-x-[23px] sm:border-b-[40px]" />
+        <div className="h-0 w-0 border-x-[14px] border-b-[25px] border-x-transparent border-b-white sm:border-x-[23px] sm:border-b-[40px]" />
       )}
     </div>
   );
@@ -30,7 +30,7 @@ export function DepartmentBadge({ name, count, isPrimary }: DepartmentSummary) {
     <Badge
       variant="outline"
       className={[
-        "h-7 rounded-md border bg-neutral-950/35 px-3 font-overpass-mono text-xs font-semibold tracking-normal shadow-[inset_0_0_14px_rgba(255,255,255,0.025)]",
+        "h-6 rounded-md border bg-neutral-950/35 px-2 font-overpass-mono text-[10px] font-semibold tracking-normal shadow-[inset_0_0_14px_rgba(255,255,255,0.025)] sm:h-7 sm:px-3 sm:text-xs",
         isPrimary
           ? "border-orange-1000 text-orange-1000"
           : "border-divider-1000 text-cream-800",

@@ -5,10 +5,10 @@ export function BackStory() {
   return (
     <div className="flex flex-col gap-6 border-t border-divider-1000 pt-6 md:flex-row md:items-center md:justify-between">
       <div>
-        <h2 className="mb-4 text-xl font-bold uppercase tracking-tighter text-orange-1000">
+        <h2 className="mb-3 text-lg font-bold uppercase tracking-tighter text-orange-1000 sm:mb-4 sm:text-xl">
           The back story
         </h2>
-        <div className="max-w-4xl text-sm leading-relaxed text-foreground-900 space-y-6">
+        <div className="max-w-4xl space-y-5 text-xs leading-relaxed text-foreground-900 sm:space-y-6 sm:text-sm">
           <p>I kept thinking there has to be a better way.</p>
 
           <p>
