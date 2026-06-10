@@ -196,10 +196,23 @@ Use ISR for company-facing pages instead of making React Query the primary data 
 Current page policy:
 
 - `/companies`: server-rendered and revalidated every `86400` seconds.
-- `/companies/[identifier]`: statically generated for known companies with `generateStaticParams`, currently `vercel`, and revalidated every `900` seconds.
-- Unknown company identifiers return 404 for now.
+- `/companies/[identifier]`: statically generated for the known companies in `COMPANY_BOARD_TOKENS` (currently `vercel`, `stripe`, `discord`, `figma`, `datadog`) with `generateStaticParams`, and revalidated every `900` seconds.
+- Unknown company identifiers return 404 for now (`dynamicParams = false`).
 
 React Query can still be used for browser-owned interactive API islands, but page generation should use server data and ISR. This keeps the page shell cacheable while leaving room for richer client-side filters later.
+
+## Static Generation Strategy and Scaling
+
+`COMPANY_BOARD_TOKENS` is the single source of truth: each token doubles as the route identifier and feeds `generateStaticParams`. Adding a token there both lists the company under `/companies` and prebuilds a static detail page.
+
+This strategy is deliberately matched to a small, curated, code-owned company list. Its load-bearing assumption is that the list stays small. The trade-offs that follow from it:
+
+- The build scales linearly with the list. Every company prerenders at build time, each doing two Greenhouse fetches (departments and jobs), plus a logo fetch in `next.config.ts`. At a handful of companies this is free; at hundreds it makes builds slow and couples deploy success to Greenhouse being healthy at build time. A slow upstream throws past the `10s` timeout, which fails the page build.
+- Adding a company requires a code change and a redeploy. `dynamicParams = false` means a new token 404s until the next build. This is correct while the list is curated in code, and a dealbreaker the moment companies should be added from a database, CMS, or admin UI.
+
+Pivot point: when the company set becomes large or dynamically sourced, switch to `dynamicParams = true` and generate pages on demand (lazy ISR) instead of all-at-build. Until then, keep prebuilding the curated set — it is the right fit for the current scale.
+
+We considered enabling Cache Components (the Next.js 16 `cacheComponents` flag) and decided against it for now. It would replace the route-segment `revalidate`/`dynamicParams` configs with `use cache` and `cacheLife` for the same caching behavior, while its main new wins — Partial Prerendering and Activity-based navigation state — do not meaningfully apply to these static-with-ISR pages. Revisit if the data model moves toward per-user or personalized content.
 
 ## `force-static`
 
