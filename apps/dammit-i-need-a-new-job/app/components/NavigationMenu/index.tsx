@@ -30,7 +30,7 @@ export function NavigationMenu({ className }: NavigationMenuProps) {
             className="h-6 w-6 animate-pulse sm:h-8 sm:w-8"
           />
         </div>
-        <div className="flex items-center gap-4 font-overpass-mono text-[10px] font-semibold uppercase tracking-tighter sm:gap-6 sm:text-xs">
+        <div className="flex items-center gap-4 font-overpass-mono text-xs font-semibold uppercase tracking-tighter sm:gap-6">
           <Link
             href="/"
             className="text-orange-1000 transition-colors duration-200 hover:text-cream-1000"
@@ -46,7 +46,7 @@ export function NavigationMenu({ className }: NavigationMenuProps) {
 
           <a
             href="https://livingkavitaloca.com"
-            className="font-overpass-mono text-[10px] font-semibold uppercase tracking-tighter text-cream-800 underline transition-colors duration-200 hover:text-orange-1000 sm:text-xs"
+            className="font-overpass-mono text-xs font-semibold uppercase tracking-tighter text-cream-800 underline transition-colors duration-200 hover:text-orange-1000"
           >
             created by kavita chaudhry
           </a>
