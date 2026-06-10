@@ -93,6 +93,48 @@ Department engineering detection is heuristic-only:
 
 The heuristic is allowed to be imperfect because the product question is whether it reduces the search space enough to be useful.
 
+## Department Taxonomy Signals
+
+Company department names are company-specific labels, not a shared taxonomy. Stripe-style labels such as `1133 EMEA Sales Development Reps` include internal cost-center numbers, regions, abbreviations, and org naming conventions that are useful as source data but noisy as product categories.
+
+Add a second signal layer on normalized departments instead of replacing the original Greenhouse department name:
+
+```txt
+name
+signals.normalizedName
+signals.category
+signals.categoryConfidence
+signals.categoryMatchedTerms
+```
+
+Keep `name` as the untouched upstream label. Use `signals.normalizedName` for cleaned matching and display experiments after stripping obvious internal prefixes/suffixes, such as leading numeric department codes or bracketed annotations.
+
+Use a small app-owned taxonomy for coarse product categories:
+
+```txt
+engineering
+product
+design
+data
+security
+sales
+customerSuccess
+marketing
+people
+finance
+legal
+operations
+unspecified
+```
+
+The taxonomy is intentionally coarse. It should help the app group, filter, and prioritize departments without claiming that every company organizes work the same way.
+
+Use Fuse.js for fuzzy term matching against the app-owned taxonomy terms. This gives typo-tolerant and noisy-label matching while keeping the taxonomy explicit and reviewable in code. Do not use Fuse.js as a semantic classifier; low-confidence or unmatched labels should remain `unspecified`.
+
+Do not treat broad technical words as engineering by themselves. Terms such as `platform`, `data`, and `security` can indicate engineering work in some companies, but Stripe also uses them in sales, product, analytics, and security-specific department names. Prefer explicit engineering terms like `engineering`, `engineer`, `eng`, `software`, `infrastructure`, or `r&d` for the engineering category.
+
+Continue to derive `signals.likelyEngineering` from this signal layer for now. It remains a heuristic shortcut for the MVP, not a canonical truth about the company.
+
 ## Filtering
 
 Filtering belongs server-side in our API for now.
@@ -235,6 +277,8 @@ Avoid putting product logic into `meta`.
 - Validate external payloads with Zod.
 - Normalize before returning data to the app.
 - Keep engineering detection heuristic-only.
+- Add coarse department taxonomy signals without replacing source department names.
+- Use Fuse.js for fuzzy taxonomy term matching.
 - Cache departments longer than jobs.
 - Use fetch-level caching as the default.
 - Percent-encode Greenhouse board tokens before upstream requests.
