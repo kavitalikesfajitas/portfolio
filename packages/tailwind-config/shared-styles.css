@@ -22,13 +22,13 @@
     --color-black-1000: #0a0a0a;
     --color-black-900: #151515;
 
-    --color-border-1000: #2a2a2a;
+    --color-divider-1000: #2a2a2a;
 
     --color-orange-1000: #ff6a2a;
     --color-orange-900: #ff8a3d;
 
-    --color-text-1000: #f8f4ed;
-    --color-text-900: #b5aea3;
+    --color-foreground-1000: #f8f4ed;
+    --color-foreground-900: #b5aea3;
     /* Smaller than text-xs (0.75rem) — for fine print like stat sub-text */
     --text-xxs: 0.625rem;
     --text-xxs--line-height: 0.875rem;
