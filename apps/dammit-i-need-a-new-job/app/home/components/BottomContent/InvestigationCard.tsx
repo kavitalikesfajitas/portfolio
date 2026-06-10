@@ -17,10 +17,13 @@ export function InvestigationCard({
   logoSrc,
 }: Investigation) {
   return (
-    <DividedPanelItem className="items-stretch gap-4 border-divider-1000 px-5 py-4 text-left sm:odd:border-r sm:nth-[n+3]:border-t lg:border-r lg:border-t-0 lg:last:border-r-0">
-      <div className="flex flex-col gap-4">
+    <DividedPanelItem
+      dividers="none"
+      className="items-stretch border-b border-divider-1000 px-4 py-4 text-left last:border-b-0 sm:border-b-0 sm:px-5 sm:odd:border-r sm:nth-[n+3]:border-t lg:border-r lg:border-t-0 lg:last:border-r-0"
+    >
+      <div className="flex flex-col gap-3 sm:gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-md bg-neutral-900">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-neutral-900 sm:size-12">
             {logoSrc ? (
               <Image
                 src={logoSrc}
@@ -35,7 +38,7 @@ export function InvestigationCard({
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h3 className="truncate text-xl font-extrabold text-cream-1000">
+              <h3 className="truncate text-lg font-extrabold text-cream-1000 sm:text-xl">
                 {name}
               </h3>
               <span className="size-1.5 shrink-0 rounded-full bg-green-500" />
@@ -43,18 +46,18 @@ export function InvestigationCard({
           </div>
         </div>
 
-        <div>
-          <div className="text-3xl font-extrabold leading-none text-orange-1000">
+        <div className="text-center sm:text-left">
+          <div className="text-2xl font-extrabold leading-none text-orange-1000 sm:text-3xl">
             {jobCount}
           </div>
-          <div className="mt-2 text-sm text-foreground-900">
+          <div className="mt-1 text-xs text-foreground-900 sm:mt-2 sm:text-sm">
             engineering jobs
           </div>
         </div>
 
         <Button
           asChild
-          className="h-10 w-full rounded-md border border-orange-1000 bg-transparent font-overpass-mono text-sm font-bold text-orange-1000 hover:bg-orange-1000 hover:text-neutral-950"
+          className="h-9 w-full rounded-md border border-orange-1000 bg-transparent font-overpass-mono text-xs font-bold text-orange-1000 hover:bg-orange-1000 hover:text-neutral-950 sm:h-10 sm:text-sm"
         >
           <Link href={href}>Investigate -&gt;</Link>
         </Button>

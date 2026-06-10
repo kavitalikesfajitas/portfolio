@@ -9,10 +9,10 @@ export function RightContentHero() {
   return (
     <div
       className={clsx(
-        "flex flex-col flex-1 items-center lg:items-end gap-0 relative",
+        "relative flex min-w-0 w-full flex-1 flex-col items-center gap-0 lg:items-end",
       )}
     >
-      <Card className="flex h-[430px] w-80 flex-col overflow-visible bg-neutral-910 text-cream-1000 border-divider-1000 relative py-0">
+      <Card className="relative flex h-[430px] w-full max-w-80 flex-col overflow-visible border-divider-1000 bg-neutral-910 py-0 text-cream-1000">
         <DaysCounterCardContent />
         <Image
           src={Cat6}
