@@ -10,15 +10,22 @@ export function LeftContentHero() {
       <div className="font-overpass-mono text-2xl font-bold uppercase tracking-tighter text-orange-1000">
         Why This Exists
       </div>
-      <div className="max-w-xl space-y-6 font-overpass-mono text-md leading-relaxed text-cream-800">
+      <div className="max-w-full lg:max-w-xl space-y-6 font-overpass-mono text-sm lg:text-md leading-relaxed text-cream-800">
         <p>
-          I got tired of scrolling through job boards that felt more like social
-          media feeds than job searches.
+          I started looking at job listings and found myself wondering how much
+          of the market I was actually seeing.
         </p>
         <p>
-          While looking for my next role, I’m experimenting with a better way to
-          discover opportunities.
+          Am I seeing what&apos;s available, or am I seeing what an algorithm
+          thinks I should see?
         </p>
+        <p>I wanted more control over how I discovered opportunities.</p>
+        <p>
+          Between recommendations, sponsored posts, AI-generated suggestions,
+          and platform-specific filters, it felt like someone else&apos;s
+          algorithm was deciding what opportunities made it into my feed.
+        </p>
+        <p>So I started digging.</p>
       </div>
     </div>
   );
