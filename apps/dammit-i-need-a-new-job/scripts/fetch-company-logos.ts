@@ -22,6 +22,7 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const outputDir = path.join(scriptDir, "..", "public", "images", "logos");
 const publicPrefix = "/images/logos";
 const manifestFileName = "manifest.json";
+const LOGO_FETCH_TIMEOUT_MS = 5_000;
 
 // Greenhouse board tokens usually match the company's primary domain. Add an
 // entry here for any token that doesn't.
@@ -64,7 +65,10 @@ export type LogoResult = {
 async function fetchLogo(domain: string) {
   for (const url of sourcesFor(domain)) {
     try {
-      const response = await fetch(url, { redirect: "follow" });
+      const response = await fetch(url, {
+        redirect: "follow",
+        signal: AbortSignal.timeout(LOGO_FETCH_TIMEOUT_MS),
+      });
       const contentType =
         (response.headers.get("content-type") ?? "").split(";")[0]?.trim() ??
         "";
