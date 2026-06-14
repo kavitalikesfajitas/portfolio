@@ -40,13 +40,6 @@ export default async (phase: string) => {
     experimental: {
       esmExternals: true,
     },
-    webpack: (config) => {
-      config.resolve.alias = {
-        ...(config.resolve.alias || {}),
-        "@": appRoot,
-      };
-      return config;
-    },
     images: {
       unoptimized: false,
     },
