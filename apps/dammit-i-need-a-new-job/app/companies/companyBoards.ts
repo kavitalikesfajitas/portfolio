@@ -11,4 +11,5 @@ export const COMPANY_BOARD_TOKENS = [
   "discord",
   "figma",
   "datadog",
+  "affirm",
 ] as const;
