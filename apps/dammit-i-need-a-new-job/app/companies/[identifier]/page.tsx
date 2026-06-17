@@ -31,7 +31,7 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
     buildCompanyJobsView(departmentsResponse.departments, jobsResponse.jobs);
 
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-neutral-950 text-cream-1000">
+    <div className="flex flex-col flex-1 items-center justify-start bg-neutral-950 text-cream-1000">
       <main className="flex w-full flex-col gap-4 px-5 py-6 font-overpass-mono md:max-w-7xl md:gap-6 md:px-10 md:py-10">
         <section className="rounded-lg border border-divider-1000 bg-neutral-910/80 p-4 md:p-6">
           <div className="flex flex-wrap items-start justify-between gap-4 md:gap-6">
