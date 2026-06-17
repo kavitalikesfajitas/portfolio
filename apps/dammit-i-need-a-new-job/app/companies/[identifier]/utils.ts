@@ -120,7 +120,13 @@ export function buildCompanyJobsView(
       ),
       updatedAt: job.updatedAt,
     }))
-    .filter((job) => job.departments.length > 0);
+    .filter((job) => job.departments.length > 0)
+    // updatedAt is already canonical ISO 8601 UTC (see normalizeTimestamp), so a
+    // lexicographic compare sorts chronologically without parsing a Date per
+    // comparison. Newest first. Runs once at build/ISR time, not per request.
+    .sort((a, b) =>
+      a.updatedAt < b.updatedAt ? 1 : a.updatedAt > b.updatedAt ? -1 : 0,
+    );
 
   const departmentOptions = uniqueValues(
     engineeringDepartments.map((department) =>
