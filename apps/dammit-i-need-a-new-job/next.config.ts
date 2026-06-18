@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
 import url from "node:url";
+import createMDX from "@next/mdx";
 import { PHASE_PRODUCTION_BUILD } from "next/constants";
 
 const workspaceRoot = path.resolve(
@@ -11,6 +12,13 @@ const workspaceRoot = path.resolve(
 );
 
 const appRoot = path.dirname(url.fileURLToPath(import.meta.url));
+
+const withMDX = createMDX({
+  options: {
+    remarkPlugins: [],
+    rehypePlugins: [],
+  },
+});
 
 export default async (phase: string) => {
   // Fetch a logo for every company in COMPANY_BOARD_TOKENS before a production
@@ -26,6 +34,7 @@ export default async (phase: string) => {
 
   const nextConfig: NextConfig = {
     reactStrictMode: true,
+    pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
     turbopack: {
       root: workspaceRoot, // Specify the monorepo root as turbo directory
     },
@@ -44,5 +53,5 @@ export default async (phase: string) => {
       unoptimized: false,
     },
   };
-  return nextConfig;
+  return withMDX(nextConfig);
 };
