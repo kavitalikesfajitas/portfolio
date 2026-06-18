@@ -40,10 +40,10 @@ describe("Greenhouse client", () => {
     );
     vi.stubGlobal("fetch", fetchMock);
 
-    await fetchGreenhouseJobs("acme/jobs", { includeContent: true });
+    await fetchGreenhouseJobs("acme/jobs");
 
     expect(fetchMock).toHaveBeenCalledWith(
-      "https://boards-api.greenhouse.io/v1/boards/acme%2Fjobs/jobs?content=true",
+      "https://boards-api.greenhouse.io/v1/boards/acme%2Fjobs/jobs",
       expect.objectContaining({
         next: { revalidate: GREENHOUSE_JOBS_REVALIDATE_SECONDS },
         signal: expect.any(AbortSignal),

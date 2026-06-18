@@ -37,12 +37,10 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
   }
 
   const { provider, identifier } = parsedParams.data;
-  const { content, term } = parsedQuery.data;
+  const { term } = parsedQuery.data;
 
   try {
-    const jobsResponse = await fetchGreenhouseJobs(identifier, {
-      includeContent: content,
-    });
+    const jobsResponse = await fetchGreenhouseJobs(identifier);
     const normalizedJobs = normalizeGreenhouseJobs(jobsResponse.jobs);
     const jobs = term
       ? matchJobsByTitleTerm(normalizedJobs, term).map((match) => match.job)
@@ -53,7 +51,7 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
         provider,
         identifier,
         resource: "jobs",
-        endpoint: content ? "jobs?content=true" : "jobs",
+        endpoint: "jobs",
         jobs,
         meta: {
           total: jobs.length,

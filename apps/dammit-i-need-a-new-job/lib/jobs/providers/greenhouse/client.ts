@@ -10,10 +10,6 @@ export const GREENHOUSE_JOBS_REVALIDATE_SECONDS = 900;
 export const GREENHOUSE_DEPARTMENTS_REVALIDATE_SECONDS = 86_400;
 const GREENHOUSE_FETCH_TIMEOUT_MS = 10_000;
 
-type FetchGreenhouseJobsOptions = {
-  includeContent?: boolean;
-};
-
 async function fetchGreenhouseJson<T>(
   path: string,
   parse: (data: unknown) => T,
@@ -70,19 +66,11 @@ export async function fetchGreenhouseDepartments(
 
 export async function fetchGreenhouseJobs(
   boardToken: string,
-  { includeContent = false }: FetchGreenhouseJobsOptions = {},
 ): Promise<GreenhouseJobsResponse> {
   const encodedBoardToken = encodeBoardToken(boardToken);
-  const searchParams = new URLSearchParams();
-
-  if (includeContent) {
-    searchParams.set("content", "true");
-  }
-
-  const query = searchParams.size > 0 ? `?${searchParams.toString()}` : "";
 
   return fetchGreenhouseJson(
-    `/${encodedBoardToken}/jobs${query}`,
+    `/${encodedBoardToken}/jobs`,
     (data) => greenhouseJobsResponseSchema.parse(data),
     GREENHOUSE_JOBS_REVALIDATE_SECONDS,
   );

@@ -25,7 +25,7 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
 
   const [departmentsResponse, jobsResponse] = await Promise.all([
     fetchGreenhouseDepartments(identifier),
-    fetchGreenhouseJobs(identifier, { includeContent: true }),
+    fetchGreenhouseJobs(identifier),
   ]);
   const { jobs, departmentOptions, totalEngineeringJobs } =
     buildCompanyJobsView(departmentsResponse.departments, jobsResponse.jobs);

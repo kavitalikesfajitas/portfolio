@@ -10,15 +10,11 @@ export const jobsRouteParamsSchema = z.object({
     .regex(/^[a-z0-9][a-z0-9._-]*$/i, "Invalid provider identifier"),
 });
 
-const booleanQuerySchema = z
-  .enum(["true", "false"])
-  .optional()
-  .transform((value) => value === "true");
-
-export const jobsRouteQuerySchema = z.object({
-  content: booleanQuerySchema,
-  term: z.string().trim().min(1).max(120).optional(),
-});
+export const jobsRouteQuerySchema = z
+  .object({
+    term: z.string().trim().min(1).max(120).optional(),
+  })
+  .strict();
 
 export type JobsRouteParams = z.infer<typeof jobsRouteParamsSchema>;
 export type JobsRouteQuery = z.infer<typeof jobsRouteQuerySchema>;
