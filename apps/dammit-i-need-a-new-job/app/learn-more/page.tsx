@@ -2,96 +2,71 @@ import Link from "next/link";
 
 export const metadata = {
   title: "Learn More | Dammit I Gotta Get A New Job",
-  description:
-    "The product and engineering decisions behind the Dammit job search experiment.",
+  description: "Decision notes for the Dammit job search experiment.",
 };
 
 const decisionNotes = [
   {
     title: "Company Logo Generation",
     href: "/learn-more/decisions/company-logo-generation",
-    description:
-      "Why seeded company logos live in public assets, how the fetch script keeps builds practical, and where logo storage needs to move when companies become dynamic.",
+    label: "Logos",
+    description: "Static assets for now; reviewed logo URLs later.",
   },
   {
     title: "Job API Decisions",
     href: "/learn-more/decisions/job-api",
-    description:
-      "Why the MVP starts with Greenhouse, uses departments as the first discovery surface, validates external payloads with Zod, and treats company taxonomy as signal instead of truth.",
+    label: "Data",
+    description: "Greenhouse first, department-led discovery, normalized data.",
   },
 ];
 
 export default function LearnMorePage() {
   return (
     <div className="flex flex-1 flex-col items-center bg-neutral-950 text-cream-1000">
-      <main className="flex w-full max-w-7xl flex-1 flex-col gap-10 px-5 py-8 font-overpass-mono sm:px-10 sm:py-10">
+      <main className="flex w-full max-w-7xl flex-1 flex-col gap-8 px-5 py-8 font-overpass-mono sm:px-10 sm:py-10">
         <section className="border-b border-divider-1000 pb-10">
           <p className="mb-3 text-xs font-bold uppercase tracking-tighter text-orange-1000">
             Learn more
           </p>
           <h1 className="text-3xl font-bold uppercase tracking-tighter text-cream-1000 sm:text-5xl">
-            The decisions behind Dammit
+            Decision notes
           </h1>
           <p className="mt-5 max-w-4xl text-sm leading-relaxed text-foreground-900 sm:text-base">
-            This started as a practical job-search experiment, but the
-            interesting part is the thinking around it: what data to trust, what
-            should stay static, what can become dynamic later, and where a
-            little visual polish makes the whole thing easier to scan.
+            A little insight into the decisions I made along the way. This is
+            obviously a pet project, but it would be amiss to not think about
+            what would need to change if it ever had to scale.
+          </p>
+          <p className="mt-4 max-w-4xl text-xs leading-relaxed text-cream-800 sm:text-sm">
+            Tiny flex: these started as docs in the repo. I repurposed them as
+            MDX so the same source stays readable on GitHub and renders here in
+            the site.
           </p>
         </section>
 
         <section>
-          <h2 className="text-xl font-bold uppercase tracking-tighter text-orange-1000 sm:text-2xl">
-            Decision notes
-          </h2>
-          <div className="my-6 grid gap-4 lg:grid-cols-2">
-            {decisionNotes.map((note) => {
-              const isExternal = note.href.startsWith("http");
-              const className =
-                "rounded-md border border-divider-1000 bg-neutral-910/80 p-5 no-underline transition-colors hover:border-orange-1000";
-              const content = (
-                <>
-                  <span className="block text-sm font-bold uppercase tracking-tighter text-orange-1000">
-                    {note.title}
-                  </span>
-                  <span className="mt-3 block text-sm leading-relaxed text-foreground-900">
-                    {note.description}
-                  </span>
-                </>
-              );
-
-              if (isExternal) {
-                return (
-                  <a
-                    key={note.href}
+          <div className="grid gap-4 lg:grid-cols-2">
+            {decisionNotes.map((note) => (
+              <article
+                key={note.href}
+                className="rounded-md border border-divider-1000 bg-neutral-910/80 p-5"
+              >
+                <p className="mb-3 text-xs font-bold uppercase tracking-tighter text-cream-800">
+                  {note.label}
+                </p>
+                <h3 className="text-sm font-bold uppercase tracking-tighter">
+                  <Link
                     href={note.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={className}
+                    className="text-orange-1000 underline-offset-4 hover:underline"
                   >
-                    {content}
-                  </a>
-                );
-              }
-
-              return (
-                <Link key={note.href} href={note.href} className={className}>
-                  {content}
-                </Link>
-              );
-            })}
+                    {note.title} -&gt;
+                  </Link>
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-foreground-900">
+                  {note.description}
+                </p>
+              </article>
+            ))}
           </div>
-        </section>
-
-        <section className="border-t border-divider-1000 pt-10">
-          <h2 className="text-xl font-bold uppercase tracking-tighter text-orange-1000 sm:text-2xl">
-            What belongs here
-          </h2>
-          <p className="mt-4 max-w-4xl text-sm leading-relaxed text-foreground-900 sm:text-base">
-            This page is the front door for the thought process. Individual
-            decision pages can go deeper, but this page should stay skimmable:
-            what we decided, why it mattered, and where to read the longer note.
-          </p>
         </section>
       </main>
     </div>
