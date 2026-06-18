@@ -1601,7 +1601,7 @@ __metadata:
     "@vitest/coverage-v8": "npm:4.1.4"
     eslint: "npm:^9"
     jsdom: "npm:^26.1.0"
-    postcss: "npm:^8.5.6"
+    postcss: "npm:^8.5.10"
     prettier: "npm:^3.6.2"
     prettier-plugin-tailwindcss: "npm:^0.7.1"
     react: "npm:^19.2.4"
@@ -1657,7 +1657,7 @@ __metadata:
     eslint: "npm:^9"
     jsdom: "npm:^26.1.0"
     lucide-react: "npm:^0.553.0"
-    postcss: "npm:^8.5.6"
+    postcss: "npm:^8.5.10"
     prettier: "npm:^3.6.2"
     prettier-plugin-tailwindcss: "npm:^0.7.1"
     radix-ui: "npm:^1.5.0"
@@ -1702,7 +1702,7 @@ __metadata:
     "@types/react-dom": "npm:^19.2.3"
     clsx: "npm:^2.1.1"
     eslint: "npm:^9"
-    postcss: "npm:^8.5.6"
+    postcss: "npm:^8.5.10"
     prettier: "npm:^3.6.2"
     react: "npm:^19.2.4"
     react-dom: "npm:^19.2.4"
@@ -1718,13 +1718,13 @@ __metadata:
   resolution: "@kavita-likes-fajitas/tailwind-config@workspace:packages/tailwind-config"
   dependencies:
     "@tailwindcss/postcss": "npm:^4.1.12"
-    postcss: "npm:^8.5.6"
+    postcss: "npm:^8.5.10"
     prettier: "npm:^3.6.2"
     prettier-plugin-tailwindcss: "npm:^0.7.1"
     tailwindcss: "npm:^4.1.12"
   peerDependencies:
     "@tailwindcss/postcss": ^4.1.12
-    postcss: ^8.5.6
+    postcss: ^8.5.10
     tailwindcss: ^4.1.12
   peerDependenciesMeta:
     postcss:
@@ -1767,7 +1767,7 @@ __metadata:
     lodash: "npm:^4.18.1"
     lucide-react: "npm:^0.553.0"
     motion: "npm:^12.23.24"
-    postcss: "npm:^8.5.6"
+    postcss: "npm:^8.5.10"
     prettier: "npm:^3.6.2"
     prettier-plugin-tailwindcss: "npm:^0.7.1"
     react: "npm:^19.2.4"
@@ -12985,7 +12985,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.5.15":
+"postcss@npm:^8.5.10, postcss@npm:^8.5.15":
   version: 8.5.15
   resolution: "postcss@npm:8.5.15"
   dependencies:
