@@ -1,8 +1,5 @@
 import Link from "next/link";
-import {
-  fetchGreenhouseDepartments,
-  fetchGreenhouseJobs,
-} from "@/lib/jobs/providers/greenhouse/client";
+import { fetchGreenhouseDepartments } from "@/lib/jobs/providers/greenhouse/client";
 import { COMPANY_BOARD_TOKENS } from "../companyBoards";
 import { formatCompanyName } from "../utils";
 
@@ -23,12 +20,9 @@ export function generateStaticParams() {
 export default async function CompanyPage({ params }: CompanyPageProps) {
   const { identifier } = await params;
 
-  const [departmentsResponse, jobsResponse] = await Promise.all([
-    fetchGreenhouseDepartments(identifier),
-    fetchGreenhouseJobs(identifier),
-  ]);
+  const departmentsResponse = await fetchGreenhouseDepartments(identifier);
   const { jobs, departmentOptions, totalEngineeringJobs } =
-    buildCompanyJobsView(departmentsResponse.departments, jobsResponse.jobs);
+    buildCompanyJobsView(departmentsResponse.departments);
 
   return (
     <div className="flex flex-col flex-1 items-center justify-start bg-neutral-950 text-cream-1000">

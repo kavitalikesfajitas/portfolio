@@ -1,13 +1,10 @@
 import type { FilterFn } from "@tanstack/react-table";
 import type { CompanyJob, DepartmentFilterOption } from "./types";
 import {
+  type NormalizedJob,
   normalizeGreenhouseDepartments,
-  normalizeGreenhouseJobs,
 } from "@/lib/jobs/providers/greenhouse/normalize";
-import type {
-  GreenhouseDepartment,
-  GreenhouseJob,
-} from "@/lib/jobs/providers/greenhouse/schema";
+import type { GreenhouseDepartment } from "@/lib/jobs/providers/greenhouse/schema";
 
 export const arrayIncludesSome: FilterFn<CompanyJob> = (
   row,
@@ -75,6 +72,34 @@ function uniqueValues<T>(values: T[]) {
   return [...new Set(values)];
 }
 
+function mergeDepartmentJobs(jobs: NormalizedJob[]) {
+  const jobsById = new Map<string, NormalizedJob>();
+
+  for (const job of jobs) {
+    const existingJob = jobsById.get(job.id);
+
+    if (!existingJob) {
+      jobsById.set(job.id, job);
+      continue;
+    }
+
+    const departmentsById = new Map(
+      existingJob.departments.map((department) => [department.id, department]),
+    );
+
+    for (const department of job.departments) {
+      departmentsById.set(department.id, department);
+    }
+
+    jobsById.set(job.id, {
+      ...existingJob,
+      departments: [...departmentsById.values()],
+    });
+  }
+
+  return [...jobsById.values()];
+}
+
 // Same engineering-department definition as the companies list page, so the
 // detail page surfaces the exact teams shown on each company card.
 export function normalizeEngineeringDepartments(
@@ -91,10 +116,7 @@ export function normalizeEngineeringDepartments(
 // Builds the engineering-only view the detail page renders: the job list (each
 // job tagged with the engineering teams it belongs to) plus the team filter
 // options. Jobs with no engineering team are dropped.
-export function buildCompanyJobsView(
-  departments: GreenhouseDepartment[],
-  rawJobs: GreenhouseJob[],
-): {
+export function buildCompanyJobsView(departments: GreenhouseDepartment[]): {
   jobs: CompanyJob[];
   departmentOptions: DepartmentFilterOption[];
   totalEngineeringJobs: number;
@@ -107,7 +129,9 @@ export function buildCompanyJobsView(
     ]),
   );
 
-  const jobs = normalizeGreenhouseJobs(rawJobs)
+  const jobs = mergeDepartmentJobs(
+    engineeringDepartments.flatMap((department) => department.jobs),
+  )
     .map((job) => ({
       id: job.id,
       title: job.title,
