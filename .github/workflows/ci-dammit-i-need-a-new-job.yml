@@ -38,6 +38,8 @@ jobs:
             ${{ github.workspace }}/.cache
             ${{ github.workspace }}/**/tsconfig.tsbuildinfo
           key: dammit-i-need-a-new-job-cache-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            dammit-i-need-a-new-job-cache-${{ runner.os }}-
 
       - name: 🕵️ Typecheck
         run: yarn turbo typecheck --filter="dammit-i-need-a-new-job..."
