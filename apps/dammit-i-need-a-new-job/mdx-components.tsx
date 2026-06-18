@@ -5,7 +5,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     h1: ({ children, ...props }) => (
       <h1
-        className="text-3xl font-bold uppercase tracking-tighter text-cream-1000 sm:text-5xl"
+        className="max-w-full break-words text-3xl font-bold uppercase tracking-tighter text-cream-1000 sm:text-5xl"
         {...props}
       >
         {children}
@@ -13,7 +13,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     h2: ({ children, ...props }) => (
       <h2
-        className="mt-10 text-xl font-bold uppercase tracking-tighter text-orange-1000 sm:text-2xl"
+        className="mt-10 max-w-full break-words text-xl font-bold uppercase tracking-tighter text-orange-1000 sm:text-2xl"
         {...props}
       >
         {children}
@@ -21,7 +21,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     h3: ({ children, ...props }) => (
       <h3
-        className="mt-6 text-lg font-bold uppercase tracking-tighter text-cream-1000"
+        className="mt-6 max-w-full break-words text-lg font-bold uppercase tracking-tighter text-cream-1000"
         {...props}
       >
         {children}
@@ -29,7 +29,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     p: ({ children, ...props }) => (
       <p
-        className="my-4 max-w-4xl text-sm leading-relaxed text-foreground-900 sm:text-base"
+        className="my-4 max-w-4xl break-words text-sm leading-relaxed text-foreground-900 sm:text-base"
         {...props}
       >
         {children}
@@ -37,7 +37,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     ul: ({ children, ...props }) => (
       <ul
-        className="my-4 ml-5 max-w-4xl list-disc space-y-2 text-sm leading-relaxed text-foreground-900 sm:text-base"
+        className="my-4 ml-5 max-w-4xl break-words list-disc space-y-2 text-sm leading-relaxed text-foreground-900 sm:text-base"
         {...props}
       >
         {children}
@@ -45,7 +45,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     ol: ({ children, ...props }) => (
       <ol
-        className="my-4 ml-5 max-w-4xl list-decimal space-y-2 text-sm leading-relaxed text-foreground-900 sm:text-base"
+        className="my-4 ml-5 max-w-4xl break-words list-decimal space-y-2 text-sm leading-relaxed text-foreground-900 sm:text-base"
         {...props}
       >
         {children}
@@ -77,7 +77,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     },
     code: ({ children, ...props }) => (
       <code
-        className="rounded bg-neutral-900 px-1.5 py-0.5 font-overpass-mono text-xs text-cream-800"
+        className="break-words rounded bg-neutral-900 px-1.5 py-0.5 font-overpass-mono text-xs text-cream-800"
         {...props}
       >
         {children}
@@ -85,7 +85,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     pre: ({ children, ...props }) => (
       <pre
-        className="my-5 max-w-4xl overflow-x-auto rounded-md border border-divider-1000 bg-neutral-910/80 p-4 text-sm text-cream-800"
+        className="my-5 max-w-full overflow-x-auto whitespace-pre-wrap break-words rounded-md border border-divider-1000 bg-neutral-910/80 p-4 text-sm text-cream-800"
         {...props}
       >
         {children}

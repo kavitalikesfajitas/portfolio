@@ -2,10 +2,10 @@ import Link from "next/link";
 
 export function CurrentInvestigationsHeader() {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <div className="mb-2 inline-flex rounded-sm border border-green-500 px-2 py-1 text-xs font-bold uppercase leading-none tracking-tighter text-green-500">
-          Live job listings
+    <div className="flex flex-col gap-3 sm:flex-row flex-wrap sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-2">
+        <div className="mb-2 w-fit inline-flex rounded-sm border border-green-500 px-2 py-1 text-xs font-bold uppercase leading-none tracking-tighter text-green-500">
+          Live
         </div>
         <h2 className="text-xl font-bold leading-none uppercase tracking-tighter text-orange-1000 sm:text-2xl">
           Current Investigations

@@ -18,17 +18,17 @@ In scope for the MVP:
 - Normalization into a small internal shape.
 - Native `fetch`.
 - Next fetch caching.
-- Server-side filtering heuristics.
+- ISR-backed company pages.
+- Client-side filtering on company detail pages.
 
-Out of scope for now:
+Not trying to solve yet:
 
-- Database.
-- Prisma.
-- Sync jobs.
-- Background cron.
-- Redis.
-- Algolia or a dedicated search engine.
-- User auth for the public app experience.
+- A persistent jobs database.
+- Scheduled background syncing.
+- Dedicated search infrastructure.
+- User accounts or saved searches.
+
+That list is intentionally short. The point of the MVP is not to design a job platform from first principles; it is to prove that company-owned job board data can make the discovery experience feel more direct and useful.
 
 ## Route Shape
 
@@ -54,9 +54,11 @@ The route structure intentionally leaves room for future providers such as Lever
 
 Keep departments and jobs as separate proxy endpoints.
 
-The departments endpoint is the first-class discovery endpoint for this experiment. It fetches Greenhouse `/departments`, validates the response, normalizes departments, and preserves nested jobs returned by Greenhouse. The rendered company pages use this endpoint shape exclusively.
+The departments endpoint is the first-class discovery endpoint for this experiment. It fetches Greenhouse `/departments`, validates the response, normalizes departments, and preserves nested jobs returned by Greenhouse.
 
-The jobs endpoint fetches Greenhouse `/jobs`, validates the response, normalizes jobs, and can apply server-side query filtering. It is retained as an API surface for a future search/detail iteration, but it is not used by the current company list or company detail pages. It intentionally does not request `content=true`; full job descriptions are out of scope until there is a product surface that renders them.
+The rendered company pages use the same department-first data model, but they fetch through the shared server-side Greenhouse client instead of making an HTTP request back into the app's own API route. The important product decision is the shape of the data, not whether the page calls the route over HTTP.
+
+The jobs endpoint fetches Greenhouse `/jobs`, validates the response, and normalizes jobs. It is retained as a protected API surface, but it is not the primary MVP path for the rendered company list or company detail pages. It intentionally does not request `content=true`; full job descriptions are out of scope until there is a product surface that renders them.
 
 Do not combine departments and jobs into one route yet. They have different cache profiles and different product jobs.
 
@@ -94,7 +96,17 @@ The heuristic is allowed to be imperfect because the product question is whether
 
 ## Department Taxonomy Signals
 
-Company department names are company-specific labels, not a shared taxonomy. Stripe-style labels such as `1133 EMEA Sales Development Reps` include internal cost-center numbers, regions, abbreviations, and org naming conventions that are useful as source data but noisy as product categories.
+Company department names are company-specific labels, not a shared taxonomy. This showed up quickly with Stripe-style labels.
+
+Some labels include internal cost-center numbers, regions, abbreviations, or org naming conventions:
+
+```txt
+1133 EMEA Sales Development Reps
+1120 Training & Certification
+2200 Enginering Platform
+```
+
+Those labels are useful as source data, but noisy as product categories. They also create traps. `Sales Development` contains the word `Development`, but it is not an engineering team. `Training & Certification` is closer to customer success than engineering. `Enginering Platform` is probably engineering even though the label is misspelled.
 
 Add a second signal layer on normalized departments instead of replacing the original Greenhouse department name:
 
@@ -128,25 +140,30 @@ unspecified
 
 The taxonomy is intentionally coarse. It should help the app group, filter, and prioritize departments without claiming that every company organizes work the same way.
 
-Use Fuse.js for fuzzy term matching against the app-owned taxonomy terms. This gives typo-tolerant and noisy-label matching while keeping the taxonomy explicit and reviewable in code. Do not use Fuse.js as a semantic classifier; low-confidence or unmatched labels should remain `unspecified`.
+Use Fuse.js for fuzzy term matching against the app-owned taxonomy terms. This gives typo-tolerant and noisy-label matching while keeping the taxonomy explicit and reviewable in code.
+
+The important part is that Fuse is not being used as a magic semantic classifier. It is a small tolerance layer around a list of terms we own. That lets the app catch obvious messy labels like `Enginering Platform`, while tests still protect against over-tagging labels like `Corporate Development`, `Policy Development`, or `Talent Development` as engineering just because they contain a broad word.
+
+Low-confidence or unmatched labels should remain `unspecified`.
 
 Do not treat broad technical words as engineering by themselves. Terms such as `platform`, `data`, and `security` can indicate engineering work in some companies, but Stripe also uses them in sales, product, analytics, and security-specific department names. Prefer explicit engineering terms like `engineering`, `engineer`, `eng`, `software`, `infrastructure`, or `r&d` for the engineering category.
 
 Continue to derive `signals.likelyEngineering` from this signal layer for now. It remains a heuristic shortcut for the MVP, not a canonical truth about the company.
 
-## Filtering
+## Current Filtering
 
-Filtering belongs server-side in the retained jobs API surface.
+Filtering currently belongs to the company detail UI.
 
-For example:
+The page renders jobs from the department-first response and lets the browser filter the already-loaded rows by:
 
 ```txt
-/api/v1/jobs/greenhouse/vercel?term=engineer
+team / department
+job title or keyword
 ```
 
-The API can inspect normalized job titles and return matching jobs. The current rendered UI does not call this endpoint, but keeping it gives the next iteration one place to evolve search and matching logic.
+That is enough for the MVP. It keeps the page interactive without introducing a database, sync job, or search index.
 
-This is not a full search engine. It is a small filtering layer for the MVP.
+The retained jobs endpoint still accepts a small `term` query, but the current rendered UI does not call it. That endpoint should not be treated as the main filtering architecture yet; it is a protected supporting route that can either evolve later or be removed if the department-first page keeps being the better product surface.
 
 ## Caching
 
@@ -161,14 +178,16 @@ Current upstream fetch cache policy:
 - Departments: long-lived cache, currently `86400` seconds.
 - Jobs: shorter cache, currently `900` seconds.
 
-The departments route exports `dynamic = "force-static"` and route-level `revalidate = 86400` because its response is public and only depends on the provider identifier. It does not hand-roll `Cache-Control`; Next derives the ISR cache behavior from the route config.
+The departments route exports `dynamic = "force-static"` and route-level `revalidate = 86400` because its response is public and only depends on route params. It does not hand-roll `Cache-Control`; Next derives the ISR cache behavior from the route config.
 
 ```txt
 dynamic = "force-static"
 revalidate = 86400
 ```
 
-The jobs route does not export route-level revalidation because it depends on request-time headers and query params. It is retained for API use, not for company page rendering.
+The departments API route can generate unknown board-token responses on demand because route handlers default to dynamic params. That is separate from `/companies/[identifier]`, where the page route intentionally sets `dynamicParams = false` and only renders the curated company list.
+
+The jobs route does not export route-level revalidation because it depends on request-time headers and query params. It is retained for protected API use, not for company page rendering.
 
 Departments change less often than jobs and are useful as the first narrowing step, so they can be cached more aggressively.
 
@@ -199,7 +218,7 @@ Current page policy:
 - `/companies/[identifier]`: statically generated for the known companies in `COMPANY_BOARD_TOKENS` (currently `vercel`, `stripe`, `discord`, `figma`, `datadog`, `affirm`) with `generateStaticParams`, and revalidated every `900` seconds.
 - Unknown company identifiers return 404 for now (`dynamicParams = false`).
 
-React Query can still be used for browser-owned interactive API islands, but page generation should use server data and ISR. This keeps the page shell cacheable while leaving room for richer client-side filters later.
+React Query can still be used for browser-owned interactive API islands, but page generation should use server data and ISR. The current filters run against the jobs already delivered to the company page.
 
 ## Static Generation Strategy and Scaling
 
@@ -207,12 +226,10 @@ React Query can still be used for browser-owned interactive API islands, but pag
 
 This strategy is deliberately matched to a small, curated, code-owned company list. Its load-bearing assumption is that the list stays small. The trade-offs that follow from it:
 
-- The build scales linearly with the list. Every company prerenders at build time, each doing one Greenhouse departments fetch, plus a logo fetch in `next.config.ts`. At a handful of companies this is free; at hundreds it makes builds slow and couples deploy success to Greenhouse being healthy at build time. A slow upstream throws past the `10s` timeout, which fails the page build.
+- The build scales linearly with the list. Every company prerenders at build time, each doing one Greenhouse departments fetch. The logo guard in `next.config.ts` only runs the logo script when a curated company is missing a logo file or manifest entry. At a handful of companies this is fine; at hundreds the page build can still become slow and couple deploy success to Greenhouse being healthy at build time. A slow upstream throws past the `10s` timeout, which fails the page build.
 - Adding a company requires a code change and a redeploy. `dynamicParams = false` means a new token 404s until the next build. This is correct while the list is curated in code, and a dealbreaker the moment companies should be added from a database, CMS, or admin UI.
 
-Pivot point: when the company set becomes large or dynamically sourced, switch to `dynamicParams = true` and generate pages on demand (lazy ISR) instead of all-at-build. Until then, keep prebuilding the curated set — it is the right fit for the current scale.
-
-We considered enabling Cache Components (the Next.js 16 `cacheComponents` flag) and decided against it for now. It would replace the route-segment `revalidate`/`dynamicParams` configs with `use cache` and `cacheLife` for the same caching behavior, while its main new wins — Partial Prerendering and Activity-based navigation state — do not meaningfully apply to these static-with-ISR pages. Revisit if the data model moves toward per-user or personalized content.
+Pivot point: when the company set becomes large or dynamically sourced, switch to `dynamicParams = true` and generate pages on demand (lazy ISR) instead of all-at-build. Until then, keep prebuilding the curated set because it is the right fit for the current scale.
 
 ## `force-static`
 
@@ -237,7 +254,7 @@ Current policy:
 - Departments endpoint: public.
 - Jobs endpoint: requires `x-api-key` outside development.
 
-The departments endpoint stays public because it is the cheap discovery request, drives the current UI, and can be cached for longer. The jobs endpoint is retained for a future iteration and can support query options, so it is reasonable to protect it when it is called from server-side code.
+The departments endpoint stays public because it is the cheap discovery request and can be cached for longer. The current UI uses the same server-side Greenhouse client and department-first shape directly. The jobs endpoint is retained as a protected supporting route and can support query options, so it is reasonable to protect it when it is called from server-side code.
 
 Local development bypasses the key check when `NODE_ENV=development` so the app remains easy to run on `https://localhost:3002`.
 
@@ -276,7 +293,7 @@ meta
 The `meta` object should stay lightweight and operational:
 
 - result counts
-- applied filter description
+- optional applied filter description
 - upstream total
 - cache revalidation value
 
