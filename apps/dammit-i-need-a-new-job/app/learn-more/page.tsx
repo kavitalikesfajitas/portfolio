@@ -15,7 +15,7 @@ const decisionNotes = [
   },
   {
     title: "Job API Decisions",
-    href: "https://github.com/kavitalikesfajitas/portfolio/blob/main/apps/dammit-i-need-a-new-job/docs/001-job-api-decisions.md",
+    href: "/learn-more/decisions/job-api",
     description:
       "Why the MVP starts with Greenhouse, uses departments as the first discovery surface, validates external payloads with Zod, and treats company taxonomy as signal instead of truth.",
   },

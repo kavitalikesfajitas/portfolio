@@ -84,7 +84,7 @@ yarn turbo build --filter="dammit-i-need-a-new-job..."
 - PNG imports are typed with the app-level image declaration file.
 - The existential crisis stat is intentionally infinite.
 - Typecheck depends on the local icon package build because this app imports generated icon output.
-- Job API decisions are documented in [`docs/001-job-api-decisions.md`](docs/001-job-api-decisions.md).
+- Job API decisions are documented in [`docs/001-job-api-decisions.mdx`](docs/001-job-api-decisions.mdx).
 
 ## Vercel
 

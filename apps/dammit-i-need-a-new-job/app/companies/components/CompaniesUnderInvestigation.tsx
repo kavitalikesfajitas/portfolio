@@ -1,4 +1,5 @@
 import { CompanyJobListingRow } from "@/app/components/CompanyJobListingRow";
+import Link from "next/link";
 import { COMPANY_BOARD_TOKENS } from "../companyBoards";
 import { getCompanyRow } from "./CompanyRow";
 
@@ -20,14 +21,12 @@ export async function CompaniesUnderInvestigation() {
         <p className="max-w-4xl text-sm leading-relaxed text-foreground-900 sm:text-base">
           Finding companies with active engineering hiring.
         </p>
-        <a
-          href="https://github.com/kavitalikesfajitas/portfolio/blob/main/apps/dammit-i-need-a-new-job/docs/001-job-api-decisions.md"
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          href="/learn-more/decisions/job-api"
           className="mt-2 inline-block text-xs font-bold text-orange-1000 underline-offset-4 hover:underline sm:text-sm"
         >
           Why these companies? Read the decisions -&gt;
-        </a>
+        </Link>
       </div>
 
       {companies.length > 0 ? (
