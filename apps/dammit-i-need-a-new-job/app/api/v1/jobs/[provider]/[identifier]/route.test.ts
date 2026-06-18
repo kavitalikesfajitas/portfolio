@@ -24,6 +24,19 @@ function createRequest(key?: string) {
   );
 }
 
+function createContentRequest(key?: string) {
+  const headers = new Headers();
+
+  if (key) {
+    headers.set(API_KEY_HEADER, key);
+  }
+
+  return new NextRequest(
+    "https://example.com/api/v1/jobs/greenhouse/vercel?content=true",
+    { headers },
+  );
+}
+
 describe("jobs route", () => {
   const originalKey = process.env.JOBS_API_KEY;
   const mockedFetchGreenhouseJobs = vi.mocked(fetchGreenhouseJobs);
@@ -64,8 +77,16 @@ describe("jobs route", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("x-api-key");
-    expect(mockedFetchGreenhouseJobs).toHaveBeenCalledWith("vercel", {
-      includeContent: false,
+    expect(mockedFetchGreenhouseJobs).toHaveBeenCalledWith("vercel");
+  });
+
+  it("rejects full-content API requests", async () => {
+    const response = await GET(createContentRequest(VALID_KEY), {
+      params: Promise.resolve({ provider: "greenhouse", identifier: "vercel" }),
     });
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({ error: "Invalid query" });
+    expect(mockedFetchGreenhouseJobs).not.toHaveBeenCalled();
   });
 });

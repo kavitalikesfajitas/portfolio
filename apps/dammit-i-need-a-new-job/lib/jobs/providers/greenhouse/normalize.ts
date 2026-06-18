@@ -67,7 +67,6 @@ export type NormalizedJob = {
   language: string | null;
   companyName: string | null;
   firstPublishedAt: string | null;
-  content?: string;
   departments: Array<{
     id: number;
     name: string;
@@ -251,7 +250,6 @@ export function normalizeGreenhouseJobs(
       language: job.language ?? null,
       companyName: job.company_name ?? null,
       firstPublishedAt: normalizeTimestamp(job.first_published),
-      ...(job.content ? { content: job.content } : {}),
       departments:
         job.departments?.map((department) => ({
           id: department.id,

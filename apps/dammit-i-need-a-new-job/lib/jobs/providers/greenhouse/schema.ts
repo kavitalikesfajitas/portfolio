@@ -35,7 +35,6 @@ export const greenhouseJobSchema = z
     location: greenhouseLocationSchema.nullable().optional(),
     absolute_url: z.url(),
     language: z.string().nullable().optional(),
-    content: z.string().optional(),
     company_name: z.string().optional(),
     first_published: z.string().nullable().optional(),
     departments: z.array(greenhouseDepartmentReferenceSchema).optional(),
