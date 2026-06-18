@@ -3,10 +3,15 @@
  * public/images/logos/ and writes a manifest.json mapping each board token to
  * its public path.
  *
+ * A company that already has a logo on disk is left alone — only companies
+ * without one are fetched. Pass `--force` (or call with `{ force: true }`) to
+ * re-download every logo.
+ *
  * Runs two ways:
- *   - `pnpm logos` (CLI) for a manual refresh.
- *   - `fetchCompanyLogos()` from next.config during a production build, which
- *     fails the build if any company in the list ends up with no logo.
+ *   - `node scripts/fetch-company-logos.ts [--force]` (CLI) for a manual run.
+ *   - `next.config.ts` starts the CLI during a production build if any curated
+ *     company is missing a logo, which fails the build if the list still ends
+ *     up incomplete.
  *
  * Logos come from public favicon/logo services (no API key). Sources are tried
  * in order and the first real image wins, so a single flaky service can't break
@@ -19,8 +24,14 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { COMPANY_BOARD_TOKENS } from "../app/companies/companyBoards.ts";
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const outputDir = path.join(scriptDir, "..", "public", "images", "logos");
-const publicPrefix = "/images/logos";
+const defaultOutputDir = path.join(
+  scriptDir,
+  "..",
+  "public",
+  "images",
+  "logos",
+);
+const defaultPublicPrefix = "/images/logos";
 const manifestFileName = "manifest.json";
 const LOGO_FETCH_TIMEOUT_MS = 5_000;
 
@@ -62,10 +73,28 @@ export type LogoResult = {
   bytes?: number;
 };
 
-async function fetchLogo(domain: string) {
-  for (const url of sourcesFor(domain)) {
+type FetchCompanyLogosOptions = {
+  force?: boolean;
+  tokens?: readonly string[];
+  outputDirectory?: string;
+  publicPathPrefix?: string;
+  fetchImpl?: typeof fetch;
+  sourcesForDomain?: typeof sourcesFor;
+};
+
+async function fetchLogo(
+  domain: string,
+  {
+    fetchImpl,
+    sourcesForDomain,
+  }: {
+    fetchImpl: typeof fetch;
+    sourcesForDomain: typeof sourcesFor;
+  },
+) {
+  for (const url of sourcesForDomain(domain)) {
     try {
-      const response = await fetch(url, {
+      const response = await fetchImpl(url, {
         redirect: "follow",
         signal: AbortSignal.timeout(LOGO_FETCH_TIMEOUT_MS),
       });
@@ -94,11 +123,11 @@ async function fetchLogo(domain: string) {
   return null;
 }
 
-async function readExistingLogos() {
+async function readExistingLogos(outputDirectory: string) {
   const byToken = new Map<string, string>();
 
   try {
-    for (const entry of await readdir(outputDir)) {
+    for (const entry of await readdir(outputDirectory)) {
       if (entry === manifestFileName) {
         continue;
       }
@@ -111,35 +140,55 @@ async function readExistingLogos() {
   return byToken;
 }
 
-export async function fetchCompanyLogos(): Promise<LogoResult[]> {
-  await mkdir(outputDir, { recursive: true });
-  const existing = await readExistingLogos();
+export async function fetchCompanyLogos({
+  force = false,
+  tokens = COMPANY_BOARD_TOKENS,
+  outputDirectory = defaultOutputDir,
+  publicPathPrefix = defaultPublicPrefix,
+  fetchImpl = fetch,
+  sourcesForDomain = sourcesFor,
+}: FetchCompanyLogosOptions = {}): Promise<LogoResult[]> {
+  await mkdir(outputDirectory, { recursive: true });
+  const existing = await readExistingLogos(outputDirectory);
 
   const results = await Promise.all(
-    COMPANY_BOARD_TOKENS.map(async (token): Promise<LogoResult> => {
+    tokens.map(async (token): Promise<LogoResult> => {
       const domain = domainFor(token);
-      const logo = await fetchLogo(domain);
+      const priorFile = existing.get(token);
 
-      if (logo) {
-        const fileName = `${token}.${logo.extension}`;
-        await writeFile(path.join(outputDir, fileName), logo.bytes);
+      // Already have it on disk — keep it, no network call (unless --force).
+      if (priorFile && !force) {
         return {
           token,
           domain,
           ok: true,
-          path: `${publicPrefix}/${fileName}`,
+          path: `${publicPathPrefix}/${priorFile}`,
+          source: "existing",
+        };
+      }
+
+      const logo = await fetchLogo(domain, { fetchImpl, sourcesForDomain });
+
+      if (logo) {
+        const fileName = `${token}.${logo.extension}`;
+        await writeFile(path.join(outputDirectory, fileName), logo.bytes);
+        return {
+          token,
+          domain,
+          ok: true,
+          path: `${publicPathPrefix}/${fileName}`,
           source: logo.source,
           bytes: logo.bytes.byteLength,
         };
       }
 
-      const priorFile = existing.get(token);
+      // Fetch failed — fall back to a logo from a previous run if we have one.
       if (priorFile) {
         return {
           token,
           domain,
           ok: true,
-          path: `${publicPrefix}/${priorFile}`,
+          path: `${publicPathPrefix}/${priorFile}`,
           source: "existing",
         };
       }
@@ -154,7 +203,7 @@ export async function fetchCompanyLogos(): Promise<LogoResult[]> {
       .map((result) => [result.token, result.path]),
   );
   await writeFile(
-    path.join(outputDir, manifestFileName),
+    path.join(outputDirectory, manifestFileName),
     `${JSON.stringify(manifest, null, 2)}\n`,
   );
 
@@ -190,5 +239,8 @@ const invokedDirectly =
   import.meta.url === pathToFileURL(process.argv[1]).href;
 
 if (invokedDirectly) {
-  reportAndExit(await fetchCompanyLogos());
+  const force = process.argv
+    .slice(2)
+    .some((arg) => arg === "--force" || arg === "-f");
+  reportAndExit(await fetchCompanyLogos({ force }));
 }
