@@ -64,7 +64,7 @@ public/images/logos/manifest.json
 node scripts/fetch-company-logos.ts
 ```
 
-It is also called unconditionally from `next.config.ts` during `PHASE_PRODUCTION_BUILD`.
+It can also be called from `next.config.ts` during `PHASE_PRODUCTION_BUILD`, but only when the build sees that at least one curated company token does not already have a logo file and manifest entry on disk.
 
 The script tries logo sources in order:
 
@@ -76,7 +76,7 @@ DuckDuckGo icon service
 
 The first successful real image wins. Tiny image payloads are rejected because they are usually placeholders or tracking pixels.
 
-Existing logo files are treated as durable enough for the current curated model. The current script still tries the logo services first, then falls back to an existing file for that company if no fresh logo can be fetched.
+Existing logo files are treated as durable enough for the current curated model. By default, the script keeps an existing token-matched file and skips the network for that company. A manual `--force` run is the escape hatch when we intentionally want to refresh everything.
 
 ## Build Cost And Scaling Numbers
 
@@ -89,41 +89,53 @@ The logo fetch work inside the script
 
 ### The Production Build Hook
 
-The hook itself is simple.
+The hook is intentionally small.
 
-During `PHASE_PRODUCTION_BUILD`, `next.config.ts` always starts the logo fetch script:
+During `PHASE_PRODUCTION_BUILD`, `next.config.ts` checks the committed logo files and `manifest.json` against `COMPANY_BOARD_TOKENS`:
+
+```txt
+companiesMissingLogos()
+```
+
+If every curated company already has a token-matched logo file and manifest entry on disk, the build skips the logo script entirely. If any token is missing either piece, the build starts the script:
 
 ```txt
 execFileSync(process.execPath, ["scripts/fetch-company-logos.ts"])
 ```
 
-There is no current `companiesMissingLogos()` guard in `next.config.ts` that prevents the child process from starting when every curated company already has a logo on disk.
-
 At the current size, the fixed build-hook cost is roughly:
 
 ```txt
 one production-build phase check
-one child Node process
-one script run over COMPANY_BOARD_TOKENS
+one small directory read
+one small manifest read
+one token-name comparison
 ```
 
-That child-process startup is not the main bottleneck at the current curated-list size, but it is still work that happens on every production build.
+That guard is effectively free at the current curated-list size and prevents warm production builds from hitting public logo services.
+
+We chose to keep this production-only. Dev should start fast, work offline, and not depend on third-party favicon services just because someone ran the app locally. If a local logo refresh is needed, it should be an intentional command:
+
+```txt
+node scripts/fetch-company-logos.ts
+node scripts/fetch-company-logos.ts --force
+```
 
 In this document, "steady state" means:
 
 ```txt
-All curated companies already have logo files
+All curated companies already have logo files and manifest entries
         ↓
-next.config.ts still starts the script during PHASE_PRODUCTION_BUILD
+next.config.ts skips the logo script during PHASE_PRODUCTION_BUILD
         ↓
-the script can fall back to committed files if fetching fails
+no logo-service network calls
 ```
 
-So steady state does not mean "the script is not invoked." It means the build has durable logo files available on disk and does not have to fail just because a favicon service is flaky.
+So steady state means the build has durable logo files available on disk and does not have to ask a favicon service for anything.
 
 ### The Fetch Path
 
-The fetch path runs on every production build.
+The fetch path only runs during production build when at least one curated company is missing a logo file, when its manifest entry is missing, or when the logo directory is absent.
 
 `next.config.ts` blocks the build with:
 
@@ -131,15 +143,15 @@ The fetch path runs on every production build.
 execFileSync(process.execPath, ["scripts/fetch-company-logos.ts"])
 ```
 
-That cost has a few pieces:
+When it does run, that cost has a few pieces:
 
 - starting a Node process, roughly `100-300ms`
 - reading existing logo files
 - resolving candidate domains
-- network-fetching missing logos
+- fetching only the curated company tokens that do not already have logo files
 - writing logo files and `manifest.json`
 
-For each company that actually needs a network fetch, the script tries up to three sources sequentially:
+For each company token that needs a network fetch, the script tries up to three sources sequentially:
 
 ```txt
 icon.horse                       5s timeout
@@ -165,7 +177,7 @@ In normal successful cases, the fetch path should be much faster than the timeou
 
 ### What Happens When One Company Is Missing
 
-The current code is better than a true "refetch everything" flow:
+The build guard is better than a true "run every time" flow:
 
 ```txt
 next.config.ts notices at least one missing logo
@@ -174,14 +186,64 @@ script starts
         ↓
 script iterates all COMPANY_BOARD_TOKENS
         ↓
-the script tries to fetch fresh logos for every token
+the script keeps existing token-matched files
         ↓
-existing files are used only as fallbacks when fetching fails
+the script fetches only missing token logos
         ↓
 manifest.json is rewritten for the full set
 ```
 
-So adding `affirm` still starts the script and walks every token so it can produce a complete manifest. In the current implementation, network work is not limited to missing files; existing files are a fallback, not a pre-fetch skip.
+So adding `affirm` starts the script and lets it produce a complete manifest, but it should not re-fetch `stripe`, `notion`, `figma`, or any other logo that already exists on disk. That is the performance choice here: a partial miss should pay for the missing logo and the manifest rewrite, not for a full refresh of every company.
+
+If we intentionally want a full refresh, the CLI supports:
+
+```txt
+node scripts/fetch-company-logos.ts --force
+```
+
+That makes the expensive behavior explicit instead of hiding it inside every production build.
+
+### What Happens If No Logo Can Be Found
+
+There are two different failure cases.
+
+The first case is temporary service failure:
+
+```txt
+token already has a logo file
+        ↓
+logo services fail or timeout
+        ↓
+script keeps the existing file
+        ↓
+manifest still points at the committed logo
+```
+
+That is allowed. The committed logo file is treated as the durable source for the current curated model, so a flaky favicon service should not break a build that already has a usable asset.
+
+The second case is a truly missing logo:
+
+```txt
+token has no logo file
+        ↓
+all logo sources fail
+        ↓
+script records the token as missing
+        ↓
+script exits non-zero
+        ↓
+production build fails
+```
+
+That failure is intentional. For a code-owned seed list, shipping a company card with a missing visual asset is more confusing than failing the build and making the missing asset visible. The fix can be either:
+
+- add a domain override if the Greenhouse token does not match the company's real domain
+- commit a manually chosen logo file
+- remove the company until the asset story is complete
+
+We are not adding a generic placeholder logo right now. A placeholder would keep the build green, but it would also hide the exact problem this script is supposed to catch: the curated company list and the visible site assets have drifted.
+
+For dynamic companies later, this should be softer. Approval-time logo resolution can show candidates, allow manual upload or override, and decide whether a company is allowed to publish without a logo. That is a product workflow decision, not something a production build should guess.
 
 ### Scaling Cliffs
 
@@ -218,17 +280,21 @@ unbounded Promise.all
 
 This is where the approach becomes noisy. It can create bursts of outbound requests, trip service limits, and make failed sources dominate build time.
 
-The cheap improvement, if the curated list grows, is to pass only missing tokens to the script:
+The current implementation already avoids network calls for existing logo files. A further refinement, if the curated list grows, would be passing only missing tokens to the script:
 
 ```txt
 next.config.ts computes missing tokens
         ↓
-node scripts/fetch-company-logos.ts affirm notion linear
+node scripts/fetch-company-logos.ts --tokens ...
         ↓
 script fetches only those tokens
         ↓
 manifest is rebuilt from existing files + new files
 ```
+
+The first half of that idea already exists as the build guard: read the committed logo directory and manifest, compare them against `COMPANY_BOARD_TOKENS`, and skip the logo script entirely when every curated company already has the pieces the app needs. The remaining refinement is passing only missing tokens into the script when the guard finds a mismatch. That would keep warm builds fast while preserving the "fail if a curated company has no logo" guarantee.
+
+That refinement is about reducing local script iteration and making the intent clearer. It is not required to avoid network fan-out for existing logos, because the script already performs that skip internally.
 
 A second improvement is adding a concurrency limit. For example, fetch at most `5-10` missing logos at a time instead of using unbounded `Promise.all`.
 
@@ -241,22 +307,23 @@ These are not benchmark numbers. They are the mental model for deciding when the
 ```txt
 Scenario                         Expected behavior
 
-6-10 companies, warm logos        child process + network attempts, with disk fallback
+6-10 companies, warm logos        guard passes, no child process
 6-10 companies, 1 missing logo    child process + usually <1s network, 15s bad case
-50 companies, warm logos          still tries the favicon services for every token
+50 companies, warm logos          guard passes, no logo-service network calls
 50 companies, 5 missing logos     probably okay, but third-party service risk is visible
-200 companies, warm logos         network fan-out is the main concern
+200 companies, warm logos         directory scan and token comparison stay cheap
 200 companies, 50 missing logos   too bursty with unbounded Promise.all
-1000 companies, warm logos        unbounded network attempts are the main issue
+1000 companies, warm logos        guard is still cheaper than logo-service fan-out
 1000 companies, cold checkout     build-time logo fetching is the wrong model
 ```
 
-The useful part of `warm logos` is resilience, not zero work.
+The useful part of `warm logos` is that builds avoid logo-service network work.
 
 Warm means:
 
 ```txt
 every token already has a logo file on disk
+and a manifest entry
 ```
 
 Cold means:
@@ -265,7 +332,7 @@ Cold means:
 many or all token logo files are absent
 ```
 
-The current architecture is more resilient when builds are warm because existing files can be reused if fresh fetches fail. The cost still grows with network dependency, timeouts, third-party service behavior, local filesystem work, and the manifest rewrite.
+The current architecture is fast when builds are warm because the script is skipped. When builds are cold or partially missing logos, the cost grows with network dependency, timeouts, third-party service behavior, local filesystem work, and the manifest rewrite.
 
 That distinction matters for CI. If CI has the repo logos committed, the build should be warm. If CI ever depends on generating most logos from scratch, the build becomes dependent on favicon services being fast and available at that moment.
 
@@ -295,7 +362,8 @@ For the current seeded list, this is okay:
 ```txt
 build-time script invocation
 static logo files
-disk fallback when fresh fetching fails
+skip-existing behavior by default
+manual full refresh with --force
 fail build if a curated company has no logo
 ```
 
@@ -323,7 +391,8 @@ This works for the current site because:
 
 - The company list is small.
 - The list is code-owned and reviewed.
-- Logos are generated only for missing companies.
+- Warm builds skip logo fetching when every curated token already has a logo file and manifest entry.
+- Partial misses fetch only the missing token logos.
 - Existing logo files live in `public/images/logos`.
 - The build can fail if a newly added curated company has no logo.
 

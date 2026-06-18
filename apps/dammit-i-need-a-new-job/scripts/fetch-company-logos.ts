@@ -3,10 +3,15 @@
  * public/images/logos/ and writes a manifest.json mapping each board token to
  * its public path.
  *
+ * A company that already has a logo on disk is left alone — only companies
+ * without one are fetched. Pass `--force` (or call with `{ force: true }`) to
+ * re-download every logo.
+ *
  * Runs two ways:
- *   - `pnpm logos` (CLI) for a manual refresh.
- *   - `fetchCompanyLogos()` from next.config during a production build, which
- *     fails the build if any company in the list ends up with no logo.
+ *   - `node scripts/fetch-company-logos.ts [--force]` (CLI) for a manual run.
+ *   - `next.config.ts` starts the CLI during a production build if any curated
+ *     company is missing a logo, which fails the build if the list still ends
+ *     up incomplete.
  *
  * Logos come from public favicon/logo services (no API key). Sources are tried
  * in order and the first real image wins, so a single flaky service can't break
@@ -69,6 +74,7 @@ export type LogoResult = {
 };
 
 type FetchCompanyLogosOptions = {
+  force?: boolean;
   tokens?: readonly string[];
   outputDirectory?: string;
   publicPathPrefix?: string;
@@ -135,6 +141,7 @@ async function readExistingLogos(outputDirectory: string) {
 }
 
 export async function fetchCompanyLogos({
+  force = false,
   tokens = COMPANY_BOARD_TOKENS,
   outputDirectory = defaultOutputDir,
   publicPathPrefix = defaultPublicPrefix,
@@ -147,6 +154,19 @@ export async function fetchCompanyLogos({
   const results = await Promise.all(
     tokens.map(async (token): Promise<LogoResult> => {
       const domain = domainFor(token);
+      const priorFile = existing.get(token);
+
+      // Already have it on disk — keep it, no network call (unless --force).
+      if (priorFile && !force) {
+        return {
+          token,
+          domain,
+          ok: true,
+          path: `${publicPathPrefix}/${priorFile}`,
+          source: "existing",
+        };
+      }
+
       const logo = await fetchLogo(domain, { fetchImpl, sourcesForDomain });
 
       if (logo) {
@@ -162,7 +182,7 @@ export async function fetchCompanyLogos({
         };
       }
 
-      const priorFile = existing.get(token);
+      // Fetch failed — fall back to a logo from a previous run if we have one.
       if (priorFile) {
         return {
           token,
@@ -219,5 +239,8 @@ const invokedDirectly =
   import.meta.url === pathToFileURL(process.argv[1]).href;
 
 if (invokedDirectly) {
-  reportAndExit(await fetchCompanyLogos());
+  const force = process.argv
+    .slice(2)
+    .some((arg) => arg === "--force" || arg === "-f");
+  reportAndExit(await fetchCompanyLogos({ force }));
 }
