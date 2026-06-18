@@ -43,6 +43,12 @@ export function NavigationMenu({ className }: NavigationMenuProps) {
           >
             companies
           </Link>
+          <Link
+            href="/learn-more"
+            className="text-orange-1000 transition-colors duration-200 hover:text-cream-1000"
+          >
+            learn more
+          </Link>
 
           <a
             href="https://livingkavitaloca.com"
