@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight } from "@kavita-likes-fajitas/kavita-fajita-icons";
 
 export const metadata = {
   title: "Learn More | Dammit I Gotta Get A New Job",
@@ -56,9 +57,10 @@ export default function LearnMorePage() {
                 <h3 className="text-sm font-bold uppercase tracking-tighter">
                   <Link
                     href={note.href}
-                    className="text-orange-1000 underline-offset-4 hover:underline"
+                    className="inline-flex items-center gap-2 text-orange-1000 underline-offset-4 hover:underline"
                   >
-                    {note.title} -&gt;
+                    <span>{note.title}</span>
+                    <ArrowRight className="size-4 shrink-0" aria-hidden />
                   </Link>
                 </h3>
                 <p className="mt-3 text-sm leading-relaxed text-foreground-900">

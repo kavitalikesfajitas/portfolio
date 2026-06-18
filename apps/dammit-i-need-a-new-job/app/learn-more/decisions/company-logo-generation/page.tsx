@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight } from "@kavita-likes-fajitas/kavita-fajita-icons";
 import DecisionContent from "@/docs/002-company-logo-generation.mdx";
 import { LogoDecisionPreview } from "../../components/LogoDecisionPreview";
 
@@ -14,9 +15,10 @@ export default function CompanyLogoGenerationDecisionPage() {
       <main className="flex w-full max-w-7xl flex-1 flex-col px-5 py-8 font-overpass-mono sm:px-10 sm:py-10">
         <Link
           href="/learn-more"
-          className="mb-6 text-xs font-bold uppercase tracking-tighter text-orange-1000 underline-offset-4 hover:underline"
+          className="mb-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-tighter text-orange-1000 underline-offset-4 hover:underline"
         >
-          &lt;- Back to learn more
+          <ArrowRight className="size-4 shrink-0 rotate-180" aria-hidden />
+          <span>Back to learn more</span>
         </Link>
 
         <p className="mb-3 text-xs font-bold uppercase tracking-tighter text-orange-1000">
@@ -42,9 +44,10 @@ export default function CompanyLogoGenerationDecisionPage() {
               href="https://github.com/kavitalikesfajitas/portfolio/blob/main/apps/dammit-i-need-a-new-job/scripts/fetch-company-logos.ts"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs font-bold uppercase tracking-tighter text-orange-1000 underline-offset-4 hover:underline"
+              className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-tighter text-orange-1000 underline-offset-4 hover:underline"
             >
-              Read the script -&gt;
+              <span>Read the script</span>
+              <ArrowRight className="size-4 shrink-0" aria-hidden />
             </a>
           </aside>
         </div>
