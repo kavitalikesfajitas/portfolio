@@ -19,8 +19,14 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { COMPANY_BOARD_TOKENS } from "../app/companies/companyBoards.ts";
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const outputDir = path.join(scriptDir, "..", "public", "images", "logos");
-const publicPrefix = "/images/logos";
+const defaultOutputDir = path.join(
+  scriptDir,
+  "..",
+  "public",
+  "images",
+  "logos",
+);
+const defaultPublicPrefix = "/images/logos";
 const manifestFileName = "manifest.json";
 const LOGO_FETCH_TIMEOUT_MS = 5_000;
 
@@ -62,10 +68,27 @@ export type LogoResult = {
   bytes?: number;
 };
 
-async function fetchLogo(domain: string) {
-  for (const url of sourcesFor(domain)) {
+type FetchCompanyLogosOptions = {
+  tokens?: readonly string[];
+  outputDirectory?: string;
+  publicPathPrefix?: string;
+  fetchImpl?: typeof fetch;
+  sourcesForDomain?: typeof sourcesFor;
+};
+
+async function fetchLogo(
+  domain: string,
+  {
+    fetchImpl,
+    sourcesForDomain,
+  }: {
+    fetchImpl: typeof fetch;
+    sourcesForDomain: typeof sourcesFor;
+  },
+) {
+  for (const url of sourcesForDomain(domain)) {
     try {
-      const response = await fetch(url, {
+      const response = await fetchImpl(url, {
         redirect: "follow",
         signal: AbortSignal.timeout(LOGO_FETCH_TIMEOUT_MS),
       });
@@ -94,11 +117,11 @@ async function fetchLogo(domain: string) {
   return null;
 }
 
-async function readExistingLogos() {
+async function readExistingLogos(outputDirectory: string) {
   const byToken = new Map<string, string>();
 
   try {
-    for (const entry of await readdir(outputDir)) {
+    for (const entry of await readdir(outputDirectory)) {
       if (entry === manifestFileName) {
         continue;
       }
@@ -111,23 +134,29 @@ async function readExistingLogos() {
   return byToken;
 }
 
-export async function fetchCompanyLogos(): Promise<LogoResult[]> {
-  await mkdir(outputDir, { recursive: true });
-  const existing = await readExistingLogos();
+export async function fetchCompanyLogos({
+  tokens = COMPANY_BOARD_TOKENS,
+  outputDirectory = defaultOutputDir,
+  publicPathPrefix = defaultPublicPrefix,
+  fetchImpl = fetch,
+  sourcesForDomain = sourcesFor,
+}: FetchCompanyLogosOptions = {}): Promise<LogoResult[]> {
+  await mkdir(outputDirectory, { recursive: true });
+  const existing = await readExistingLogos(outputDirectory);
 
   const results = await Promise.all(
-    COMPANY_BOARD_TOKENS.map(async (token): Promise<LogoResult> => {
+    tokens.map(async (token): Promise<LogoResult> => {
       const domain = domainFor(token);
-      const logo = await fetchLogo(domain);
+      const logo = await fetchLogo(domain, { fetchImpl, sourcesForDomain });
 
       if (logo) {
         const fileName = `${token}.${logo.extension}`;
-        await writeFile(path.join(outputDir, fileName), logo.bytes);
+        await writeFile(path.join(outputDirectory, fileName), logo.bytes);
         return {
           token,
           domain,
           ok: true,
-          path: `${publicPrefix}/${fileName}`,
+          path: `${publicPathPrefix}/${fileName}`,
           source: logo.source,
           bytes: logo.bytes.byteLength,
         };
@@ -139,7 +168,7 @@ export async function fetchCompanyLogos(): Promise<LogoResult[]> {
           token,
           domain,
           ok: true,
-          path: `${publicPrefix}/${priorFile}`,
+          path: `${publicPathPrefix}/${priorFile}`,
           source: "existing",
         };
       }
@@ -154,7 +183,7 @@ export async function fetchCompanyLogos(): Promise<LogoResult[]> {
       .map((result) => [result.token, result.path]),
   );
   await writeFile(
-    path.join(outputDir, manifestFileName),
+    path.join(outputDirectory, manifestFileName),
     `${JSON.stringify(manifest, null, 2)}\n`,
   );
 
