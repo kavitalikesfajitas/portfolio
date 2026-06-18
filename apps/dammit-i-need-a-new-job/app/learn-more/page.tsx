@@ -3,20 +3,27 @@ import { ArrowRight } from "@kavita-likes-fajitas/kavita-fajita-icons";
 
 export const metadata = {
   title: "Learn More | Dammit I Gotta Get A New Job",
-  description: "Decision notes for the Dammit job search experiment.",
+  description: "Project notes for the Dammit job search experiment.",
 };
 
 const decisionNotes = [
   {
+    title: "The Back Story",
+    href: "/learn-more/back-story",
+    label: "Article",
+    description:
+      "Why this started, why Greenhouse comes first, and why the process became worth documenting.",
+  },
+  {
     title: "Company Logo Generation",
     href: "/learn-more/decisions/company-logo-generation",
-    label: "Logos",
+    label: "Decision note",
     description: "Static assets for now; reviewed logo URLs later.",
   },
   {
     title: "Job API Decisions",
     href: "/learn-more/decisions/job-api",
-    label: "Data",
+    label: "Decision note",
     description: "Greenhouse first, department-led discovery, normalized data.",
   },
 ];
@@ -30,70 +37,23 @@ export default function LearnMorePage() {
             Learn more
           </p>
           <h1 className="text-3xl font-bold uppercase tracking-tighter text-cream-1000 sm:text-5xl">
-            Decision notes
+            Project notes
           </h1>
           <p className="mt-5 max-w-4xl text-sm leading-relaxed text-foreground-900 sm:text-base">
-            A little insight into the decisions I made along the way. This is
-            obviously a pet project, but it would be amiss to not think about
-            what would need to change if it ever had to scale.
+            A little insight into the story behind the project and the decisions
+            I made along the way. This is obviously a pet project, but it would
+            be amiss to not think about what would need to change if it ever had
+            to scale.
           </p>
-          <p className="mt-4 max-w-4xl text-xs leading-relaxed text-cream-800 sm:text-sm">
+          <p className="mt-4 max-w-4xl text-sm leading-relaxed text-cream-800 sm:text-base">
             Tiny flex: these started as docs in the repo. I repurposed them as
             MDX so the same source stays readable on GitHub and renders here in
             the site.
           </p>
         </section>
 
-        <section className="grid gap-6 border-b border-divider-1000 pb-10 lg:grid-cols-[220px_minmax(0,1fr)]">
-          <h2 className="text-lg font-bold uppercase tracking-tighter text-orange-1000 sm:text-xl">
-            The back story
-          </h2>
-          <div className="max-w-4xl space-y-5 text-sm leading-relaxed text-foreground-900 sm:text-base">
-            <p>I kept thinking there had to be a better way.</p>
-
-            <p>
-              It felt like it was getting harder and harder to sift through job
-              listings on LinkedIn. Between recommendations, sponsored posts,
-              and AI-generated suggestions, I couldn&apos;t shake the feeling
-              that I was only seeing what the algorithm wanted me to see.
-            </p>
-
-            <p>
-              Naturally, I started wondering if I could make the experience
-              better for myself. What if I pulled jobs directly from the
-              companies I actually cared about? I started exploring, with AI as
-              a thought partner, whether there were public APIs I could use to
-              source job listings or if there was another way to collect the
-              data.
-            </p>
-
-            <p>
-              At first, I was only building it for myself. But the deeper I got
-              into the problem, the more interesting it became. Eventually I
-              realized the journey was just as interesting as the solution, so I
-              decided to document it.
-            </p>
-
-            <p>
-              What makes this fun is that the APIs aren&apos;t exactly
-              plug-and-play. I can&apos;t just ask Greenhouse for every
-              engineering job on the internet. I have to think about companies,
-              boards, departments, discovery, aggregation, filtering, and all
-              the other problems that show up once you start looking at this at
-              scale.
-            </p>
-
-            <p>
-              Current status: I&apos;m digging into the Greenhouse APIs,
-              figuring out how job listings are structured, what information is
-              publicly available, and what it would actually take to aggregate
-              this data into something useful.
-            </p>
-          </div>
-        </section>
-
         <section>
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-3">
             {decisionNotes.map((note) => (
               <article
                 key={note.href}

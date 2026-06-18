@@ -19,13 +19,18 @@ export function LeftContentHero() {
           Am I seeing what&apos;s available, or am I seeing what an algorithm
           thinks I should see?
         </p>
-        <p>I wanted more control over how I discovered opportunities.</p>
         <p>
-          Between recommendations, sponsored posts, AI-generated suggestions,
-          and platform-specific filters, it felt like someone else&apos;s
-          algorithm was deciding what opportunities made it into my feed.
+          I wanted more control over how I discovered opportunities. ween
+          recommendations, sponsored posts, AI-generated suggestions, and
+          platform-specific filters, it felt like someone else&apos;s algorithm
+          was deciding what opportunities made it into my feed.
         </p>
-        <p>So I started digging.</p>
+        <p>
+          So I started digging. And started this project - this pulls live
+          listings directly from company job boards, starting with some major
+          tech names, instead of treating a platform feed as the source of
+          truth.
+        </p>
       </div>
     </div>
   );

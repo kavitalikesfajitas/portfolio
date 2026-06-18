@@ -52,7 +52,7 @@ export function InvestigationCard({
               {jobCount}
             </div>
             <div className="mt-1 text-xs text-foreground-900 sm:mt-2 sm:text-sm">
-              engineering jobs
+              live engineering jobs
             </div>
           </div>
         </div>

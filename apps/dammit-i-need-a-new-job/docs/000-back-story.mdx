@@ -1,0 +1,31 @@
+# The Back Story
+
+I kept thinking there had to be a better way.
+
+It felt like it was getting harder and harder to sift through job listings on LinkedIn. Between recommendations, sponsored posts, and AI-generated suggestions, I couldn't shake the feeling that I was only seeing what the algorithm wanted me to see.
+
+Am I seeing what's available, or am I seeing what a platform thinks I should see?
+
+I wanted more control over how I discovered opportunities. So this project pulls live listings directly from company job boards, starting with places I actually want to investigate, instead of treating a platform feed as the source of truth.
+
+Naturally, I started wondering if I could make the experience better for myself. What if I pulled jobs directly from the companies I actually cared about? I started exploring, with AI as a thought partner, whether there were public APIs I could use to source job listings or if there was another way to collect the data.
+
+At first, I was only building it for myself. But the deeper I got into the problem, the more interesting it became. Eventually I realized the journey was just as interesting as the solution, so I decided to document it.
+
+What makes this fun is that the APIs aren't exactly plug-and-play. I can't just ask Greenhouse for every engineering job on the internet. I have to think about companies, boards, departments, discovery, aggregation, filtering, and all the other problems that show up once you start looking at this at scale.
+
+## Current Scope
+
+Right now, this only works with Greenhouse.
+
+That is intentional. Greenhouse has public job board endpoints, a lot of companies use it, and it is enough surface area to learn the shape of the problem without pretending this is already a universal job search engine.
+
+The current version starts with known company board tokens, asks Greenhouse for those companies' public jobs, and uses the department data as the first way to understand what is available. That means the site can show live listings for the companies it knows about, but it is not crawling every ATS or every job board on the internet.
+
+That constraint is useful. It keeps the project small enough to reason about while still surfacing the real product questions: which companies belong here, how reliable is the upstream data, how should teams and departments be normalized, and what would need to change before adding another provider like Lever, Ashby, or Workday.
+
+## Why Document It
+
+This is obviously a pet project, but it would be amiss to not think about what would need to change if it ever had to scale.
+
+That is why the Learn More section exists. The homepage can stay focused on the working experiment. The articles and decision notes can hold the thought process: what data to trust, what should stay static, what can become dynamic later, and where a little visual polish makes the whole thing easier to scan.

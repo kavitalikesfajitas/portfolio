@@ -21,7 +21,7 @@ export function BackStory() {
           </p>
 
           <Link
-            href="/learn-more"
+            href="/learn-more/back-story"
             className="inline-flex items-center gap-2 font-bold uppercase tracking-tighter text-orange-1000 underline-offset-4 hover:underline"
           >
             <span>Read the back story</span>

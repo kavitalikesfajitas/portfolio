@@ -18,7 +18,10 @@ export function NavigationMenu({ className }: NavigationMenuProps) {
     >
       <hr className="mt-6 w-full self-center border-t border-orange-1000/80 sm:mt-8" />
       <div className="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-3 px-5 pb-2 sm:gap-x-6 sm:px-6">
-        <div className="flex items-center gap-2">
+        <Link
+          href="/"
+          className="flex items-center gap-2 transition-opacity duration-200 hover:opacity-80"
+        >
           <div className="font-overpass-mono text-xl font-bold uppercase tracking-tighter text-cream-1000 sm:text-2xl">
             DAMMIT.
           </div>
@@ -29,7 +32,7 @@ export function NavigationMenu({ className }: NavigationMenuProps) {
             quality={75}
             className="h-6 w-6 animate-pulse sm:h-8 sm:w-8"
           />
-        </div>
+        </Link>
         <div className="flex items-center gap-4 font-overpass-mono text-xs font-semibold uppercase tracking-tighter sm:gap-6">
           <Link
             href="/"
