@@ -20,7 +20,7 @@ export function LogoDecisionPreview() {
             alt={`${logo.label} logo`}
             width={72}
             height={72}
-            className="h-12 w-12 object-contain"
+            className="object-cover"
           />
         </div>
       ))}
