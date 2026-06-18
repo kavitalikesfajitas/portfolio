@@ -26,7 +26,7 @@ So the current approach is:
 3. Try public favicon/logo services.
 4. Save the first valid image to `public/images/logos`.
 5. Write a `manifest.json` that maps company token to public logo path.
-6. Reuse existing files on future builds so normal builds do not keep hitting logo services.
+6. Fall back to existing files if logo services fail so builds can still pass with committed logo assets.
 
 This is intentionally pragmatic. It answers, "How do we get logos without trying so hard?"
 
@@ -64,7 +64,7 @@ public/images/logos/manifest.json
 node scripts/fetch-company-logos.ts
 ```
 
-It is also called from `next.config.ts` when a company in `COMPANY_BOARD_TOKENS` is missing a logo on disk.
+It is also called unconditionally from `next.config.ts` during `PHASE_PRODUCTION_BUILD`.
 
 The script tries logo sources in order:
 
@@ -76,54 +76,56 @@ DuckDuckGo icon service
 
 The first successful real image wins. Tiny image payloads are rejected because they are usually placeholders or tracking pixels.
 
-Existing logo files are treated as durable enough for the current curated model. If a logo already exists and the script is not run with `--force`, the file is kept and no network request is made for that company.
+Existing logo files are treated as durable enough for the current curated model. The current script still tries the logo services first, then falls back to an existing file for that company if no fresh logo can be fetched.
 
 ## Build Cost And Scaling Numbers
 
 There are two separate costs to think about:
 
 ```txt
-The guard in next.config.ts
-The logo fetch script when the guard finds missing files
+The production-build hook in next.config.ts
+The logo fetch work inside the script
 ```
 
-### The Guard
+### The Production Build Hook
 
-The guard is effectively free.
+The hook itself is simple.
 
-`companiesMissingLogos()` does one synchronous directory read of `public/images/logos`, builds a `Set` of token names that already exist on disk, and filters `COMPANY_BOARD_TOKENS` against that set.
-
-At the current size, that means:
+During `PHASE_PRODUCTION_BUILD`, `next.config.ts` always starts the logo fetch script:
 
 ```txt
-~6-8 logo files
-~6 company tokens
-one readdirSync
-one small Set
-one small filter
+execFileSync(process.execPath, ["scripts/fetch-company-logos.ts"])
 ```
 
-That is sub-millisecond work and runs once per `next.config.ts` load: one `next build`, one `next dev` start, etc. Even with thousands of files in the logo directory, one local `readdirSync` would usually be low single-digit milliseconds. It is not the bottleneck.
+There is no current `companiesMissingLogos()` guard in `next.config.ts` that prevents the child process from starting when every curated company already has a logo on disk.
 
-The important win is that the steady state does not hit the network:
+At the current size, the fixed build-hook cost is roughly:
+
+```txt
+one production-build phase check
+one child Node process
+one script run over COMPANY_BOARD_TOKENS
+```
+
+That child-process startup is not the main bottleneck at the current curated-list size, but it is still work that happens on every production build.
+
+In this document, "steady state" means:
 
 ```txt
 All curated companies already have logo files
         ↓
-companiesMissingLogos() returns []
+next.config.ts still starts the script during PHASE_PRODUCTION_BUILD
         ↓
-No child process
-        ↓
-No logo-service network calls
+the script can fall back to committed files if fetching fails
 ```
 
-That is the whole point of the guard.
+So steady state does not mean "the script is not invoked." It means the build has durable logo files available on disk and does not have to fail just because a favicon service is flaky.
 
 ### The Fetch Path
 
-The fetch path only runs when at least one curated company is missing a logo file, or when the logo directory is absent.
+The fetch path runs on every production build.
 
-When `missing.length > 0`, `next.config.ts` blocks the build with:
+`next.config.ts` blocks the build with:
 
 ```txt
 execFileSync(process.execPath, ["scripts/fetch-company-logos.ts"])
@@ -172,18 +174,18 @@ script starts
         ↓
 script iterates all COMPANY_BOARD_TOKENS
         ↓
-existing files are kept without network calls
+the script tries to fetch fresh logos for every token
         ↓
-missing files are fetched
+existing files are used only as fallbacks when fetching fails
         ↓
 manifest.json is rewritten for the full set
 ```
 
-So adding `affirm` does not need to redownload `vercel`, `stripe`, `discord`, etc. if those files already exist. It still starts the script and walks every token so it can produce a complete manifest, but network work is limited to missing files unless `--force` is used.
+So adding `affirm` still starts the script and walks every token so it can produce a complete manifest. In the current implementation, network work is not limited to missing files; existing files are a fallback, not a pre-fetch skip.
 
 ### Scaling Cliffs
 
-The first scaling cliff is not the guard. It is the network fetch path.
+The first scaling cliff is the network fetch path.
 
 At small scale:
 
@@ -239,17 +241,17 @@ These are not benchmark numbers. They are the mental model for deciding when the
 ```txt
 Scenario                         Expected behavior
 
-6-10 companies, warm logos        basically free
+6-10 companies, warm logos        child process + network attempts, with disk fallback
 6-10 companies, 1 missing logo    child process + usually <1s network, 15s bad case
-50 companies, warm logos          still basically free
+50 companies, warm logos          still tries the favicon services for every token
 50 companies, 5 missing logos     probably okay, but third-party service risk is visible
-200 companies, warm logos         guard is still cheap, manifest is still small
+200 companies, warm logos         network fan-out is the main concern
 200 companies, 50 missing logos   too bursty with unbounded Promise.all
-1000 companies, warm logos        directory scan is still not the main issue
+1000 companies, warm logos        unbounded network attempts are the main issue
 1000 companies, cold checkout     build-time logo fetching is the wrong model
 ```
 
-The surprising part is that `1000 companies, warm logos` is much less scary than `50 companies, cold checkout`.
+The useful part of `warm logos` is resilience, not zero work.
 
 Warm means:
 
@@ -263,7 +265,7 @@ Cold means:
 many or all token logo files are absent
 ```
 
-The current architecture is optimized for warm builds. The cost of warm builds grows with local filesystem work and a tiny manifest rewrite. The cost of cold builds grows with network dependency, timeouts, and third-party service behavior.
+The current architecture is more resilient when builds are warm because existing files can be reused if fresh fetches fail. The cost still grows with network dependency, timeouts, third-party service behavior, local filesystem work, and the manifest rewrite.
 
 That distinction matters for CI. If CI has the repo logos committed, the build should be warm. If CI ever depends on generating most logos from scratch, the build becomes dependent on favicon services being fast and available at that moment.
 
@@ -291,9 +293,9 @@ Even with a cap, the build should not become the long-term place where dynamic l
 For the current seeded list, this is okay:
 
 ```txt
-build-time guard
+build-time script invocation
 static logo files
-fetch missing logos only
+disk fallback when fresh fetching fails
 fail build if a curated company has no logo
 ```
 
@@ -357,7 +359,7 @@ Potential scaling issues:
 - Build-time logo fetching couples deploy success to third-party logo services.
 - A large company list would make logo validation/generation slower and noisier.
 
-The current script mitigates some of this by reusing existing files and only fetching missing logos. That is enough for a small curated list, but not enough for a dynamic registry.
+The current script mitigates some of this by reusing existing files when fresh logo fetching fails. That is enough for a small curated list, but not enough for a dynamic registry.
 
 ## The Runtime Write Question
 

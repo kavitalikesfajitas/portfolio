@@ -9,7 +9,7 @@ const logoEntries = Object.entries(logoManifest).map(([token, src]) => ({
 
 export function LogoDecisionPreview() {
   return (
-    <div className="my-8 grid grid-cols-3 gap-3 sm:grid-cols-5">
+    <div className="my-5 grid grid-cols-3 gap-3">
       {logoEntries.map((logo) => (
         <div
           key={logo.token}
