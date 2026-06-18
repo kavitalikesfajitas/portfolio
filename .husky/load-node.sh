@@ -7,7 +7,7 @@ if ! command -v yarn >/dev/null 2>&1; then
   command -v fnm >/dev/null 2>&1 && eval "$(fnm env --use-on-cd)" 2>/dev/null  # fnm
   [ -s "$HOME/.asdf/asdf.sh" ] && \. "$HOME/.asdf/asdf.sh"              # asdf
   [ -d "$HOME/.volta/bin" ] && export PATH="$HOME/.volta/bin:$PATH"     # volta
-  for d in /opt/homebrew/bin /usr/local/bin "$HOME/.local/bin"; do      # brew/global
-    [ -d "$d" ] && export PATH="$d:$PATH"
+  for d in /opt/homebrew/bin /usr/local/bin "$HOME/.local/bin"; do      # brew/global fallback
+    [ -d "$d" ] && export PATH="$PATH:$d"
   done
 fi
