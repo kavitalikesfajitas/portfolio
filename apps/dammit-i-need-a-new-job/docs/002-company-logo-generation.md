@@ -1,0 +1,669 @@
+# Company Logo Generation
+
+This note documents the current logo-generation approach and the thinking that got us here.
+
+## Status
+
+In progress. The current approach works for the small curated company list and is intentionally low-effort. It is not the final architecture for dynamically approved companies.
+
+## The Product Question
+
+The product problem is simple:
+
+```txt
+We have a list of companies for the site.
+We want each company card/page to have a recognizable logo.
+We do not want to manually hunt for assets every time.
+We also do not want logo work to become a whole design/admin system yet.
+```
+
+The first version optimizes for the current reality: a short, owner-curated list of Greenhouse board tokens. Most tokens match the company domain (`stripe` -> `stripe.com`, `figma` -> `figma.com`), which means we can usually derive a reasonable favicon/logo candidate without asking for extra metadata.
+
+So the current approach is:
+
+1. Read `COMPANY_BOARD_TOKENS`.
+2. Derive a likely company domain for each token.
+3. Try public favicon/logo services.
+4. Save the first valid image to `public/images/logos`.
+5. Write a `manifest.json` that maps company token to public logo path.
+6. Reuse existing files on future builds so normal builds do not keep hitting logo services.
+
+This is intentionally pragmatic. It answers, "How do we get logos without trying so hard?"
+
+## The Architecture Question
+
+The deeper question is:
+
+```txt
+Where should a logo live once a company exists?
+```
+
+There is a big difference between logos for companies known at build time and logos for companies approved after deploy.
+
+For a seeded company, `public/images/logos` is a good fit. The file is part of the deployed app artifact. The build can verify it exists. The site can serve it as a normal static asset.
+
+That was the original mental model: company logos are public site assets, so the app should look in `public/*` and render stable public URLs. Nothing about this is wrong for the curated list. It is exactly what `public` is for.
+
+For a company approved after deploy, `public/images/logos` becomes a more complicated answer. It is no longer just a folder; it is part of the immutable-ish deployment output. Depending on the host/runtime, writing there after deploy may be impossible, temporary, private to one instance, or disconnected from the static asset server.
+
+That does not mean runtime writes are impossible everywhere. It means runtime writes to the app's `public` directory are not a good scaling assumption.
+
+## Current Implementation
+
+The current implementation lives in:
+
+```txt
+scripts/fetch-company-logos.ts
+next.config.ts
+public/images/logos/manifest.json
+```
+
+`fetch-company-logos.ts` can run as a CLI:
+
+```txt
+node scripts/fetch-company-logos.ts
+```
+
+It is also called from `next.config.ts` when a company in `COMPANY_BOARD_TOKENS` is missing a logo on disk.
+
+The script tries logo sources in order:
+
+```txt
+icon.horse
+Google favicon service
+DuckDuckGo icon service
+```
+
+The first successful real image wins. Tiny image payloads are rejected because they are usually placeholders or tracking pixels.
+
+Existing logo files are treated as durable enough for the current curated model. If a logo already exists and the script is not run with `--force`, the file is kept and no network request is made for that company.
+
+## Build Cost And Scaling Numbers
+
+There are two separate costs to think about:
+
+```txt
+The guard in next.config.ts
+The logo fetch script when the guard finds missing files
+```
+
+### The Guard
+
+The guard is effectively free.
+
+`companiesMissingLogos()` does one synchronous directory read of `public/images/logos`, builds a `Set` of token names that already exist on disk, and filters `COMPANY_BOARD_TOKENS` against that set.
+
+At the current size, that means:
+
+```txt
+~6-8 logo files
+~6 company tokens
+one readdirSync
+one small Set
+one small filter
+```
+
+That is sub-millisecond work and runs once per `next.config.ts` load: one `next build`, one `next dev` start, etc. Even with thousands of files in the logo directory, one local `readdirSync` would usually be low single-digit milliseconds. It is not the bottleneck.
+
+The important win is that the steady state does not hit the network:
+
+```txt
+All curated companies already have logo files
+        ↓
+companiesMissingLogos() returns []
+        ↓
+No child process
+        ↓
+No logo-service network calls
+```
+
+That is the whole point of the guard.
+
+### The Fetch Path
+
+The fetch path only runs when at least one curated company is missing a logo file, or when the logo directory is absent.
+
+When `missing.length > 0`, `next.config.ts` blocks the build with:
+
+```txt
+execFileSync(process.execPath, ["scripts/fetch-company-logos.ts"])
+```
+
+That cost has a few pieces:
+
+- starting a Node process, roughly `100-300ms`
+- reading existing logo files
+- resolving candidate domains
+- network-fetching missing logos
+- writing logo files and `manifest.json`
+
+For each company that actually needs a network fetch, the script tries up to three sources sequentially:
+
+```txt
+icon.horse                       5s timeout
+Google favicon service           5s timeout
+DuckDuckGo icon service          5s timeout
+```
+
+Worst case for one missing company is therefore roughly `15s` of timeout waiting.
+
+The script processes tokens with `Promise.all`, so the wall-clock worst case is closer to the slowest missing company's timeout chain, not `15s * numberOfCompanies`.
+
+For example:
+
+```txt
+1 missing company, all sources timeout       ~15s worst case
+5 missing companies, all sources timeout     ~15s wall-clock worst case
+50 missing companies, all sources timeout    still ~15s in theory, but risky
+```
+
+The "in theory" matters. With many companies, unbounded concurrency can open many simultaneous connections and make rate limiting, DNS, and transient network failures more likely.
+
+In normal successful cases, the fetch path should be much faster than the timeout ceiling. If `icon.horse` or another early source responds quickly, a missing company can resolve in well under a second.
+
+### What Happens When One Company Is Missing
+
+The current code is better than a true "refetch everything" flow:
+
+```txt
+next.config.ts notices at least one missing logo
+        ↓
+script starts
+        ↓
+script iterates all COMPANY_BOARD_TOKENS
+        ↓
+existing files are kept without network calls
+        ↓
+missing files are fetched
+        ↓
+manifest.json is rewritten for the full set
+```
+
+So adding `affirm` does not need to redownload `vercel`, `stripe`, `discord`, etc. if those files already exist. It still starts the script and walks every token so it can produce a complete manifest, but network work is limited to missing files unless `--force` is used.
+
+### Scaling Cliffs
+
+The first scaling cliff is not the guard. It is the network fetch path.
+
+At small scale:
+
+```txt
+6 companies
+1 missing logo
+normal response times
+```
+
+This is fine.
+
+At medium scale:
+
+```txt
+50 companies
+5 missing logos
+normal response times
+```
+
+Still probably fine, but the approval/build flow starts depending more visibly on third-party favicon services.
+
+At larger scale:
+
+```txt
+100-200 companies
+many missing logos
+unbounded Promise.all
+3 sources per missing company
+```
+
+This is where the approach becomes noisy. It can create bursts of outbound requests, trip service limits, and make failed sources dominate build time.
+
+The cheap improvement, if the curated list grows, is to pass only missing tokens to the script:
+
+```txt
+next.config.ts computes missing tokens
+        ↓
+node scripts/fetch-company-logos.ts affirm notion linear
+        ↓
+script fetches only those tokens
+        ↓
+manifest is rebuilt from existing files + new files
+```
+
+A second improvement is adding a concurrency limit. For example, fetch at most `5-10` missing logos at a time instead of using unbounded `Promise.all`.
+
+Those optimizations are not necessary for the current tiny curated list, but they are the obvious path if this remains build-time tooling for a larger seed set.
+
+### Back-Of-The-Envelope Scale Model
+
+These are not benchmark numbers. They are the mental model for deciding when the current approach is still fine versus when it starts asking too much from the build.
+
+```txt
+Scenario                         Expected behavior
+
+6-10 companies, warm logos        basically free
+6-10 companies, 1 missing logo    child process + usually <1s network, 15s bad case
+50 companies, warm logos          still basically free
+50 companies, 5 missing logos     probably okay, but third-party service risk is visible
+200 companies, warm logos         guard is still cheap, manifest is still small
+200 companies, 50 missing logos   too bursty with unbounded Promise.all
+1000 companies, warm logos        directory scan is still not the main issue
+1000 companies, cold checkout     build-time logo fetching is the wrong model
+```
+
+The surprising part is that `1000 companies, warm logos` is much less scary than `50 companies, cold checkout`.
+
+Warm means:
+
+```txt
+every token already has a logo file on disk
+```
+
+Cold means:
+
+```txt
+many or all token logo files are absent
+```
+
+The current architecture is optimized for warm builds. The cost of warm builds grows with local filesystem work and a tiny manifest rewrite. The cost of cold builds grows with network dependency, timeouts, and third-party service behavior.
+
+That distinction matters for CI. If CI has the repo logos committed, the build should be warm. If CI ever depends on generating most logos from scratch, the build becomes dependent on favicon services being fast and available at that moment.
+
+### When To Change It
+
+There are a few practical thresholds where the implementation should change:
+
+- If adding one company noticeably slows CI, pass the missing tokens into the script instead of asking the script to inspect every token.
+- If we regularly add batches of companies, add a concurrency limit before the list gets large.
+- If the approved-company path becomes dynamic, move logo resolution out of the build and into approval time.
+- If logo quality matters more than "recognizable enough," add manual review/override before publishing.
+
+A reasonable concurrency cap would be small:
+
+```txt
+5 concurrent logo fetches      conservative and plenty for approvals
+10 concurrent logo fetches     still reasonable for batch seeding
+50+ concurrent logo fetches    probably unnecessary pressure on flaky services
+```
+
+Even with a cap, the build should not become the long-term place where dynamic logos are discovered. A cap makes the seed tooling calmer. It does not solve the product goal of approving companies without a redeploy.
+
+### Scale Conclusion
+
+For the current seeded list, this is okay:
+
+```txt
+build-time guard
+static logo files
+fetch missing logos only
+fail build if a curated company has no logo
+```
+
+For a larger curated list, this needs small tooling improvements:
+
+```txt
+pass missing tokens to the CLI
+limit fetch concurrency
+keep committed logo files warm in CI
+```
+
+For dynamic companies, this should become an approval-time workflow:
+
+```txt
+resolve candidates once
+review or override
+store the chosen logo in S3/Blob/etc.
+store logoUrl in Edge Config
+render the stored URL
+```
+
+## Why This Works Right Now
+
+This works for the current site because:
+
+- The company list is small.
+- The list is code-owned and reviewed.
+- Logos are generated only for missing companies.
+- Existing logo files live in `public/images/logos`.
+- The build can fail if a newly added curated company has no logo.
+
+That last point is useful today. If someone adds a company to the curated list, the build should not silently ship a broken logo state.
+
+The current build flow is intentionally conservative:
+
+```txt
+Company is added to code
+        ↓
+Build notices logo is missing
+        ↓
+Build fetches or reuses logo
+        ↓
+Build fails if no logo exists
+        ↓
+Published app has a complete static manifest
+```
+
+That is the right amount of pressure for a curated seed list. If the owner chose a company in code, the build should make sure the visual asset story is complete.
+
+## Where This Starts To Bend
+
+This approach starts to bend when company additions become dynamic.
+
+Potential scaling issues:
+
+- A company approved after deploy should not require a redeploy just to publish a logo.
+- Runtime writes into `public/images/logos` may be possible in some environments, but they are not portable or reliably durable across serverless/immutable deploys.
+- Public favicon services can be flaky, rate-limited, or return low-quality images.
+- A Greenhouse board token does not always map cleanly to a company domain.
+- Some logos need manual correction or override.
+- Build-time logo fetching couples deploy success to third-party logo services.
+- A large company list would make logo validation/generation slower and noisier.
+
+The current script mitigates some of this by reusing existing files and only fetching missing logos. That is enough for a small curated list, but not enough for a dynamic registry.
+
+## The Runtime Write Question
+
+It is tempting to say, "when a company is approved, just write the logo into `public/images/logos`." That is worth thinking through carefully.
+
+There are three different operations that sound similar but behave differently:
+
+```txt
+Write to the repo before deploy
+Write to the deployed app filesystem after deploy
+Write to an external asset store after deploy
+```
+
+### Writing To The Repo Before Deploy
+
+This is what the current seeded-company workflow effectively does.
+
+```txt
+Add token to COMPANY_BOARD_TOKENS
+        ↓
+Fetch logo into public/images/logos
+        ↓
+Commit or build with logo present
+        ↓
+Deploy app artifact
+```
+
+This is reliable because the asset becomes part of the build output. The app can serve it as a normal static file.
+
+The tradeoff is that it requires code/build participation. That is fine for seeded companies, but it does not solve the "approve without redeploy" goal.
+
+### Writing To The Deployed App Filesystem
+
+This is the tricky path.
+
+On a long-lived Node server, a process can technically write files to local disk. If that same server is configured to serve those files, this can appear to work.
+
+But for a Next app deployed to common modern hosting targets, relying on that is fragile:
+
+- Serverless functions may have ephemeral filesystems.
+- A written file may disappear on the next invocation or deployment.
+- Multiple instances would not share the same local write.
+- The static asset layer may never see the written file.
+- Preview and production deployments could drift.
+- The app artifact starts behaving like mutable storage, which is not what it is best at.
+
+So the precise position is not "`public` is bad." The precise position is:
+
+```txt
+Writing to public/images/logos after deploy may be technically possible in
+some runtimes, but it is not a durable, portable, or scalable storage model.
+```
+
+That is why this note does not treat runtime writes to `public` as the dynamic-company solution.
+
+### Writing To An External Asset Store
+
+This is the better dynamic model.
+
+```txt
+Company approved after deploy
+        ↓
+Logo resolved or uploaded
+        ↓
+Logo stored in durable asset storage
+        ↓
+Approved company record stores logoUrl
+        ↓
+Pages render logoUrl
+```
+
+This works because the logo lifecycle is no longer tied to the Next deployment artifact. The approved registry can change independently, and the logo asset can change independently.
+
+## Storage Options For Dynamic Logos
+
+### Option 1: Keep Using `public/images/logos`
+
+Use this for seeded companies.
+
+This is the current source of truth for code-reviewed companies. If the company is in the repo, the logo can be in the repo. The app reads a public path and does not need to care how the file was originally found.
+
+Pros:
+
+- Simple.
+- Fast.
+- Works with normal static asset serving.
+- Easy to inspect in the repo.
+- Good for a short curated list.
+
+Cons:
+
+- Requires redeploy to add/change assets reliably.
+- Does not fit post-deploy approvals.
+- Build-time logo fetching can couple deploys to third-party favicon services.
+
+Verdict: keep for seed data, not for dynamic approvals.
+
+### Option 2: S3 Bucket
+
+Upload reviewed dynamic logos to S3 and store the S3 or CloudFront URL as `logoUrl`.
+
+```txt
+Approval action
+        ↓
+Upload logo to S3
+        ↓
+Store CloudFront URL in Edge Config
+        ↓
+Render remote logo URL
+```
+
+Pros:
+
+- Durable.
+- Portable.
+- Cheap.
+- Works well with CloudFront caching.
+- Does not depend on the Next deployment filesystem.
+- Fits the existing AWS/infra direction if we want to own the asset path.
+
+Cons:
+
+- Requires bucket policy/CORS/CDN decisions.
+- Requires upload credentials in the approval path.
+- Needs cleanup behavior if logos are replaced or companies are removed.
+- Slightly more infrastructure than Vercel-native storage.
+
+This is a strong option if we want explicit ownership over logo storage.
+
+### Option 3: Vercel Blob
+
+Upload reviewed dynamic logos to Vercel Blob and store the Blob URL as `logoUrl`.
+
+Pros:
+
+- Vercel-native.
+- Simple mental model for a Vercel-hosted Next app.
+- Avoids custom S3/CloudFront setup.
+- Good fit for small dynamic asset volume.
+
+Cons:
+
+- Vendor-specific.
+- May be less aligned if the rest of the portfolio infra lives in AWS.
+- Still needs an approval/upload path.
+
+This is a strong option if we want the least custom infrastructure.
+
+### Option 4: Cloudinary Or Similar Media Service
+
+Upload or reference logos through a media service.
+
+Pros:
+
+- Image transformations and optimization.
+- Good UI/tools for manual asset work.
+- Easy logo replacement.
+
+Cons:
+
+- Another SaaS dependency.
+- Overkill if logos are small and rarely changed.
+
+This is reasonable if logo quality/manual curation becomes more important.
+
+## Logo Resolution At Approval Time
+
+The current resolver still has value in the dynamic model. It just moves earlier in the workflow.
+
+Instead of:
+
+```txt
+Render page
+        ↓
+Figure out logo
+```
+
+or:
+
+```txt
+Build app
+        ↓
+Figure out every logo
+```
+
+the dynamic flow should be:
+
+```txt
+Approve company
+        ↓
+Resolve logo candidates
+        ↓
+Owner chooses or overrides
+        ↓
+Persist final logo asset
+        ↓
+Persist logoUrl with approved company
+```
+
+This keeps page rendering boring. Pages should not call favicon services. Pages should not upload files. Pages should only read a stable `logoUrl`.
+
+The approval UI can show:
+
+- the derived domain
+- logo candidates from icon services
+- existing static logo if one exists
+- an upload/override option
+- the final URL that will be stored
+
+This also gives the owner a chance to reject bad auto-detected logos before the company becomes public.
+
+## Future Dynamic Registry Model
+
+The dynamic company registry RFC proposes Vercel Edge Config as the first approved-company registry. Logo generation should follow the same approval boundary:
+
+```txt
+User requests company
+        ↓
+Server validates Greenhouse board token
+        ↓
+Logo candidates are resolved
+        ↓
+Owner reviews or overrides logo
+        ↓
+Final logo is stored in durable asset storage
+        ↓
+Approved company record stores logoUrl
+```
+
+In that future model, pages should not fetch logos during render and builds should not be responsible for dynamic company logos.
+
+Instead, an approved company record should include:
+
+```ts
+type ApprovedCompany = {
+  identifier: string;
+  provider: "greenhouse";
+  boardToken: string;
+  displayName: string;
+  logoUrl: string;
+};
+```
+
+Seeded companies can keep using static files under `public/images/logos`. Dynamically approved companies should use durable runtime asset storage such as:
+
+- Vercel Blob
+- S3
+- Cloudinary
+- another small asset store
+
+Edge Config should store the reference, not the binary asset:
+
+```txt
+Edge Config: company metadata + logoUrl
+S3/Blob/etc: actual logo bytes
+```
+
+That separation matters. Edge Config is good for fast, small config reads. It is not the place to store image binaries.
+
+The approval workflow should write the final `logoUrl` into the approved company registry.
+
+## Recommended First Step
+
+Keep the current script for seeded companies.
+
+When the dynamic company registry starts:
+
+1. Reuse the existing logo resolver as an approval-time helper.
+2. Do not run dynamic logo generation during page render.
+3. Do not rely on writing to `public/images/logos` after deploy.
+4. Store reviewed dynamic logos in durable asset storage.
+5. Store the final `logoUrl` in Edge Config with the approved company record.
+
+This keeps the current build simple while creating a path to dynamic approvals.
+
+The first dynamic implementation does not need to solve every logo problem. A reasonable first cut is:
+
+1. Keep seeded logos in `public/images/logos`.
+2. For Edge Config companies, require `logoUrl`.
+3. Generate logo candidates in the approval workflow.
+4. Store the chosen logo in S3 or Vercel Blob.
+5. Save the final remote URL in Edge Config.
+
+That gives the app two supported logo sources:
+
+```txt
+Seeded company      -> static public logo path
+Approved company    -> remote reviewed logoUrl
+```
+
+The page components should not care which source produced the URL.
+
+## Open Questions
+
+- Should a company be approvable before a logo is reviewed?
+- Should the app allow a manual logo upload/override in the first dynamic version?
+- Should logo candidates be previewed in an owner-only approval UI?
+- Which durable asset store should back dynamic logos?
+- Should static seeded logos eventually move into the same asset store as dynamic logos?
+- If using S3, should logos be public bucket URLs or CloudFront URLs?
+- What cache headers should dynamic logos get?
+- Should replacing a logo trigger path revalidation for `/companies` and `/companies/[identifier]`?
+- Should the approval flow preserve source attribution for auto-detected logos?
+
+## Decision For Now
+
+The current build-time logo generation is acceptable for the curated seed list. It is not the scaling model for approved dynamic companies.
+
+For dynamic additions, logo resolution should move to approval time, and the page should only consume a stored `logoUrl`.
