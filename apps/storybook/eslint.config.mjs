@@ -1,4 +1,4 @@
-import reactLibraryEslintConfig from "@kavita-likes-fajitas/eslint-config/react-library.mjs";
+import reactLibraryEslintConfig from "@kavita-likes-fajitas/eslint-config/react-library";
 
 /** @type {import("eslint").Linter.Config[]} */
 const eslintConfig = [
