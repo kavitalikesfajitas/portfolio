@@ -1,4 +1,4 @@
-import HeroImage from "@/public/images/work/thumbnails/dammit.svg";
+import HeroImage from "@/public/images/work/thumbnails/dammit.png";
 
 export const metadata = {
   title: "Job Discovery API",
@@ -65,7 +65,7 @@ Departments and jobs are deliberately **separate endpoints**. They answer differ
 
 The core hypothesis: company-provided departments can reduce the search space _before_ you inspect every job. Greenhouse's `/departments` endpoint returns department groupings with nested jobs, which lets the app ask "which departments look engineering-related?" before fetching or rendering a larger flat list.
 
-So `/departments` is the first-class discovery request — cheap, public, and cacheable — while `/jobs?content=true` is reserved for richer detail views.
+So `/departments` is the first-class discovery request — cheap, public, and cacheable — while `/jobs` is retained as a protected supporting route for future search/detail work. It intentionally does not request `content=true`; full job descriptions stay out of scope until there is a product surface that renders them.
 
 ### Validate at the Boundary with Zod
 
@@ -84,7 +84,7 @@ type NormalizedJob = {
 };
 ```
 
-When normalizing nested jobs from `/departments`, the containing department is injected only when it isn't already present, and department references are deduped by Greenhouse department id so the same department never appears twice.
+When normalizing nested jobs from `/departments`, the containing department is injected only when it isn't already present, and department references are deduped by Greenhouse department id so the same department never appears twice. The company detail page then renders an engineering-only view from those department-nested jobs, dedupes jobs that appear in multiple engineering departments, and lets the browser filter the already-loaded rows.
 
 ### Department Classification — a Signal Layer, Not a Rename
 
@@ -110,22 +110,56 @@ The heuristic is _allowed_ to be imperfect. The product question isn't "is this 
 
 Caching happens at two layers, tuned to how often each thing actually changes:
 
-| Resource    | Cache strategy                        | Why                              |
-| ----------- | ------------------------------------- | -------------------------------- |
-| Departments | fetch `revalidate: 86400` + route ISR | Org structure changes rarely     |
-| Jobs        | fetch `revalidate: 900`               | Listings open/close/update often |
+<div className="my-4 overflow-x-auto md:my-6">
+  <table className="w-full border-collapse text-left text-xs md:text-sm">
+    <thead>
+      <tr>
+        <th className="border-b border-gray-700 bg-gray-800/50 px-3 py-2 font-semibold text-white md:px-4 md:py-3">
+          Resource
+        </th>
+        <th className="border-b border-gray-700 bg-gray-800/50 px-3 py-2 font-semibold text-white md:px-4 md:py-3">
+          Cache strategy
+        </th>
+        <th className="border-b border-gray-700 bg-gray-800/50 px-3 py-2 font-semibold text-white md:px-4 md:py-3">
+          Why
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          Departments
+        </td>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          <code>fetch</code> <code>revalidate: 86400</code> + route ISR
+        </td>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          Org structure changes rarely
+        </td>
+      </tr>
+      <tr>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          Jobs
+        </td>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          <code>fetch</code> <code>revalidate: 900</code>, protected route
+          response is <code>private, no-store</code>
+        </td>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          Listings open/close/update often
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 ```ts
 fetch(url, { next: { revalidate: seconds } });
 ```
 
-The public departments route also sets a CDN header so most visitors hit a cached response instead of triggering a fresh upstream call:
+The public departments route leans on Next's ISR instead of hand-rolling `Cache-Control`: it exports `dynamic = "force-static"` and `revalidate = 86400`, so Next owns the generated cache headers and regeneration behavior. The protected jobs route is different because it reads headers and query params; its response is `private, no-store` with `Vary: x-api-key`, while the server-side Greenhouse fetch underneath can still revalidate for `900` seconds.
 
-```txt
-Cache-Control: public, s-maxage=86400, stale-while-revalidate=3600
-```
-
-Company pages use **ISR** rather than making React Query the primary data source. The page shell stays cacheable and server-rendered; React Query is reserved for browser-owned interactive islands. The departments proxy is public (it's the cheap discovery request); the more expensive jobs proxy requires an `x-api-key` outside development — kept server-only, never sent from the browser, because the underlying Greenhouse data is public and caching solves the performance concern more directly.
+Company pages use **ISR** rather than making React Query the primary data source. The page shell stays cacheable and server-rendered; React Query is reserved for browser-owned interactive islands. The current company page renders from the department-first Greenhouse response and filters the delivered rows in the browser. The departments proxy is public (it's the cheap discovery request); the jobs proxy requires an `x-api-key` outside development — kept server-only, never sent from the browser.
 
 ### Hardening the Upstream Calls
 
@@ -147,12 +181,13 @@ export const COMPANY_BOARD_TOKENS = [
   "discord",
   "figma",
   "datadog",
+  "affirm",
 ] as const;
 ```
 
 This single constant doubles as the route identifier, the Greenhouse board token, the input to `generateStaticParams`, and the input to the build-time logo fetch. At a handful of curated companies, prebuilding every page at build time is the right fit — it's free and fully static.
 
-But it has a clear **pivot point**: the build scales linearly with the list (each company does two Greenhouse fetches plus a logo fetch at build time), and `dynamicParams = false` means a new company 404s until the next deploy. That's correct while the list is curated in code, and a dealbreaker the moment companies should be added from a database or admin UI.
+But it has a clear **pivot point**: the build scales linearly with the list. Each company detail page prerenders from one Greenhouse departments fetch, and the logo guard only runs the logo script when a curated company is missing a committed logo file or manifest entry. At a handful of companies this is fine; at hundreds the page build can still become slow and couple deploy success to Greenhouse being healthy at build time. `dynamicParams = false` means a new company 404s until the next deploy. That's correct while the list is curated in code, and a dealbreaker the moment companies should be added from a database or admin UI.
 
 So the next architectural step is documented as an RFC: a **runtime source registry** backed by Vercel Edge Config. Instead of "available companies," the model becomes "available sources":
 
@@ -188,7 +223,7 @@ Greenhouse is the first adapter. Lever and Ashby slot in behind the same interfa
 - **Greenhouse job board data, normalized** behind a clean internal shape with full Zod validation at the boundary
 - **Department-first discovery** that narrows the search space before rendering a flat job list
 - **Typo-tolerant department classification** via an explicit, reviewable app-owned taxonomy — not a black-box model
-- **Two-tier caching** (long for departments, short for jobs) keeping the app fast and cheap on Vercel Hobby
+- **Two-tier caching** (long for department-first rendering, short for the protected jobs proxy's upstream fetch) keeping the app fast and cheap on Vercel Hobby
 - **A documented adapter + registry path** so a second and third provider don't require rewriting the app
 
 ---
@@ -203,7 +238,7 @@ These are the right calls for an MVP, and worth naming explicitly:
 
 ⚠️ **No persistence yet** — jobs aren't stored, so there's no history, diffing, or analytics. That's a feature for now: less to operate, and the ATS stays the single source of truth.
 
-⚠️ **Server-side filtering, not search** — `?term=engineer` inspects normalized titles. It's one place to evolve matching logic, not a full search engine.
+⚠️ **Browser filtering, not search** — company pages filter the already-loaded engineering jobs by title, location, and team. The retained jobs API still accepts `?term=engineer` against normalized titles, but the current rendered UI does not call it.
 
 ---
 

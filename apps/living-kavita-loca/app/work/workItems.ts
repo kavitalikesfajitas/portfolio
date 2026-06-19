@@ -18,6 +18,10 @@ export const WORK_ITEMS = [
     slug: "pr-deploy-previews",
     title: "PR Deploy Previews",
   },
+  {
+    slug: "job-discovery-api",
+    title: "Job Discovery API",
+  },
 ] as const;
 
 export type WorkItem = (typeof WORK_ITEMS)[number];
