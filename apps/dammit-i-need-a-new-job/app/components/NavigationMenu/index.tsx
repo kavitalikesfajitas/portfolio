@@ -48,16 +48,16 @@ export function NavigationMenu({ className }: NavigationMenuProps) {
           </Link>
           <Link
             href="/learn-more"
-            className="text-orange-1000 transition-colors duration-200 hover:text-cream-1000"
+            className="text-orange-1000 transition-colors duration-200 hover:text-cream-1000 text-nowrap"
           >
             learn more
           </Link>
 
           <a
             href="https://livingkavitaloca.com"
-            className="font-overpass-mono text-xs font-semibold uppercase tracking-tighter text-cream-800 underline transition-colors duration-200 hover:text-orange-1000"
+            className="font-overpass-mono text-xs font-semibold uppercase tracking-tighter text-cream-800 text-nowrap underline transition-colors duration-200 hover:text-orange-1000"
           >
-            created by kavita chaudhry
+            made by kavita
           </a>
         </div>
       </div>
