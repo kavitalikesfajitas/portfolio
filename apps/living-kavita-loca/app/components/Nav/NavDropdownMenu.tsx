@@ -35,6 +35,10 @@ export function NavDropdownMenu() {
             </DropdownMenuLink>
           ))}
           <DropdownMenuSeparator />
+          <DropdownMenuLabel className="text-sm md:text-base">
+            Websites
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
           <DropdownMenuExternalLink
             href="https://dammitigottagetanewjob.com/"
             className="text-sm md:text-base"

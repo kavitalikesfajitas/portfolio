@@ -20,7 +20,7 @@ export const WORK_ITEMS = [
   },
   {
     slug: "job-discovery-api",
-    title: "Job Discovery API",
+    title: "Gotta Get A New Job - API Discovery",
   },
 ] as const;
 
