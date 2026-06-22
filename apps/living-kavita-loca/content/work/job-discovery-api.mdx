@@ -1,0 +1,253 @@
+import HeroImage from "@/public/images/work/thumbnails/dammit.png";
+
+export const metadata = {
+  title: "Job Discovery API",
+  heroImage: HeroImage,
+  role: "Full-Stack Engineer / Architect",
+  tech: [
+    "Next.js",
+    "TypeScript",
+    "Zod",
+    "Fuse.js",
+    "React Query",
+    "Vercel",
+    "Greenhouse API",
+  ],
+};
+
+# Job Discovery API
+
+**Role:** Full-Stack Engineer / Architect  
+**Tech Stack:** Next.js · TypeScript · Zod · Fuse.js · React Query · Vercel · Greenhouse Job Board API
+
+---
+
+## Overview
+
+This is the data layer behind [_Dammit, I Need a New Job_](https://dammitigottagetanewjob.com/) — a satirical side project that's secretly an excuse to experiment with a better way to discover engineering roles.
+
+The premise is simple: most job boards bury good listings under duplicates, sponsored posts, and stale openings. But the companies themselves already publish clean, structured, public job data through their applicant tracking systems (ATS) — Greenhouse, Lever, Ashby. So instead of scraping a job board, this fetches directly from the source, validates it, normalizes it into a stable internal shape, and uses company-provided _departments_ as a signal to narrow the search space before you ever look at a flat list of titles.
+
+The current MVP is Greenhouse-only and runs entirely inside the Next.js app — no database, no background sync, no search engine. The interesting engineering is in the boundaries: how external payloads get validated, how noisy department labels get classified, and how the whole thing stays fast and nearly free on Vercel's Hobby tier.
+
+## The Challenge
+
+Aggregating job data sounds like "just call an API," but the real problems show up immediately:
+
+- **Every provider is different.** A Greenhouse board token is not a Lever site is not an Ashby org. Their payloads don't share shapes, and pretending they do leaks provider quirks into every page.
+- **External payloads lie.** Public ATS APIs are an external contract that can change without warning. Trusting them unguarded means runtime crashes deep inside rendering.
+- **Department names are noisy, not canonical.** "Engineering" doesn't mean the same thing at every company, and labels like `1133 EMEA Sales Development Reps` carry cost-center codes, regions, and abbreviations. They're useful as a signal, useless as a taxonomy.
+- **It has to be cheap.** This is a side project on a Hobby plan. Every page render that hammers an upstream API at request time is a cost and a reliability risk.
+
+The goal was a small, well-bounded data layer that treats the ATS as the live source of truth, validates everything at the edge, and leaves room to add providers later without rewriting the app.
+
+---
+
+## Solution Architecture
+
+### Provider-Specific Proxy Routes
+
+Rather than one generic endpoint, the API uses provider-namespaced proxy routes. This keeps room for Lever and Ashby without pretending their identifiers or payloads match Greenhouse:
+
+```txt
+app/api/v1/departments/[provider]/[identifier]
+app/api/v1/jobs/[provider]/[identifier]
+```
+
+```txt
+/api/v1/departments/greenhouse/vercel
+/api/v1/jobs/greenhouse/vercel?term=engineer
+```
+
+Departments and jobs are deliberately **separate endpoints**. They answer different product questions and have different cache profiles, so collapsing them into one route would force a single caching policy onto two very different access patterns.
+
+### Departments-First Discovery
+
+The core hypothesis: company-provided departments can reduce the search space _before_ you inspect every job. Greenhouse's `/departments` endpoint returns department groupings with nested jobs, which lets the app ask "which departments look engineering-related?" before fetching or rendering a larger flat list.
+
+So `/departments` is the first-class discovery request — cheap, public, and cacheable — while `/jobs` is retained as a protected supporting route for future search/detail work. It intentionally does not request `content=true`; full job descriptions stay out of scope until there is a product surface that renders them.
+
+### Validate at the Boundary with Zod
+
+Greenhouse payloads are an external contract, so they get validated with Zod before anything else touches them, then normalized into an internal shape with stable field names that still preserves enough upstream identifiers to debug and link back to the source.
+
+```ts
+type NormalizedJob = {
+  id: string;
+  provider: JobSourceProvider;
+  companyName: string | null;
+  title: string;
+  absoluteUrl: string;
+  location: string | null;
+  departments: string[];
+  updatedAt: string | null;
+};
+```
+
+When normalizing nested jobs from `/departments`, the containing department is injected only when it isn't already present, and department references are deduped by Greenhouse department id so the same department never appears twice. The company detail page then renders an engineering-only view from those department-nested jobs, dedupes jobs that appear in multiple engineering departments, and lets the browser filter the already-loaded rows.
+
+### Department Classification — a Signal Layer, Not a Rename
+
+The trick with noisy department labels is to **add signals without destroying the source data.** The upstream `name` stays untouched; a parallel `signals` object carries the cleaned-up interpretation:
+
+```txt
+name                          // untouched upstream label
+signals.normalizedName        // cleaned for matching/display
+signals.category              // coarse, app-owned taxonomy
+signals.categoryConfidence
+signals.categoryMatchedTerms
+signals.likelyEngineering
+```
+
+Classification runs against a small, explicit, **app-owned taxonomy** (`engineering`, `product`, `design`, `data`, `security`, `sales`, … `unspecified`) using [Fuse.js](https://www.fusejs.io/) for typo-tolerant fuzzy matching. Two deliberate constraints keep it honest:
+
+- Fuse.js is a **fuzzy matcher, not a semantic classifier.** Low-confidence or unmatched labels stay `unspecified` rather than being force-fit into a category.
+- Broad words like `platform`, `data`, and `security` are **not** treated as engineering on their own — at a company like Stripe they show up in sales, analytics, and security org names too. Only explicit terms (`engineering`, `engineer`, `eng`, `software`, `infrastructure`, `r&d`) drive the engineering category.
+
+The heuristic is _allowed_ to be imperfect. The product question isn't "is this taxonomy correct" — it's "does this reduce the search space enough to be useful."
+
+### Caching and Rendering
+
+Caching happens at two layers, tuned to how often each thing actually changes:
+
+<div className="my-4 overflow-x-auto md:my-6">
+  <table className="w-full border-collapse text-left text-xs md:text-sm">
+    <thead>
+      <tr>
+        <th className="border-b border-gray-700 bg-gray-800/50 px-3 py-2 font-semibold text-white md:px-4 md:py-3">
+          Resource
+        </th>
+        <th className="border-b border-gray-700 bg-gray-800/50 px-3 py-2 font-semibold text-white md:px-4 md:py-3">
+          Cache strategy
+        </th>
+        <th className="border-b border-gray-700 bg-gray-800/50 px-3 py-2 font-semibold text-white md:px-4 md:py-3">
+          Why
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          Departments
+        </td>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          <code>fetch</code> <code>revalidate: 86400</code> + route ISR
+        </td>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          Org structure changes rarely
+        </td>
+      </tr>
+      <tr>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          Jobs
+        </td>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          <code>fetch</code> <code>revalidate: 900</code>, protected route
+          response is <code>private, no-store</code>
+        </td>
+        <td className="border-b border-gray-800 px-3 py-2 text-gray-300 md:px-4 md:py-3">
+          Listings open/close/update often
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+```ts
+fetch(url, { next: { revalidate: seconds } });
+```
+
+The public departments route leans on Next's ISR instead of hand-rolling `Cache-Control`: it exports `dynamic = "force-static"` and `revalidate = 86400`, so Next owns the generated cache headers and regeneration behavior. The protected jobs route is different because it reads headers and query params; its response is `private, no-store` with `Vary: x-api-key`, while the server-side Greenhouse fetch underneath can still revalidate for `900` seconds.
+
+Company pages use **ISR** rather than making React Query the primary data source. The page shell stays cacheable and server-rendered; React Query is reserved for browser-owned interactive islands. The current company page renders from the department-first Greenhouse response and filters the delivered rows in the browser. The departments proxy is public (it's the cheap discovery request); the jobs proxy requires an `x-api-key` outside development — kept server-only, never sent from the browser.
+
+### Hardening the Upstream Calls
+
+A few small things keep a flaky upstream from taking down a page render:
+
+- Greenhouse board tokens are **percent-encoded** before going into request paths, so reserved URL characters can't break the upstream request.
+- Every Greenhouse fetch uses an **abort timeout** — if the API doesn't respond in time, the client throws instead of hanging the proxy indefinitely.
+
+---
+
+## Designing for the Next Provider
+
+The MVP's company list is code-owned, and that's intentional:
+
+```ts
+export const COMPANY_BOARD_TOKENS = [
+  "vercel",
+  "stripe",
+  "discord",
+  "figma",
+  "datadog",
+  "affirm",
+] as const;
+```
+
+This single constant doubles as the route identifier, the Greenhouse board token, the input to `generateStaticParams`, and the input to the build-time logo fetch. At a handful of curated companies, prebuilding every page at build time is the right fit — it's free and fully static.
+
+But it has a clear **pivot point**: the build scales linearly with the list. Each company detail page prerenders from one Greenhouse departments fetch, and the logo guard only runs the logo script when a curated company is missing a committed logo file or manifest entry. At a handful of companies this is fine; at hundreds the page build can still become slow and couple deploy success to Greenhouse being healthy at build time. `dynamicParams = false` means a new company 404s until the next deploy. That's correct while the list is curated in code, and a dealbreaker the moment companies should be added from a database or admin UI.
+
+So the next architectural step is documented as an RFC: a **runtime source registry** backed by Vercel Edge Config. Instead of "available companies," the model becomes "available sources":
+
+```ts
+type JobSourceProvider = "greenhouse" | "lever" | "ashby";
+
+type JobSource = {
+  provider: JobSourceProvider;
+  identifier: string;
+  displayName?: string;
+  enabled: boolean;
+};
+```
+
+The registry stores **sources, not listings** — the ATS stays the source of truth for jobs. Edge Config fits because reads are frequent, writes are rare, records are tiny, and adding a source doesn't require a redeploy. Company detail pages flip to `dynamicParams = true` (lazy ISR), so post-deploy sources render on first request while build-time known sources stay prewarmed.
+
+A provider **adapter interface** keeps provider quirks out of page logic:
+
+```ts
+type JobProviderAdapter = {
+  validateSource: (identifier: string) => Promise<boolean>;
+  fetchJobs: (identifier: string) => Promise<NormalizedJob[]>;
+  fetchDepartments?: (identifier: string) => Promise<NormalizedDepartment[]>;
+};
+```
+
+Greenhouse is the first adapter. Lever and Ashby slot in behind the same interface once the registry stops assuming every identifier is a Greenhouse board token. And there's a deliberate ceiling: Edge Config stays the home for lean source config, and the design only moves to Postgres when it needs _application_ data — source notes, audit history, per-source credentials, analytics, multiple sources per company.
+
+---
+
+## Results
+
+- **Greenhouse job board data, normalized** behind a clean internal shape with full Zod validation at the boundary
+- **Department-first discovery** that narrows the search space before rendering a flat job list
+- **Typo-tolerant department classification** via an explicit, reviewable app-owned taxonomy — not a black-box model
+- **Two-tier caching** (long for department-first rendering, short for the protected jobs proxy's upstream fetch) keeping the app fast and cheap on Vercel Hobby
+- **A documented adapter + registry path** so a second and third provider don't require rewriting the app
+
+---
+
+## Tradeoffs
+
+These are the right calls for an MVP, and worth naming explicitly:
+
+⚠️ **Heuristic, not canonical** — department classification is intentionally fuzzy. It's a search-space reducer, not a claim about how any company organizes work.
+
+⚠️ **Code-owned company list** — adding a company means a code change and redeploy today. Acceptable while the list is small and curated; the registry RFC is the planned exit.
+
+⚠️ **No persistence yet** — jobs aren't stored, so there's no history, diffing, or analytics. That's a feature for now: less to operate, and the ATS stays the single source of truth.
+
+⚠️ **Browser filtering, not search** — company pages filter the already-loaded engineering jobs by title, location, and team. The retained jobs API still accepts `?term=engineer` against normalized titles, but the current rendered UI does not call it.
+
+---
+
+## Future Enhancements
+
+- **Lever and Ashby adapters** behind the existing provider interface
+- **Runtime source registry** on Edge Config, with a protected admin mutation to add sources without a deploy
+- **Postgres** if and when source metadata, audit history, or analytics outgrow configuration storage
+
+---
+
+_Built as part of [dammitigottagetanewjob.com](https://dammitigottagetanewjob.com/), 2026._
