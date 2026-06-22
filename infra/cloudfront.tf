@@ -1,12 +1,13 @@
 # CloudFront Origin Access Control for S3
-# Note: Currently using legacy OAI - uncomment and update after import if needed
-# resource "aws_cloudfront_origin_access_control" "main" {
-#   name                              = "s3-oac-${var.bucket_name}"
-#   description                       = "OAC for ${var.bucket_name}"
-#   origin_access_control_origin_type = "s3"
-#   signing_behavior                  = "always"
-#   signing_protocol                  = "sigv4"
-# }
+# OAC uses IAM SigV4 signing, replacing the legacy OAI approach.
+# This keeps the S3 bucket fully private while allowing CloudFront access.
+resource "aws_cloudfront_origin_access_control" "main" {
+  name                              = "s3-oac-${var.bucket_name}"
+  description                       = "OAC for ${var.bucket_name}"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
+}
 
 # CloudFront Function to append index.html to directory requests.
 # S3 (via OAI) doesn't auto-resolve /path/ to /path/index.html like S3 website hosting does.
@@ -52,12 +53,9 @@ resource "aws_cloudfront_distribution" "main" {
   price_class         = "PriceClass_All"
 
   origin {
-    domain_name = aws_s3_bucket.site.bucket_regional_domain_name
-    origin_id   = "${var.bucket_name}.s3.us-east-1.amazonaws.com"
-
-    s3_origin_config {
-      origin_access_identity = "origin-access-identity/cloudfront/EKE9IL6S8DPXC"
-    }
+    domain_name              = aws_s3_bucket.site.bucket_regional_domain_name
+    origin_id                = "${var.bucket_name}.s3.us-east-1.amazonaws.com"
+    origin_access_control_id = aws_cloudfront_origin_access_control.main.id
   }
 
   default_cache_behavior {
@@ -82,7 +80,7 @@ resource "aws_cloudfront_distribution" "main" {
     error_caching_min_ttl = 60
   }
 
-  # S3 returns 403 for missing objects when using OAI
+  # S3 returns 403 for missing objects when using OAC
   custom_error_response {
     error_code            = 403
     response_code         = 404
@@ -108,22 +106,26 @@ resource "aws_cloudfront_distribution" "main" {
   }
 }
 
-# S3 bucket policy to allow CloudFront OAI access
+# S3 bucket policy to allow CloudFront OAC access
 resource "aws_s3_bucket_policy" "site" {
   bucket = aws_s3_bucket.site.id
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Id      = "Policy1639076644274"
     Statement = [
       {
-        Sid    = "2"
+        Sid    = "AllowCloudFrontServicePrincipalReadOnly"
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity EKE9IL6S8DPXC"
+          Service = "cloudfront.amazonaws.com"
         }
         Action   = "s3:GetObject"
         Resource = "${aws_s3_bucket.site.arn}/*"
+        Condition = {
+          StringEquals = {
+            "AWS:SourceArn" = aws_cloudfront_distribution.main.arn
+          }
+        }
       }
     ]
   })

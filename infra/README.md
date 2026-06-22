@@ -31,7 +31,7 @@ This Terraform configuration manages the complete infrastructure for the livingk
 │  + CF Function (URI rewrite)  │
 └──────┬────────────────────────┘
        │
-       │ Origin Access Identity (OAI)
+       │ Origin Access Control (OAC / SigV4)
        ▼
 ┌─────────────────────┐
 │    S3 Bucket        │
@@ -189,7 +189,7 @@ dig TXT livingkavitaloca.com
 
 ### CloudFront 403/404 Errors
 
-1. Verify S3 bucket policy allows CloudFront OAI access
+1. Verify S3 bucket policy allows CloudFront OAC access
 2. Check files exist in S3 bucket
 3. Verify CloudFront origin configuration
 4. Check CloudFront distribution status
@@ -274,7 +274,7 @@ The only trade-off is needing a small [CloudFront Function](https://docs.aws.ama
 
 **Production:**
 
-- **S3 Bucket**: Private access only via CloudFront Origin Access Identity (OAI)
+- **S3 Bucket**: Private access only via CloudFront Origin Access Control (OAC) with IAM SigV4 signing. All public access is blocked.
 - **HTTPS**: Enforced via CloudFront with ACM certificate
 - **GitHub Actions**: OIDC authentication (no long-lived credentials)
 - **IAM**: Least-privilege access with scoped permissions
