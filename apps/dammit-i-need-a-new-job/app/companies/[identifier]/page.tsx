@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { fetchGreenhouseDepartments } from "@/lib/jobs/providers/greenhouse/client";
+import { getCompanyDepartmentEnrichment } from "@/lib/jobs/department-enrichment-store";
 import { COMPANY_BOARD_TOKENS } from "../companyBoards";
 import { formatCompanyName } from "../utils";
 
@@ -22,7 +23,10 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
 
   const departmentsResponse = await fetchGreenhouseDepartments(identifier);
   const { jobs, departmentOptions, totalEngineeringJobs } =
-    buildCompanyJobsView(departmentsResponse.departments);
+    buildCompanyJobsView(
+      departmentsResponse.departments,
+      getCompanyDepartmentEnrichment(identifier),
+    );
 
   return (
     <div className="flex flex-col flex-1 items-center justify-start bg-neutral-950 text-cream-1000">

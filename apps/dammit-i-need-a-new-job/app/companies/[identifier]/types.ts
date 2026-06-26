@@ -4,6 +4,7 @@ export type CompanyJob = {
   absoluteUrl: string;
   location: string | null;
   departments: string[];
+  searchTerms: string[];
   updatedAt: string;
 };
 

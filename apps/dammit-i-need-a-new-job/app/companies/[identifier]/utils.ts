@@ -4,6 +4,7 @@ import {
   type NormalizedJob,
   normalizeGreenhouseDepartments,
 } from "@/lib/jobs/providers/greenhouse/normalize";
+import type { DepartmentEnrichmentById } from "@/lib/jobs/department-enrichment";
 import type { GreenhouseDepartment } from "@/lib/jobs/providers/greenhouse/schema";
 
 export const arrayIncludesSome: FilterFn<CompanyJob> = (
@@ -36,9 +37,12 @@ export const globalJobSearch: FilterFn<CompanyJob> = (
 
   const job = row.original;
 
-  return [job.title, job.location ?? "", ...job.departments].some((value) =>
-    value.toLowerCase().includes(query),
-  );
+  return [
+    job.title,
+    job.location ?? "",
+    ...job.departments,
+    ...job.searchTerms,
+  ].some((value) => value.toLowerCase().includes(query));
 };
 
 export function formatUpdatedLabel(updatedAt: string) {
@@ -70,6 +74,22 @@ export function formatTeamName(name: string) {
 
 function uniqueValues<T>(values: T[]) {
   return [...new Set(values)];
+}
+
+function enrichmentSearchTerms(
+  department: GreenhouseDepartment,
+  enrichment: DepartmentEnrichmentById[string] | undefined,
+) {
+  if (!enrichment) {
+    return [];
+  }
+
+  return [
+    department.name,
+    enrichment.displayName,
+    enrichment.category,
+    ...enrichment.aliases,
+  ];
 }
 
 function mergeDepartmentJobs(jobs: NormalizedJob[]) {
@@ -116,7 +136,10 @@ export function normalizeEngineeringDepartments(
 // Builds the engineering-only view the detail page renders: the job list (each
 // job tagged with the engineering teams it belongs to) plus the team filter
 // options. Jobs with no engineering team are dropped.
-export function buildCompanyJobsView(departments: GreenhouseDepartment[]): {
+export function buildCompanyJobsView(
+  departments: GreenhouseDepartment[],
+  enrichmentById: DepartmentEnrichmentById | undefined = {},
+): {
   jobs: CompanyJob[];
   departmentOptions: DepartmentFilterOption[];
   totalEngineeringJobs: number;
@@ -125,25 +148,47 @@ export function buildCompanyJobsView(departments: GreenhouseDepartment[]): {
   const engineeringDepartmentNameById = new Map(
     engineeringDepartments.map((department) => [
       department.id,
-      formatTeamName(department.signals.normalizedName),
+      enrichmentById[String(department.id)]?.displayName ??
+        formatTeamName(department.signals.normalizedName),
     ]),
+  );
+  const rawDepartmentById = new Map(
+    departments.map((department) => [department.id, department]),
   );
 
   const jobs = mergeDepartmentJobs(
     engineeringDepartments.flatMap((department) => department.jobs),
   )
-    .map((job) => ({
-      id: job.id,
-      title: job.title,
-      absoluteUrl: job.absoluteUrl,
-      location: job.location,
-      departments: uniqueValues(
-        job.departments
-          .map((department) => engineeringDepartmentNameById.get(department.id))
-          .filter((name): name is string => name !== undefined),
-      ),
-      updatedAt: job.updatedAt,
-    }))
+    .map((job) => {
+      const searchTerms = job.departments.flatMap((department) =>
+        enrichmentSearchTerms(
+          rawDepartmentById.get(department.id) ?? {
+            id: department.id,
+            name: department.name,
+            parent_id: department.parentId,
+            child_ids: department.childIds,
+            jobs: [],
+          },
+          enrichmentById[String(department.id)],
+        ),
+      );
+
+      return {
+        id: job.id,
+        title: job.title,
+        absoluteUrl: job.absoluteUrl,
+        location: job.location,
+        departments: uniqueValues(
+          job.departments
+            .map((department) =>
+              engineeringDepartmentNameById.get(department.id),
+            )
+            .filter((name): name is string => name !== undefined),
+        ),
+        searchTerms: uniqueValues(searchTerms),
+        updatedAt: job.updatedAt,
+      };
+    })
     .filter((job) => job.departments.length > 0)
     // updatedAt is already canonical ISO 8601 UTC (see normalizeTimestamp), so a
     // lexicographic compare sorts chronologically without parsing a Date per
@@ -153,8 +198,10 @@ export function buildCompanyJobsView(departments: GreenhouseDepartment[]): {
     );
 
   const departmentOptions = uniqueValues(
-    engineeringDepartments.map((department) =>
-      formatTeamName(department.signals.normalizedName),
+    engineeringDepartments.map(
+      (department) =>
+        enrichmentById[String(department.id)]?.displayName ??
+        formatTeamName(department.signals.normalizedName),
     ),
   )
     .map((name) => ({

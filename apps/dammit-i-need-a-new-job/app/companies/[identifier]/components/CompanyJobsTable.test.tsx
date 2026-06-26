@@ -21,6 +21,7 @@ function makeJobs(count: number): CompanyJob[] {
     absoluteUrl: `https://example.com/jobs/${index + 1}`,
     location: "Remote",
     departments: ["Team 1"],
+    searchTerms: [],
     updatedAt: "2026-06-01T00:00:00.000Z",
   }));
 }
@@ -114,6 +115,45 @@ describe("given a <CompanyJobsTable>", () => {
     expect(screen.getByRole("heading", { name: "Job 25" })).toBeVisible();
     expect(
       screen.queryByRole("button", { name: /Load/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  test("it filters jobs using enrichment search terms", () => {
+    render(
+      <CompanyJobsTable
+        jobs={[
+          {
+            id: "job-1",
+            title: "Software Engineer",
+            absoluteUrl: "https://example.com/jobs/1",
+            location: "Remote",
+            departments: ["Payins"],
+            searchTerms: ["payments", "money movement"],
+            updatedAt: "2026-06-01T00:00:00.000Z",
+          },
+          {
+            id: "job-2",
+            title: "Infrastructure Engineer",
+            absoluteUrl: "https://example.com/jobs/2",
+            location: "Remote",
+            departments: ["Infrastructure"],
+            searchTerms: [],
+            updatedAt: "2026-06-01T00:00:00.000Z",
+          },
+        ]}
+        departmentOptions={departmentOptions}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText(/Search jobs/), {
+      target: { value: "money movement" },
+    });
+
+    expect(
+      screen.getByRole("heading", { name: "Software Engineer" }),
+    ).toBeVisible();
+    expect(
+      screen.queryByRole("heading", { name: "Infrastructure Engineer" }),
     ).not.toBeInTheDocument();
   });
 });

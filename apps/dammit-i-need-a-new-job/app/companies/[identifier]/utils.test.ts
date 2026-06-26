@@ -52,11 +52,13 @@ describe("buildCompanyJobsView", () => {
         id: "greenhouse:101",
         title: "Product Engineer",
         departments: ["Engineering"],
+        searchTerms: [],
       }),
       expect.objectContaining({
         id: "greenhouse:102",
         title: "Infrastructure Engineer",
         departments: ["Engineering"],
+        searchTerms: [],
       }),
     ]);
   });
@@ -87,6 +89,44 @@ describe("buildCompanyJobsView", () => {
       expect.objectContaining({
         id: "greenhouse:101",
         departments: ["Engineering", "Infrastructure Engineering"],
+        searchTerms: [],
+      }),
+    ]);
+  });
+
+  it("uses provided enrichment for display names and search terms", () => {
+    const departments: GreenhouseDepartment[] = [
+      {
+        id: 1,
+        name: "Payins - Eng",
+        parent_id: null,
+        child_ids: [],
+        jobs: [makeJob(101, "Software Engineer")],
+      },
+    ];
+
+    const view = buildCompanyJobsView(departments, {
+      "1": {
+        displayName: "Payins",
+        category: "engineering",
+        aliases: ["payments", "money movement"],
+        confidence: "high",
+        reasoning: "Stripe team name with engineering suffix.",
+      },
+    });
+
+    expect(view.departmentOptions).toEqual([{ name: "Payins", count: 1 }]);
+    expect(view.jobs).toEqual([
+      expect.objectContaining({
+        id: "greenhouse:101",
+        departments: ["Payins"],
+        searchTerms: [
+          "Payins - Eng",
+          "Payins",
+          "engineering",
+          "payments",
+          "money movement",
+        ],
       }),
     ]);
   });
