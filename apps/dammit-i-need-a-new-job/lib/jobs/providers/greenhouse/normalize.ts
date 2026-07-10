@@ -56,8 +56,8 @@ const DEPARTMENT_MATCH_THRESHOLD = 0.3;
 
 export type NormalizedJob = {
   id: string;
-  provider: "greenhouse";
-  providerJobId: number;
+  provider: "ashby" | "greenhouse";
+  providerJobId: number | string;
   internalJobId: number | null;
   title: string;
   location: string | null;
@@ -102,11 +102,11 @@ export type NormalizedDepartment = {
 // Greenhouse fields come straight from each company's ATS, so they arrive with
 // trailing whitespace and double spaces. Collapse runs of whitespace to a
 // single space and trim the ends.
-function normalizeWhitespace(value: string) {
+export function normalizeWhitespace(value: string) {
   return value.replace(/\s+/g, " ").trim();
 }
 
-function normalizeDepartmentName(name: string) {
+export function normalizeDepartmentName(name: string) {
   return normalizeWhitespace(
     name.replace(/^\d+\s+/, "").replace(/\s+\[[^\]]+\]$/, ""),
   );
@@ -122,7 +122,7 @@ const TEXT_PLACEHOLDERS = new Set([
   "na",
 ]);
 
-function normalizeFreeText(value: string | null | undefined) {
+export function normalizeFreeText(value: string | null | undefined) {
   if (value == null) {
     return null;
   }
@@ -138,7 +138,7 @@ function normalizeFreeText(value: string | null | undefined) {
 
 // Greenhouse timestamps arrive with mixed UTC offsets (-04:00, -05:00, ...).
 // Collapse them to canonical ISO 8601 UTC so they sort and compare correctly.
-function normalizeTimestamp(value: string | null | undefined) {
+export function normalizeTimestamp(value: string | null | undefined) {
   if (value == null) {
     return null;
   }
@@ -148,7 +148,7 @@ function normalizeTimestamp(value: string | null | undefined) {
   return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
 }
 
-function findMatchingTerms(name: string, terms: readonly string[]) {
+export function findMatchingTerms(name: string, terms: readonly string[]) {
   const normalizedName = name.toLowerCase();
   const departmentNameFuse = new Fuse([{ name }], {
     keys: ["name"],
@@ -175,7 +175,7 @@ function findMatchingTerms(name: string, terms: readonly string[]) {
   });
 }
 
-function classifyDepartment(name: string) {
+export function classifyDepartment(name: string) {
   const normalizedName = normalizeDepartmentName(name);
   const matches = Object.entries(DEPARTMENT_CATEGORY_TERMS)
     .map(([category, terms]) => ({

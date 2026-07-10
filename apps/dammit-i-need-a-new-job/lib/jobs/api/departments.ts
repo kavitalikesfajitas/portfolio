@@ -1,7 +1,7 @@
 import type { NormalizedDepartment } from "@/lib/jobs/providers/greenhouse/normalize";
 
 export type DepartmentsApiResponse = {
-  provider: "greenhouse";
+  provider: "ashby" | "greenhouse";
   identifier: string;
   resource: "departments";
   endpoint: "departments";

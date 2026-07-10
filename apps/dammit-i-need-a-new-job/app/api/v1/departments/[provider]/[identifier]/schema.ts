@@ -1,7 +1,8 @@
 import { z } from "zod";
+import { JOB_PROVIDER_IDS } from "@/lib/jobs/providers";
 
 export const departmentsRouteParamsSchema = z.object({
-  provider: z.enum(["greenhouse"]),
+  provider: z.enum(JOB_PROVIDER_IDS),
   identifier: z
     .string()
     .trim()

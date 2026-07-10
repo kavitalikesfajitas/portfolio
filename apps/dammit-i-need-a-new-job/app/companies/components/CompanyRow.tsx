@@ -1,20 +1,19 @@
-import { fetchGreenhouseDepartments } from "@/lib/jobs/providers/greenhouse/client";
-import { normalizeGreenhouseDepartments } from "@/lib/jobs/providers/greenhouse/normalize";
+import { JOB_PROVIDERS } from "@/lib/jobs/providers";
 import logoManifest from "@/public/images/logos/manifest.json";
-import { formatCompanyName, formatUpdatedLabel } from "../utils";
+import type { CompanyBoard } from "../companyBoards";
+import { formatUpdatedLabel } from "../utils";
 
 const MAX_VISIBLE_DEPARTMENTS = 3;
 
 // Maps board token -> public logo path, populated by `pnpm logos`.
 const logos = logoManifest as Record<string, string>;
 
-//TODO: run through this logo
-export async function getCompanyRow(boardToken: string) {
+export async function getCompanyRow(board: CompanyBoard) {
   try {
-    const response = await fetchGreenhouseDepartments(boardToken);
-    const engineeringDepartments = normalizeGreenhouseDepartments(
-      response.departments,
-    )
+    const { departments } = await JOB_PROVIDERS[
+      board.provider
+    ].fetchDepartments(board.identifier);
+    const engineeringDepartments = departments
       .filter(
         (department) =>
           department.signals.likelyEngineering && department.jobCount > 0,
@@ -38,9 +37,9 @@ export async function getCompanyRow(boardToken: string) {
     );
 
     return {
-      companyName: formatCompanyName(boardToken),
-      logoSrc: logos[boardToken] ?? null,
-      href: `/companies/${boardToken}`,
+      companyName: board.name,
+      logoSrc: logos[board.slug] ?? null,
+      href: `/companies/${board.slug}`,
       updatedLabel: formatUpdatedLabel(latestUpdatedAt),
       engineeringDepartmentCount: engineeringDepartments.length,
       engineeringJobCount: engineeringJobIds.size,
@@ -57,7 +56,7 @@ export async function getCompanyRow(boardToken: string) {
     };
   } catch (error) {
     console.error(
-      `Unable to load Greenhouse departments for ${boardToken}`,
+      `Unable to load ${board.provider} departments for ${board.identifier}`,
       error,
     );
     return null;

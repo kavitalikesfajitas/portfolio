@@ -1,10 +1,9 @@
 import type { FilterFn } from "@tanstack/react-table";
 import type { CompanyJob, DepartmentFilterOption } from "./types";
-import {
-  type NormalizedJob,
-  normalizeGreenhouseDepartments,
+import type {
+  NormalizedDepartment,
+  NormalizedJob,
 } from "@/lib/jobs/providers/greenhouse/normalize";
-import type { GreenhouseDepartment } from "@/lib/jobs/providers/greenhouse/schema";
 
 export const arrayIncludesSome: FilterFn<CompanyJob> = (
   row,
@@ -103,9 +102,9 @@ function mergeDepartmentJobs(jobs: NormalizedJob[]) {
 // Same engineering-department definition as the companies list page, so the
 // detail page surfaces the exact teams shown on each company card.
 export function normalizeEngineeringDepartments(
-  departments: GreenhouseDepartment[],
+  departments: NormalizedDepartment[],
 ) {
-  return normalizeGreenhouseDepartments(departments)
+  return departments
     .filter(
       (department) =>
         department.signals.likelyEngineering && department.jobCount > 0,
@@ -116,7 +115,7 @@ export function normalizeEngineeringDepartments(
 // Builds the engineering-only view the detail page renders: the job list (each
 // job tagged with the engineering teams it belongs to) plus the team filter
 // options. Jobs with no engineering team are dropped.
-export function buildCompanyJobsView(departments: GreenhouseDepartment[]): {
+export function buildCompanyJobsView(departments: NormalizedDepartment[]): {
   jobs: CompanyJob[];
   departmentOptions: DepartmentFilterOption[];
   totalEngineeringJobs: number;

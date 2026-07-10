@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { fetchGreenhouseDepartments } from "@/lib/jobs/providers/greenhouse/client";
-import { COMPANY_BOARD_TOKENS } from "../companyBoards";
-import { formatCompanyName } from "../utils";
+import { notFound } from "next/navigation";
+import { JOB_PROVIDERS } from "@/lib/jobs/providers";
+import { COMPANY_BOARDS, getCompanyBoard } from "../companyBoards";
 
 import { CompanyJobsTable } from "./components/CompanyJobsTable";
 import { buildCompanyJobsView } from "./utils";
@@ -14,15 +14,22 @@ export const dynamicParams = false;
 export const revalidate = 900;
 
 export function generateStaticParams() {
-  return COMPANY_BOARD_TOKENS.map((identifier) => ({ identifier }));
+  return COMPANY_BOARDS.map((board) => ({ identifier: board.slug }));
 }
 
 export default async function CompanyPage({ params }: CompanyPageProps) {
   const { identifier } = await params;
+  const board = getCompanyBoard(identifier);
 
-  const departmentsResponse = await fetchGreenhouseDepartments(identifier);
+  if (!board) {
+    notFound();
+  }
+
+  const { departments } = await JOB_PROVIDERS[board.provider].fetchDepartments(
+    board.identifier,
+  );
   const { jobs, departmentOptions, totalEngineeringJobs } =
-    buildCompanyJobsView(departmentsResponse.departments);
+    buildCompanyJobsView(departments);
 
   return (
     <div className="flex flex-col flex-1 items-center justify-start bg-neutral-950 text-cream-1000">
@@ -32,7 +39,7 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
             <div>
               <div className="flex items-center gap-2 md:gap-3">
                 <h1 className="text-2xl font-extrabold text-cream-1000 md:text-4xl">
-                  {formatCompanyName(identifier)}
+                  {board.name}
                 </h1>
                 <span className="size-1.5 rounded-full bg-green-500 md:size-2" />
               </div>
