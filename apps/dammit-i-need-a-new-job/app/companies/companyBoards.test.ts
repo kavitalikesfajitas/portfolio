@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import logoManifest from "@/public/images/logos/manifest.json";
-import { COMPANY_BOARDS } from "./companyBoards";
+import { COMPANY_BOARD_LIST, getCompanyBoard } from "./companyBoards";
 
 const publicDir = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -12,11 +12,20 @@ const publicDir = path.resolve(
   "public",
 );
 const logos = logoManifest as Record<string, string>;
-const boardsWithLogos = COMPANY_BOARDS.filter(
+const boardsWithLogos = COMPANY_BOARD_LIST.filter(
   (board) => board.provider === "greenhouse",
 );
 
 describe("company logos", () => {
+  it("resolves company route slugs case-insensitively", () => {
+    expect(getCompanyBoard("ASHBY")).toMatchObject({
+      slug: "ashby",
+      provider: "ashby",
+      identifier: "ashby",
+      name: "Ashby",
+    });
+  });
+
   it.each(boardsWithLogos)(
     "has a logo entry in the manifest for $slug",
     (board) => {

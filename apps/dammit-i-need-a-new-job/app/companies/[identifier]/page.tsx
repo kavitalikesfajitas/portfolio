@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { JOB_PROVIDERS } from "@/lib/jobs/providers";
-import { COMPANY_BOARDS, getCompanyBoard } from "../companyBoards";
+import { COMPANY_BOARD_LIST, getCompanyBoard } from "../companyBoards";
 
 import { CompanyJobsTable } from "./components/CompanyJobsTable";
 import { buildCompanyJobsView } from "./utils";
@@ -14,7 +14,7 @@ export const dynamicParams = false;
 export const revalidate = 900;
 
 export function generateStaticParams() {
-  return COMPANY_BOARDS.map((board) => ({ identifier: board.slug }));
+  return COMPANY_BOARD_LIST.map((board) => ({ identifier: board.slug }));
 }
 
 export default async function CompanyPage({ params }: CompanyPageProps) {

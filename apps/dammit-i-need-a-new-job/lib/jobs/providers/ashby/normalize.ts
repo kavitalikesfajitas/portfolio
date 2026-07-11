@@ -60,12 +60,11 @@ export function normalizeAshbyJobs(jobs: AshbyJob[]): NormalizedJob[] {
       title: normalizeWhitespace(job.title),
       location: normalizeFreeText(job.location),
       absoluteUrl,
-      updatedAt:
-        normalizeTimestamp(job.publishedDate) ?? job.publishedDate ?? "",
+      updatedAt: normalizeTimestamp(job.publishedAt) ?? job.publishedAt ?? "",
       requisitionId: null,
       language: null,
       companyName: null,
-      firstPublishedAt: normalizeTimestamp(job.publishedDate),
+      firstPublishedAt: normalizeTimestamp(job.publishedAt),
       departments: [
         {
           id: departmentId,

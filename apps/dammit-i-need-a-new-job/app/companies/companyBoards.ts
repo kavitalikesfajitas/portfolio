@@ -7,32 +7,61 @@ export type CompanyBoard = {
   name: string;
 };
 
-function greenhouseBoard(identifier: string): CompanyBoard {
+function normalizeBoardSlug(value: string) {
+  return value.trim().toLowerCase();
+}
+
+function formatCompanyName(slug: string) {
+  return slug.charAt(0).toUpperCase() + slug.slice(1);
+}
+
+function companyBoard(
+  provider: CompanyBoardProvider,
+  slug: string,
+  options: Partial<Pick<CompanyBoard, "identifier" | "name">> = {},
+): CompanyBoard {
+  const normalizedSlug = normalizeBoardSlug(slug);
+  const identifier = normalizeBoardSlug(options.identifier ?? slug);
+
   return {
-    slug: identifier,
-    provider: "greenhouse",
+    slug: normalizedSlug,
+    provider,
     identifier,
-    name: identifier.charAt(0).toUpperCase() + identifier.slice(1),
+    name: options.name ?? formatCompanyName(normalizedSlug),
   };
 }
 
-export const COMPANY_BOARDS = [
-  greenhouseBoard("vercel"),
-  greenhouseBoard("stripe"),
-  greenhouseBoard("discord"),
-  greenhouseBoard("figma"),
-  greenhouseBoard("datadog"),
-  greenhouseBoard("affirm"),
-  {
-    slug: "ashby",
-    provider: "ashby",
-    identifier: "ashby",
-    name: "Ashby",
-  },
-] as const satisfies readonly CompanyBoard[];
+function greenhouseBoard(
+  slug: string,
+  options?: Partial<Pick<CompanyBoard, "identifier" | "name">>,
+) {
+  return companyBoard("greenhouse", slug, options);
+}
 
-export const COMPANY_BOARD_TOKENS = COMPANY_BOARDS.map((board) => board.slug);
+function ashbyBoard(
+  slug: string,
+  options?: Partial<Pick<CompanyBoard, "identifier" | "name">>,
+) {
+  return companyBoard("ashby", slug, options);
+}
+
+// Keyed by slug so lookups are O(1) and the slug can't drift from its entry.
+// Enumeration is derived below (COMPANY_BOARD_LIST / COMPANY_BOARD_TOKENS).
+export const COMPANY_BOARDS = {
+  vercel: greenhouseBoard("vercel"),
+  stripe: greenhouseBoard("stripe"),
+  discord: greenhouseBoard("discord"),
+  figma: greenhouseBoard("figma"),
+  datadog: greenhouseBoard("datadog"),
+  affirm: greenhouseBoard("affirm"),
+  ashby: ashbyBoard("ashby"),
+} as const satisfies Record<string, CompanyBoard>;
+
+export type CompanyBoardSlug = keyof typeof COMPANY_BOARDS;
+
+export const COMPANY_BOARD_LIST = Object.values(COMPANY_BOARDS);
+export const COMPANY_BOARD_TOKENS = Object.keys(COMPANY_BOARDS);
 
 export function getCompanyBoard(slug: string) {
-  return COMPANY_BOARDS.find((board) => board.slug === slug) ?? null;
+  return COMPANY_BOARDS[normalizeBoardSlug(slug) as CompanyBoardSlug] ?? null;
 }

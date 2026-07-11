@@ -7,7 +7,7 @@ export const ashbyJobSchema = z
     department: z.string().nullable().optional(),
     team: z.string().nullable().optional(),
     location: z.string().nullable().optional(),
-    publishedDate: z.string().nullable().optional(),
+    publishedAt: z.string().nullable().optional(),
     isListed: z.boolean().optional(),
     jobUrl: z.url().optional(),
     applyUrl: z.url().optional(),

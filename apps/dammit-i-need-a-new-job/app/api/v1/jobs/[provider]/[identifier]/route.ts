@@ -28,7 +28,6 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
     Object.fromEntries(request.nextUrl.searchParams),
   );
 
-  console.log({ parsedQuery });
   if (!parsedQuery.success) {
     return NextResponse.json({ error: "Invalid query" }, { status: 400 });
   }

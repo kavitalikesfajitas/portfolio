@@ -6,11 +6,7 @@ import { InvestigationCard } from "./InvestigationCard";
 const FEATURED_COMPANIES = ["vercel", "stripe", "discord", "figma"] as const;
 
 export async function InvestigationPanel() {
-  const featuredBoards = COMPANY_BOARDS.filter((board) =>
-    FEATURED_COMPANIES.includes(
-      board.slug as (typeof FEATURED_COMPANIES)[number],
-    ),
-  );
+  const featuredBoards = FEATURED_COMPANIES.map((slug) => COMPANY_BOARDS[slug]);
   const investigations = (
     await Promise.all(
       featuredBoards.map(async (board) => {

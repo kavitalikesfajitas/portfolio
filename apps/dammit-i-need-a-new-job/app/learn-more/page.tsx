@@ -13,6 +13,12 @@ const articles = [
     description:
       "Why this started, why Greenhouse comes first, and why the process became worth documenting.",
   },
+  {
+    title: "When a Map Becomes a Database",
+    href: "/learn-more/scaling",
+    description:
+      "The small map-vs-list refactor and the big database question are the same instinct at two scales.",
+  },
 ];
 
 const decisionNotes = [

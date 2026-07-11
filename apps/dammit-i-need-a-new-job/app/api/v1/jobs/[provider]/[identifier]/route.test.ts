@@ -96,7 +96,7 @@ describe("jobs route", () => {
           title: "Product Engineer",
           team: "Engineering",
           location: "Remote",
-          publishedDate: "2026-06-01T00:00:00.000Z",
+          publishedAt: "2026-06-01T00:00:00.000Z",
           jobUrl: "https://jobs.ashbyhq.com/acme/job_123",
         },
       ],
