@@ -85,6 +85,33 @@ describe("fetchCompanyLogos", () => {
     ).resolves.toBe('{\n  "stripe": "/images/logos/stripe.png"\n}\n');
   });
 
+  test("uses logo domains from company board config", async () => {
+    const outputDirectory = await makeTempLogoDir();
+    const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(imageResponse());
+
+    const results = await fetchCompanyLogos({
+      boards: [{ slug: "ashby", logoDomain: "ashbyhq.com" }],
+      outputDirectory,
+      fetchImpl,
+      sourcesForDomain: (domain: string) => [`https://logos.example/${domain}`],
+    });
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      "https://logos.example/ashbyhq.com",
+      expect.any(Object),
+    );
+    expect(results).toEqual([
+      {
+        token: "ashby",
+        domain: "ashbyhq.com",
+        ok: true,
+        path: "/images/logos/ashby.png",
+        source: "logos.example",
+        bytes: 128,
+      },
+    ]);
+  });
+
   test("force refreshes an existing logo", async () => {
     const outputDirectory = await makeTempLogoDir();
     await writeFile(path.join(outputDirectory, "stripe.png"), "existing");

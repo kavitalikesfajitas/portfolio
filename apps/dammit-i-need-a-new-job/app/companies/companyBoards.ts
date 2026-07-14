@@ -5,6 +5,7 @@ export type CompanyBoard = {
   provider: CompanyBoardProvider;
   identifier: string;
   name: string;
+  logoDomain: string;
 };
 
 function normalizeBoardSlug(value: string) {
@@ -18,7 +19,9 @@ function formatCompanyName(slug: string) {
 function companyBoard(
   provider: CompanyBoardProvider,
   slug: string,
-  options: Partial<Pick<CompanyBoard, "identifier" | "name">> = {},
+  options: Partial<
+    Pick<CompanyBoard, "identifier" | "logoDomain" | "name">
+  > = {},
 ): CompanyBoard {
   const normalizedSlug = normalizeBoardSlug(slug);
   const identifier = normalizeBoardSlug(options.identifier ?? slug);
@@ -28,19 +31,20 @@ function companyBoard(
     provider,
     identifier,
     name: options.name ?? formatCompanyName(normalizedSlug),
+    logoDomain: options.logoDomain ?? `${normalizedSlug}.com`,
   };
 }
 
 function greenhouseBoard(
   slug: string,
-  options?: Partial<Pick<CompanyBoard, "identifier" | "name">>,
+  options?: Partial<Pick<CompanyBoard, "identifier" | "logoDomain" | "name">>,
 ) {
   return companyBoard("greenhouse", slug, options);
 }
 
 function ashbyBoard(
   slug: string,
-  options?: Partial<Pick<CompanyBoard, "identifier" | "name">>,
+  options?: Partial<Pick<CompanyBoard, "identifier" | "logoDomain" | "name">>,
 ) {
   return companyBoard("ashby", slug, options);
 }
@@ -54,7 +58,7 @@ export const COMPANY_BOARDS = {
   figma: greenhouseBoard("figma"),
   datadog: greenhouseBoard("datadog"),
   affirm: greenhouseBoard("affirm"),
-  ashby: ashbyBoard("ashby"),
+  ashby: ashbyBoard("ashby", { logoDomain: "ashbyhq.com" }),
 } as const satisfies Record<string, CompanyBoard>;
 
 export type CompanyBoardSlug = keyof typeof COMPANY_BOARDS;

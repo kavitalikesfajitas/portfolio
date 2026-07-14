@@ -1,5 +1,5 @@
 /**
- * Downloads a logo for every company in COMPANY_BOARD_TOKENS into
+ * Downloads a logo for every company in COMPANY_BOARD_LIST into
  * public/images/logos/ and writes a manifest.json mapping each board token to
  * its public path.
  *
@@ -21,7 +21,10 @@
 import { mkdir, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { COMPANY_BOARD_TOKENS } from "../app/companies/companyBoards.ts";
+import {
+  COMPANY_BOARD_LIST,
+  type CompanyBoard,
+} from "../app/companies/companyBoards.ts";
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const defaultOutputDir = path.join(
@@ -34,14 +37,6 @@ const defaultOutputDir = path.join(
 const defaultPublicPrefix = "/images/logos";
 const manifestFileName = "manifest.json";
 const LOGO_FETCH_TIMEOUT_MS = 5_000;
-
-// Greenhouse board tokens usually match the company's primary domain. Add an
-// entry here for any token that doesn't.
-const DOMAIN_OVERRIDES: Record<string, string> = {};
-
-function domainFor(token: string) {
-  return DOMAIN_OVERRIDES[token] ?? `${token}.com`;
-}
 
 // Tried in order; the first source returning a real image wins. PNG-returning
 // services come first so output stays uniform; DuckDuckGo is the high-res .ico
@@ -75,6 +70,7 @@ export type LogoResult = {
 
 type FetchCompanyLogosOptions = {
   force?: boolean;
+  boards?: readonly Pick<CompanyBoard, "logoDomain" | "slug">[];
   tokens?: readonly string[];
   outputDirectory?: string;
   publicPathPrefix?: string;
@@ -140,9 +136,16 @@ async function readExistingLogos(outputDirectory: string) {
   return byToken;
 }
 
+function boardFromToken(
+  token: string,
+): Pick<CompanyBoard, "logoDomain" | "slug"> {
+  return { slug: token, logoDomain: `${token}.com` };
+}
+
 export async function fetchCompanyLogos({
   force = false,
-  tokens = COMPANY_BOARD_TOKENS,
+  boards,
+  tokens,
   outputDirectory = defaultOutputDir,
   publicPathPrefix = defaultPublicPrefix,
   fetchImpl = fetch,
@@ -150,31 +153,38 @@ export async function fetchCompanyLogos({
 }: FetchCompanyLogosOptions = {}): Promise<LogoResult[]> {
   await mkdir(outputDirectory, { recursive: true });
   const existing = await readExistingLogos(outputDirectory);
+  const logoBoards =
+    boards ??
+    tokens?.map((token) => boardFromToken(token)) ??
+    COMPANY_BOARD_LIST;
 
   const results = await Promise.all(
-    tokens.map(async (token): Promise<LogoResult> => {
-      const domain = domainFor(token);
-      const priorFile = existing.get(token);
+    logoBoards.map(async (board): Promise<LogoResult> => {
+      const token = board.slug;
+      const priorFile = existing.get(board.slug);
 
       // Already have it on disk — keep it, no network call (unless --force).
       if (priorFile && !force) {
         return {
           token,
-          domain,
+          domain: board.logoDomain,
           ok: true,
           path: `${publicPathPrefix}/${priorFile}`,
           source: "existing",
         };
       }
 
-      const logo = await fetchLogo(domain, { fetchImpl, sourcesForDomain });
+      const logo = await fetchLogo(board.logoDomain, {
+        fetchImpl,
+        sourcesForDomain,
+      });
 
       if (logo) {
         const fileName = `${token}.${logo.extension}`;
         await writeFile(path.join(outputDirectory, fileName), logo.bytes);
         return {
           token,
-          domain,
+          domain: board.logoDomain,
           ok: true,
           path: `${publicPathPrefix}/${fileName}`,
           source: logo.source,
@@ -186,14 +196,14 @@ export async function fetchCompanyLogos({
       if (priorFile) {
         return {
           token,
-          domain,
+          domain: board.logoDomain,
           ok: true,
           path: `${publicPathPrefix}/${priorFile}`,
           source: "existing",
         };
       }
 
-      return { token, domain, ok: false };
+      return { token, domain: board.logoDomain, ok: false };
     }),
   );
 

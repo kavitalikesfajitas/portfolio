@@ -23,6 +23,7 @@ describe("company logos", () => {
       provider: "ashby",
       identifier: "ashby",
       name: "Ashby",
+      logoDomain: "ashbyhq.com",
     });
   });
 
