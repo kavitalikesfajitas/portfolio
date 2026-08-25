@@ -1,12 +1,12 @@
 import { CompanyJobListingRow } from "@/app/components/CompanyJobListingRow";
 import Link from "next/link";
-import { COMPANY_BOARD_TOKENS } from "../companyBoards";
+import { COMPANY_BOARD_LIST } from "../companyBoards";
 import { getCompanyRow } from "./CompanyRow";
 
 export async function CompaniesUnderInvestigation() {
   const companies = (
     await Promise.allSettled(
-      COMPANY_BOARD_TOKENS.map((token) => getCompanyRow(token)),
+      COMPANY_BOARD_LIST.map((board) => getCompanyRow(board)),
     )
   ).flatMap((result) =>
     result.status === "fulfilled" && result.value ? [result.value] : [],

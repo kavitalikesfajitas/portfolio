@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { normalizeGreenhouseDepartments } from "@/lib/jobs/providers/greenhouse/normalize";
 import type { GreenhouseDepartment } from "@/lib/jobs/providers/greenhouse/schema";
 import { buildCompanyJobsView } from "./utils";
 
@@ -43,7 +44,9 @@ describe("buildCompanyJobsView", () => {
       },
     ];
 
-    const view = buildCompanyJobsView(departments);
+    const view = buildCompanyJobsView(
+      normalizeGreenhouseDepartments(departments),
+    );
 
     expect(view.totalEngineeringJobs).toBe(2);
     expect(view.departmentOptions).toEqual([{ name: "Engineering", count: 2 }]);
@@ -80,7 +83,9 @@ describe("buildCompanyJobsView", () => {
       },
     ];
 
-    const view = buildCompanyJobsView(departments);
+    const view = buildCompanyJobsView(
+      normalizeGreenhouseDepartments(departments),
+    );
 
     expect(view.totalEngineeringJobs).toBe(1);
     expect(view.jobs).toEqual([

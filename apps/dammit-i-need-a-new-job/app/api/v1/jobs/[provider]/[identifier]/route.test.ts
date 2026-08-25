@@ -1,8 +1,14 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { API_KEY_HEADER } from "@/lib/auth/api-key";
+import { fetchAshbyJobs } from "@/lib/jobs/providers/ashby/client";
 import { fetchGreenhouseJobs } from "@/lib/jobs/providers/greenhouse/client";
 import { GET } from "./route";
+
+vi.mock("@/lib/jobs/providers/ashby/client", () => ({
+  ASHBY_JOBS_REVALIDATE_SECONDS: 900,
+  fetchAshbyJobs: vi.fn(),
+}));
 
 vi.mock("@/lib/jobs/providers/greenhouse/client", () => ({
   GREENHOUSE_JOBS_REVALIDATE_SECONDS: 900,
@@ -39,10 +45,12 @@ function createContentRequest(key?: string) {
 
 describe("jobs route", () => {
   const originalKey = process.env.JOBS_API_KEY;
+  const mockedFetchAshbyJobs = vi.mocked(fetchAshbyJobs);
   const mockedFetchGreenhouseJobs = vi.mocked(fetchGreenhouseJobs);
 
   beforeEach(() => {
     process.env.JOBS_API_KEY = VALID_KEY;
+    mockedFetchAshbyJobs.mockReset();
     mockedFetchGreenhouseJobs.mockReset();
   });
 
@@ -78,6 +86,40 @@ describe("jobs route", () => {
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("x-api-key");
     expect(mockedFetchGreenhouseJobs).toHaveBeenCalledWith("vercel");
+  });
+
+  it("fetches Ashby jobs when the provider is ashby", async () => {
+    mockedFetchAshbyJobs.mockResolvedValue({
+      jobs: [
+        {
+          id: "job_123",
+          title: "Product Engineer",
+          team: "Engineering",
+          location: "Remote",
+          publishedAt: "2026-06-01T00:00:00.000Z",
+          jobUrl: "https://jobs.ashbyhq.com/acme/job_123",
+        },
+      ],
+    });
+
+    const response = await GET(createRequest(VALID_KEY), {
+      params: Promise.resolve({ provider: "ashby", identifier: "acme" }),
+    });
+
+    await expect(response.json()).resolves.toMatchObject({
+      provider: "ashby",
+      identifier: "acme",
+      jobs: [
+        {
+          id: "ashby:job_123",
+          provider: "ashby",
+        },
+      ],
+      meta: { upstreamTotal: 1 },
+    });
+    expect(response.status).toBe(200);
+    expect(mockedFetchAshbyJobs).toHaveBeenCalledWith("acme");
+    expect(mockedFetchGreenhouseJobs).not.toHaveBeenCalled();
   });
 
   it("rejects full-content API requests", async () => {

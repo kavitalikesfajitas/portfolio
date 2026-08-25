@@ -1,11 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { verifyApiKey } from "@/lib/auth/api-key";
 import { matchJobsByTitleTerm } from "@/lib/jobs/matching";
-import {
-  fetchGreenhouseJobs,
-  GREENHOUSE_JOBS_REVALIDATE_SECONDS,
-} from "@/lib/jobs/providers/greenhouse/client";
-import { normalizeGreenhouseJobs } from "@/lib/jobs/providers/greenhouse/normalize";
+import { JOB_PROVIDERS } from "@/lib/jobs/providers";
 import { jobsRouteParamsSchema, jobsRouteQuerySchema } from "./schema";
 
 type RouteContext = {
@@ -40,8 +36,11 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
   const { term } = parsedQuery.data;
 
   try {
-    const jobsResponse = await fetchGreenhouseJobs(identifier);
-    const normalizedJobs = normalizeGreenhouseJobs(jobsResponse.jobs);
+    const {
+      jobs: normalizedJobs,
+      revalidate,
+      upstreamTotal,
+    } = await JOB_PROVIDERS[provider].fetchJobs(identifier);
     const jobs = term
       ? matchJobsByTitleTerm(normalizedJobs, term).map((match) => match.job)
       : normalizedJobs;
@@ -55,7 +54,7 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
         jobs,
         meta: {
           total: jobs.length,
-          upstreamTotal: jobsResponse.meta.total,
+          upstreamTotal,
           filter: term
             ? {
                 field: "title",
@@ -64,7 +63,7 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
                 totalBeforeFilter: normalizedJobs.length,
               }
             : null,
-          cache: { revalidate: GREENHOUSE_JOBS_REVALIDATE_SECONDS },
+          cache: { revalidate },
         },
       },
       {

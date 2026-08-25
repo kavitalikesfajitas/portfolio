@@ -50,16 +50,16 @@ export default async (phase: string) => {
   // Production builds should verify that every curated company has a logo, but
   // warm builds should not hit logo services. Skipped in dev so the server
   // starts fast and offline.
-  if (phase === PHASE_PRODUCTION_BUILD) {
-    const missing = companiesMissingLogos();
-    if (missing.length > 0) {
-      console.log(`Fetching logos - missing for: ${missing.join(", ")}`);
-      execFileSync(process.execPath, ["scripts/fetch-company-logos.ts"], {
-        cwd: appRoot,
-        stdio: "inherit",
-      });
-    }
+  // if (phase === PHASE_PRODUCTION_BUILD) {
+  const missing = companiesMissingLogos();
+  if (missing.length > 0) {
+    console.log(`Fetching logos - missing for: ${missing.join(", ")}`);
+    execFileSync(process.execPath, ["scripts/fetch-company-logos.ts"], {
+      cwd: appRoot,
+      stdio: "inherit",
+    });
   }
+  // }
 
   const nextConfig: NextConfig = {
     reactStrictMode: true,

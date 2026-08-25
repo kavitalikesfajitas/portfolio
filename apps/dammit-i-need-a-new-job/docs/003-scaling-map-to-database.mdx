@@ -1,0 +1,103 @@
+# When a Map Becomes a Database
+
+This started as a throwaway question while cleaning up the company list: we were finding a company board with `Array.find`, and it bugged me. It is a fixed set of boards keyed by a slug. We should not be scanning a list to find one by its key. It is a map.
+
+That refactor was small. But the instinct behind it — _index it, do not scan it_ — is the same instinct that, several orders of magnitude later, becomes a database. This note follows that thread, because it would be amiss to talk about scaling without noticing that the small version and the big version are the same idea.
+
+## The small version: config, not data
+
+The company list is config. It is a fixed, hand-curated set of a handful of boards that changes only when I edit code and redeploy. So the source of truth is an object keyed by slug, and everything else is derived from it:
+
+```ts
+export const COMPANY_BOARDS = {
+  vercel: greenhouseBoard("vercel"),
+  stripe: greenhouseBoard("stripe"),
+  // ...
+} as const satisfies Record<string, CompanyBoard>;
+
+export const COMPANY_BOARD_LIST = Object.values(COMPANY_BOARDS);
+export const COMPANY_BOARD_TOKENS = Object.keys(COMPANY_BOARDS);
+
+export function getCompanyBoard(slug: string) {
+  return COMPANY_BOARDS[slug as CompanyBoardSlug] ?? null;
+}
+```
+
+Two things fall out of keying by slug instead of holding a list:
+
+- Lookup is `O(1)` and reads as what it is — fetch the entry at this key — instead of a linear scan that happens to stop early.
+- The slug cannot drift from its entry, because the slug _is_ the entry's address. There is no second place for it to disagree with itself.
+
+Enumeration still exists; it is just derived (`Object.values`). The pages that render the whole list, and the featured-companies panel that looks up four specific slugs, both read from the same map. Nothing is a list that did not need to be.
+
+This is the right shape for config, and it should never go in a database. A round-trip to fetch a seven-entry constant would be strictly worse — latency, a dependency, cache invalidation — for zero benefit. The in-memory map _is_ the optimal index here.
+
+## The big version: data, not config
+
+The jobs are the data. Today the app is **pull-on-render**: a request for `/companies/stripe` triggers a live Greenhouse fetch, normalizes it, and renders it, with ISR caching the result for a while. That is the correct call at this scale.
+
+A company operating at, say, LinkedIn scale inverts it to **ingest-then-serve**. A background pipeline continuously pulls from thousands of sources and writes normalized rows into a store. The web request only ever reads that store. The third-party API and the user request are fully decoupled.
+
+```txt
+  TODAY (pull-on-render)              AT SCALE (ingest-then-serve)
+
+  request                            cron / queue
+    |                                    |
+    v                                    v
+  fetchDepartments() -> Greenhouse   ingest worker -> Greenhouse / Ashby
+    |                                    |   (same adapter + normalize code)
+    v                                    v
+  normalize()                         normalize() -> DB (jobs, departments)
+    |                                                  |
+    v                                                  | request
+  render                                               v
+                                       render <- read own DB / search index
+```
+
+The encouraging part: the app is already most of the way there in shape, because the seams are already cut in the right places.
+
+### What is already the right shape
+
+- **The adapter layer.** `JOB_PROVIDERS[provider].fetchJobs(identifier)` is a per-provider boundary. The ingest worker would call the exact same adapters. Adding a company's own board is one more adapter, as designed.
+- **The normalize layer.** `NormalizedJob` and `NormalizedDepartment` are already the schema. They would simply be persisted instead of returned straight to a render.
+
+### What is genuinely new
+
+- **An ingestion worker.** A scheduled job — cron, or a queue like SQS or Temporal — not a web route. It iterates the company list, calls the adapters, and upserts rows. The current `revalidate` intervals become the _scheduling cadence_ instead of a cache TTL.
+- **A primary store.** Canonical rows, indexed by the keys we already look up by:
+
+```sql
+company(slug PK, provider, identifier, name)          -- the COMPANY_BOARDS map, now rows
+department(id PK, company_slug FK, name, normalized_name,
+           likely_engineering, job_count, ...)         -- NormalizedDepartment
+job(id PK, company_slug FK, title, location,
+    absolute_url, updated_at, ...)                      -- NormalizedJob
+job_department(job_id FK, department_id FK)             -- the existing many-to-many
+```
+
+  Here is where the whole note closes its loop: `getCompanyBoard(slug)` becomes `SELECT ... WHERE slug = $1` on the primary-key index. That is the same lookup as the in-memory map, just persisted on disk. The database's B-tree index is the on-disk version of the `Map`.
+
+- **A search index.** The in-memory filtering the app does today — global job search, the Fuse.js fuzzy taxonomy matching, department faceting — moves to Postgres full-text or Elasticsearch. "Companies with active engineering hiring" and "every senior backend role in NYC across all companies" become indexed queries instead of scans.
+- **A cache layer.** Redis in front of the hot reads. Optional until there is real traffic.
+
+## The resilience win is bigger than the speed win
+
+The company list currently has a telling empty state — when the upstream API is unhappy, the page shows a "try again in a bit" message. That state exists _because_ a user request can be blocked by the upstream being down.
+
+In the ingest-then-serve model that cannot happen. The request reads our own store, which always holds the last-good snapshot. If the upstream is down, the _ingest worker_ fails and retries; users see slightly stale data instead of an error. Decoupling ingestion from traffic is what buys that, more than raw latency.
+
+## When it is actually worth doing
+
+Not yet. For a curated handful of boards, ISR-on-render is the correct call: less code, no infrastructure to run, and modest staleness is fine. The migration earns its cost at one of these pivot points:
+
+- **Board count into the hundreds or thousands** — live-fetching per render stops being viable, and ingestion wants to be parallel and rate-limited.
+- **Cross-company queries** — anything that spans every company at once is impossible without a shared index and trivial with one.
+- **Getting rate-limited by the upstream** — decoupling ingestion from traffic is the fix.
+
+The tidy part is that nothing already built blocks this. The adapter and normalize split _is_ the seam to cut along. A worker and a store go above it; the rest stays.
+
+## The through-line
+
+Config that changes at deploy time wants an in-memory map. Data that changes at runtime and outgrows one process wants a datastore with indexes. The dividing line is simply: does it fit in memory, and does it stay still?
+
+Both answers are the same instinct — do not scan, index — applied at two scales. The map refactor and the database question are the same decision, one of them just much larger.

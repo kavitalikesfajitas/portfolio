@@ -1,15 +1,72 @@
-/**
- * Greenhouse board tokens for the companies we surface under /companies.
- *
- * Each token doubles as the route identifier (/companies/[identifier]), so this
- * is the single source of truth: add a token here and it appears in the listing
- * and — via generateStaticParams — gets a prebuilt static detail page.
- */
-export const COMPANY_BOARD_TOKENS = [
-  "vercel",
-  "stripe",
-  "discord",
-  "figma",
-  "datadog",
-  "affirm",
-] as const;
+export type CompanyBoardProvider = "ashby" | "greenhouse";
+
+export type CompanyBoard = {
+  slug: string;
+  provider: CompanyBoardProvider;
+  identifier: string;
+  name: string;
+  websiteUrl: string;
+};
+
+function normalizeBoardSlug(value: string) {
+  return value.trim().toLowerCase();
+}
+
+function formatCompanyName(slug: string) {
+  return slug.charAt(0).toUpperCase() + slug.slice(1);
+}
+
+function companyBoard(
+  provider: CompanyBoardProvider,
+  slug: string,
+  options: Partial<
+    Pick<CompanyBoard, "identifier" | "name" | "websiteUrl">
+  > = {},
+): CompanyBoard {
+  const normalizedSlug = normalizeBoardSlug(slug);
+  const identifier = normalizeBoardSlug(options.identifier ?? slug);
+  const websiteUrl = options.websiteUrl ?? `https://${normalizedSlug}.com`;
+
+  return {
+    slug: normalizedSlug,
+    provider,
+    identifier,
+    name: options.name ?? formatCompanyName(normalizedSlug),
+    websiteUrl,
+  };
+}
+
+function greenhouseBoard(
+  slug: string,
+  options?: Partial<Pick<CompanyBoard, "identifier" | "name" | "websiteUrl">>,
+) {
+  return companyBoard("greenhouse", slug, options);
+}
+
+function ashbyBoard(
+  slug: string,
+  options?: Partial<Pick<CompanyBoard, "identifier" | "name" | "websiteUrl">>,
+) {
+  return companyBoard("ashby", slug, options);
+}
+
+// Keyed by slug so lookups are O(1) and the slug can't drift from its entry.
+// Enumeration is derived below (COMPANY_BOARD_LIST / COMPANY_BOARD_TOKENS).
+export const COMPANY_BOARDS = {
+  vercel: greenhouseBoard("vercel"),
+  stripe: greenhouseBoard("stripe"),
+  discord: greenhouseBoard("discord"),
+  figma: greenhouseBoard("figma"),
+  datadog: greenhouseBoard("datadog"),
+  affirm: greenhouseBoard("affirm"),
+  ashby: ashbyBoard("ashby", { websiteUrl: "https://www.ashbyhq.com" }),
+} as const satisfies Record<string, CompanyBoard>;
+
+export type CompanyBoardSlug = keyof typeof COMPANY_BOARDS;
+
+export const COMPANY_BOARD_LIST = Object.values(COMPANY_BOARDS);
+export const COMPANY_BOARD_TOKENS = Object.keys(COMPANY_BOARDS);
+
+export function getCompanyBoard(slug: string) {
+  return COMPANY_BOARDS[normalizeBoardSlug(slug) as CompanyBoardSlug] ?? null;
+}

@@ -1,9 +1,5 @@
 import { NextResponse } from "next/server";
-import {
-  fetchGreenhouseDepartments,
-  GREENHOUSE_DEPARTMENTS_REVALIDATE_SECONDS,
-} from "@/lib/jobs/providers/greenhouse/client";
-import { normalizeGreenhouseDepartments } from "@/lib/jobs/providers/greenhouse/normalize";
+import { JOB_PROVIDERS } from "@/lib/jobs/providers";
 import { departmentsRouteParamsSchema } from "./schema";
 
 type RouteContext = {
@@ -32,10 +28,8 @@ export async function GET(_request: Request, { params }: RouteContext) {
   const { provider, identifier } = parsedParams.data;
 
   try {
-    const departmentsResponse = await fetchGreenhouseDepartments(identifier);
-    const departments = normalizeGreenhouseDepartments(
-      departmentsResponse.departments,
-    );
+    const { departments, revalidate } =
+      await JOB_PROVIDERS[provider].fetchDepartments(identifier);
 
     return NextResponse.json(
       {
@@ -53,7 +47,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
           likelyEngineeringDepartments: departments.filter(
             (department) => department.signals.likelyEngineering,
           ).length,
-          cache: { revalidate: GREENHOUSE_DEPARTMENTS_REVALIDATE_SECONDS },
+          cache: { revalidate },
         },
       },
       { status: 200 },
