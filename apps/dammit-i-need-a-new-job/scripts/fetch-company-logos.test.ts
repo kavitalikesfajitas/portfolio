@@ -85,12 +85,12 @@ describe("fetchCompanyLogos", () => {
     ).resolves.toBe('{\n  "stripe": "/images/logos/stripe.png"\n}\n');
   });
 
-  test("uses logo domains from company board config", async () => {
+  test("uses company website URLs from board config for logo domains", async () => {
     const outputDirectory = await makeTempLogoDir();
     const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(imageResponse());
 
     const results = await fetchCompanyLogos({
-      boards: [{ slug: "ashby", logoDomain: "ashbyhq.com" }],
+      boards: [{ slug: "ashby", websiteUrl: "https://www.ashbyhq.com" }],
       outputDirectory,
       fetchImpl,
       sourcesForDomain: (domain: string) => [`https://logos.example/${domain}`],

@@ -70,7 +70,7 @@ export type LogoResult = {
 
 type FetchCompanyLogosOptions = {
   force?: boolean;
-  boards?: readonly Pick<CompanyBoard, "logoDomain" | "slug">[];
+  boards?: readonly Pick<CompanyBoard, "slug" | "websiteUrl">[];
   tokens?: readonly string[];
   outputDirectory?: string;
   publicPathPrefix?: string;
@@ -138,8 +138,12 @@ async function readExistingLogos(outputDirectory: string) {
 
 function boardFromToken(
   token: string,
-): Pick<CompanyBoard, "logoDomain" | "slug"> {
-  return { slug: token, logoDomain: `${token}.com` };
+): Pick<CompanyBoard, "slug" | "websiteUrl"> {
+  return { slug: token, websiteUrl: `https://${token}.com` };
+}
+
+function logoDomainFor(websiteUrl: string) {
+  return new URL(websiteUrl).hostname.replace(/^www\./, "");
 }
 
 export async function fetchCompanyLogos({
@@ -161,20 +165,21 @@ export async function fetchCompanyLogos({
   const results = await Promise.all(
     logoBoards.map(async (board): Promise<LogoResult> => {
       const token = board.slug;
+      const domain = logoDomainFor(board.websiteUrl);
       const priorFile = existing.get(board.slug);
 
       // Already have it on disk — keep it, no network call (unless --force).
       if (priorFile && !force) {
         return {
           token,
-          domain: board.logoDomain,
+          domain,
           ok: true,
           path: `${publicPathPrefix}/${priorFile}`,
           source: "existing",
         };
       }
 
-      const logo = await fetchLogo(board.logoDomain, {
+      const logo = await fetchLogo(domain, {
         fetchImpl,
         sourcesForDomain,
       });
@@ -184,7 +189,7 @@ export async function fetchCompanyLogos({
         await writeFile(path.join(outputDirectory, fileName), logo.bytes);
         return {
           token,
-          domain: board.logoDomain,
+          domain,
           ok: true,
           path: `${publicPathPrefix}/${fileName}`,
           source: logo.source,
@@ -196,14 +201,14 @@ export async function fetchCompanyLogos({
       if (priorFile) {
         return {
           token,
-          domain: board.logoDomain,
+          domain,
           ok: true,
           path: `${publicPathPrefix}/${priorFile}`,
           source: "existing",
         };
       }
 
-      return { token, domain: board.logoDomain, ok: false };
+      return { token, domain, ok: false };
     }),
   );
 
